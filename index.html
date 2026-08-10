@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starry Night — 별자리 카드 로그라이크</title>
+<meta name="description" content="별을 모아 성좌를 완성하는 턴제 로그라이크 덱빌더. 실제 천문 데이터가 곧 게임 규칙입니다.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:26px;padding:40px 20px;text-align:center;
+ font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;
+ color:#e9edf7;background:radial-gradient(ellipse at 50% 18%,#1a2350 0%,#0b1026 58%,#070a1a 100%);}
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;}
+h1{position:relative;z-index:1;font-family:Georgia,'Times New Roman',Batang,serif;font-style:italic;
+ font-weight:400;font-size:clamp(38px,9vw,68px);letter-spacing:6px;color:#e8c56a;
+ text-shadow:0 0 30px rgba(232,197,106,.45);}
+h1::before,h1::after{content:' ✦ ';font-size:.4em;vertical-align:middle;font-style:normal;opacity:.6;}
+.lede{position:relative;z-index:1;max-width:620px;font-size:clamp(15px,2.4vw,17px);line-height:1.8;color:#c9d4e8;}
+.lede b{color:#e8c56a;font-weight:600;}
+.play{position:relative;z-index:1;display:inline-block;text-decoration:none;
+ font-family:Georgia,'Times New Roman',Batang,serif;font-size:19px;letter-spacing:3px;
+ color:#241c05;background:radial-gradient(circle at 35% 25%,#f7e7b0,#e8c56a 48%,#a9812e 100%);
+ border:2px solid #5c4a16;border-radius:999px;padding:15px 46px;
+ box-shadow:0 0 0 4px rgba(232,197,106,.16),0 8px 26px rgba(0,0,0,.6);
+ transition:transform .15s ease,box-shadow .15s ease;}
+.play:hover{transform:translateY(-3px);box-shadow:0 0 0 5px rgba(232,197,106,.24),0 12px 32px rgba(0,0,0,.7);}
+.play:focus-visible{outline:2px solid #fff;outline-offset:4px;}
+.facts{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:680px;}
+.facts span{font-size:13px;color:#9fb0cc;background:rgba(10,14,34,.6);
+ border:1px solid rgba(201,212,232,.2);border-radius:999px;padding:6px 14px;}
+.note{position:relative;z-index:1;font-size:13px;color:#7f8ca6;line-height:1.7;max-width:560px;}
+.note a{color:#9fb0cc;}
+</style>
+</head>
+<body>
+<canvas class="sky" id="sky"></canvas>
+
+<h1>Starry Night</h1>
+
+<p class="lede">
+별지기가 개별 <b>별</b> 카드로 덱을 짜고, 같은 별자리의 별을 <b>한 턴에</b> 필요한 수만큼 이으면
+<b>성좌</b>가 완성되는 턴제 로그라이크 덱빌더.<br>
+적은 어느 별자리에도 속하지 못한 천체들 — 행성과 위성, 성운과 블랙홀, 그리고 이름 없는 암흑 물질.
+</p>
+
+<a class="play" href="starry-night-v0.28.html">별을 이으러 간다 →</a>
+
+<div class="facts">
+  <span>별 111종 · 별자리 26개</span>
+  <span>1막 → 2막 → 3막 · 45관문</span>
+  <span>등급 = 별의 실제 밝기 순위 (α가 으뜸)</span>
+  <span>별자리 그림 = J2000 실측 좌표</span>
+  <span>단일 HTML · 설치 없음</span>
+</div>
+
+<p class="note">
+카드는 <b>끌어다 놓아</b> 냅니다. 적이 둘 이상이면 놓은 뒤에 겨눌 적을 고릅니다.<br>
+키보드로도 됩니다 — 숫자키로 카드, Space로 턴 종료, Esc로 취소.<br>
+소스와 제작 도구는 <a href="https://github.com/leedohyang15-design/starry-night">GitHub 저장소</a>에 있습니다.
+</p>
+
+<script>
+// 배경: 천구 북극을 중심으로 아주 느리게 도는 별하늘
+(function(){
+  const c=document.getElementById('sky'),x=c.getContext('2d');
+  let W,H,stars=[];
+  function build(){
+    W=c.width=innerWidth;H=c.height=innerHeight;
+    const n=Math.round(Math.min(260,W*H/6000));
+    stars=Array.from({length:n},()=>({
+      a:Math.random()*Math.PI*2,
+      r:Math.pow(Math.random(),.6)*Math.hypot(W,H)*.62,
+      s:Math.random()*1.5+.35,
+      t:Math.random()*Math.PI*2
+    }));
+  }
+  build();addEventListener('resize',build);
+  const slow=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let rot=0;
+  (function loop(){
+    rot+=slow?0:0.00012;
+    x.clearRect(0,0,W,H);
+    const cx=W*.5,cy=H*.18;
+    for(const st of stars){
+      const a=st.a+rot,px=cx+Math.cos(a)*st.r,py=cy+Math.sin(a)*st.r*.85;
+      if(px<-4||px>W+4||py<-4||py>H+4)continue;
+      st.t+=0.012;
+      const tw=.55+Math.sin(st.t)*.28;
+      x.globalAlpha=Math.max(.08,tw*.7);
+      x.fillStyle=st.s>1.5?'#fff6de':'#cfe0ff';
+      x.beginPath();x.arc(px,py,st.s*.9,0,6.284);x.fill();
+    }
+    x.globalAlpha=1;
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# ── 구버전 빌드 (v0.28만 공개, 나머지는 로컬 보존) ──
+전투프로토타입_v0.*.html
+
+# ── 내부 개발 메모 ──
+개발현황.md
+밸런스로그.md
+sim_final_report.txt
+impeccable_out.txt
+.impeccable/
+.claude/
+
+# ── 구 문서·폐기 코드 ──
+카드목록_v0.*.md
+카드목록_v1.0.md
+카드목록_v1.1.md
+sim_battle_v1.py
+
+# ── 작업 부산물 ──
+__pycache__/
+*.pyc
+stars_raw.json
+keep_ids.json
+rank_table.json
+
+# 구 시뮬 스냅샷 (현행 v025만 공개)
+sim_data_v05.json
+sim_data_v019.json
+sim_data_v021.json
+sim_data_v024.json

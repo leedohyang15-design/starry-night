@@ -1,0 +1,3277 @@
+{
+ "STARS": {
+  "betelgeuse": {
+   "by": "α",
+   "name": "베텔게우스",
+   "con": "orion",
+   "rank": 1,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "block",
+     "v": 2
+    }
+   ],
+   "comp": {
+    "blockPlus": 3
+   },
+   "compTxt": "이 카드: 성막 +3",
+   "si": 0
+  },
+  "rigel": {
+   "by": "β",
+   "name": "리겔",
+   "con": "orion",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgPerCon",
+     "v": 5
+    }
+   ],
+   "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 피해 +1",
+   "si": 6
+  },
+  "bellatrix": {
+   "by": "γ",
+   "name": "벨라트릭스",
+   "con": "orion",
+   "rank": 3,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgPerCon",
+     "v": 3
+    }
+   ],
+   "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 피해 +1",
+   "si": 1
+  },
+  "mintaka": {
+   "by": "δ",
+   "name": "민타카",
+   "con": "orion",
+   "rank": 4,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "blockPerCon",
+     "v": 2
+    }
+   ],
+   "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 성막 +1",
+   "si": 4
+  },
+  "alnilam": {
+   "by": "ε",
+   "name": "알니람",
+   "con": "orion",
+   "rank": 5,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3
+    }
+   ],
+   "extraTxt": "이번 전투에 오리온 성좌를 완성했다면 피해 +4",
+   "everCon": "orion",
+   "everPlus": 4,
+   "si": 3
+  },
+  "sirius": {
+   "by": "α",
+   "name": "시리우스",
+   "con": "canis",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 9,
+     "pierce": true
+    }
+   ],
+   "si": 0
+  },
+  "mirzam": {
+   "by": "β",
+   "name": "미르잠",
+   "con": "canis",
+   "rank": 2,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "buffAtk",
+     "v": 3
+    }
+   ],
+   "si": 1
+  },
+  "muliphein": {
+   "by": "γ",
+   "name": "물리페인",
+   "con": "canis",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 5
+    }
+   ],
+   "comp": {
+    "dmgPlus": 2
+   },
+   "compTxt": "완성 시 피해 +2",
+   "si": 2
+  },
+  "wezen": {
+   "by": "δ",
+   "name": "웨젠",
+   "con": "canis",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 5,
+     "pierce": true
+    }
+   ],
+   "si": 4
+  },
+  "castor": {
+   "by": "α",
+   "name": "카스토르",
+   "con": "gemini",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgMulti",
+     "v": 7,
+     "n": 2
+    }
+   ],
+   "si": 0
+  },
+  "pollux": {
+   "by": "β",
+   "name": "폴룩스",
+   "con": "gemini",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgMulti",
+     "v": 2,
+     "n": 2
+    },
+    {
+     "t": "block",
+     "v": 3
+    }
+   ],
+   "si": 1
+  },
+  "alhena": {
+   "by": "γ",
+   "name": "알헤나",
+   "con": "gemini",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "block",
+     "v": 2
+    }
+   ],
+   "si": 9
+  },
+  "wasat": {
+   "by": "δ",
+   "name": "와사트",
+   "con": "gemini",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgMulti",
+     "v": 2,
+     "n": 3
+    }
+   ],
+   "si": 7
+  },
+  "mebsuta": {
+   "by": "ε",
+   "name": "메브수타",
+   "con": "gemini",
+   "rank": 5,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgMulti",
+     "v": 1,
+     "n": 3
+    }
+   ],
+   "si": 3
+  },
+  "aldebaran": {
+   "by": "α",
+   "name": "알데바란",
+   "con": "taurus",
+   "rank": 1,
+   "type": "공격",
+   "cost": 3,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 24
+    }
+   ],
+   "si": 0
+  },
+  "elnath": {
+   "by": "β",
+   "name": "엘나트",
+   "con": "taurus",
+   "rank": 2,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 8
+    },
+    {
+     "t": "block",
+     "v": 5
+    }
+   ],
+   "si": 5
+  },
+  "hyadum": {
+   "by": "γ",
+   "name": "프리마 히아둠",
+   "con": "taurus",
+   "rank": 3,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 8
+    },
+    {
+     "t": "vuln",
+     "n": 1
+    }
+   ],
+   "si": 2
+  },
+  "ain": {
+   "by": "ε",
+   "name": "아인",
+   "con": "taurus",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "buffAtk",
+     "v": 3
+    }
+   ],
+   "si": 4
+  },
+  "tianguan": {
+   "by": "ζ",
+   "name": "톈관",
+   "con": "taurus",
+   "rank": 5,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3
+    }
+   ],
+   "si": 6
+  },
+  "regulus": {
+   "by": "α",
+   "name": "레굴루스",
+   "con": "leo",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 12
+    }
+   ],
+   "comp": {
+    "dmgPlus": 5
+   },
+   "compTxt": "이 카드: 피해 +5",
+   "si": 0
+  },
+  "denebola": {
+   "by": "β",
+   "name": "데네볼라",
+   "con": "leo",
+   "rank": 2,
+   "type": "스킬",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "weak",
+     "n": 1
+    },
+    {
+     "t": "draw",
+     "n": 1
+    }
+   ],
+   "comp": {
+    "weakPlus": 1
+   },
+   "compTxt": "이 카드: 약화 2턴",
+   "si": 8
+  },
+  "algieba": {
+   "by": "γ",
+   "name": "알기에바",
+   "con": "leo",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "weakAllFx",
+     "n": 1
+    }
+   ],
+   "si": 2
+  },
+  "zosma": {
+   "by": "δ",
+   "name": "조스마",
+   "con": "leo",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "aoe",
+     "v": 4
+    }
+   ],
+   "si": 6
+  },
+  "epsleo": {
+   "by": "ε",
+   "name": "라스 엘라세드 아우스트랄리스",
+   "con": "leo",
+   "rank": 5,
+   "type": "공격",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "aoe",
+     "v": 3
+    }
+   ],
+   "si": 5
+  },
+  "spica": {
+   "by": "α",
+   "name": "스피카",
+   "con": "virgo",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 8
+    },
+    {
+     "t": "mana",
+     "v": 1
+    },
+    {
+     "t": "draw",
+     "n": 1
+    }
+   ],
+   "si": 0
+  },
+  "zavijava": {
+   "by": "β",
+   "name": "자비야바",
+   "con": "virgo",
+   "rank": 2,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "heal",
+     "v": 3
+    }
+   ],
+   "si": 6
+  },
+  "porrima": {
+   "by": "γ",
+   "name": "포리마",
+   "con": "virgo",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 4
+    },
+    {
+     "t": "heal",
+     "v": 2
+    }
+   ],
+   "si": 1
+  },
+  "auva": {
+   "by": "δ",
+   "name": "아우바",
+   "con": "virgo",
+   "rank": 4,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "heal",
+     "v": 3
+    }
+   ],
+   "si": 3
+  },
+  "vindemiatrix": {
+   "by": "ε",
+   "name": "빈데미아트릭스",
+   "con": "virgo",
+   "rank": 5,
+   "type": "스킬",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "heal",
+     "v": 3
+    }
+   ],
+   "si": 4
+  },
+  "arcturus": {
+   "by": "α",
+   "name": "아르크투루스",
+   "con": "bootes",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 10
+    }
+   ],
+   "extraTxt": "이번 전투에서 큰곰자리를 완성했다면 피해 +4",
+   "ursaEver": 4,
+   "si": 0
+  },
+  "nekkar": {
+   "by": "β",
+   "name": "네카르",
+   "con": "bootes",
+   "rank": 2,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "sacDraw",
+     "n": 1
+    }
+   ],
+   "extraTxt": "버리기 1(선택): 1장 더 뽑기",
+   "si": 3
+  },
+  "seginus": {
+   "by": "γ",
+   "name": "세기누스",
+   "con": "bootes",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 4
+    },
+    {
+     "t": "buffDef",
+     "v": 3
+    }
+   ],
+   "si": 4
+  },
+  "izar": {
+   "by": "ε",
+   "name": "이자르",
+   "con": "bootes",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "buffAtk",
+     "v": 2
+    }
+   ],
+   "si": 1
+  },
+  "vega": {
+   "by": "α",
+   "name": "베가",
+   "con": "lyra",
+   "rank": 1,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 2
+    }
+   ],
+   "si": 0
+  },
+  "sheliak": {
+   "by": "β",
+   "name": "셸리아크",
+   "con": "lyra",
+   "rank": 2,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "dmgRand",
+     "v": 3
+    }
+   ],
+   "si": 4
+  },
+  "sulafat": {
+   "by": "γ",
+   "name": "술라파트",
+   "con": "lyra",
+   "rank": 3,
+   "type": "스킬",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "weak",
+     "n": 1
+    }
+   ],
+   "si": 3
+  },
+  "lyrdelta": {
+   "by": "δ",
+   "con": "lyra",
+   "rank": 4,
+   "type": "스킬",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "buffAtk",
+     "v": 2
+    }
+   ],
+   "si": 2
+  },
+  "deneb": {
+   "by": "α",
+   "name": "데네브",
+   "con": "cygnus",
+   "rank": 1,
+   "type": "수비",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 6
+    },
+    {
+     "t": "draw",
+     "n": 2
+    }
+   ],
+   "si": 0
+  },
+  "albireo": {
+   "by": "β",
+   "name": "알비레오",
+   "con": "cygnus",
+   "rank": 2,
+   "type": "수비",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 7
+    },
+    {
+     "t": "draw",
+     "n": 1
+    }
+   ],
+   "si": 3
+  },
+  "sadr": {
+   "by": "γ",
+   "name": "사드르",
+   "con": "cygnus",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 6
+    }
+   ],
+   "si": 1
+  },
+  "gienah": {
+   "by": "ε",
+   "name": "기에나",
+   "con": "cygnus",
+   "rank": 4,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "choice"
+    }
+   ],
+   "si": 7
+  },
+  "altair": {
+   "by": "α",
+   "name": "알타이르",
+   "con": "aquila",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgMulti",
+     "v": 4,
+     "n": 2
+    }
+   ],
+   "si": 0
+  },
+  "alshain": {
+   "by": "β",
+   "name": "알샤인",
+   "con": "aquila",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgMulti",
+     "v": 3,
+     "n": 2
+    }
+   ],
+   "si": 2
+  },
+  "tarazed": {
+   "by": "γ",
+   "name": "타라제드",
+   "con": "aquila",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgMulti",
+     "v": 2,
+     "n": 3
+    }
+   ],
+   "si": 1
+  },
+  "denebokab": {
+   "by": "ε",
+   "name": "데네브 오카브",
+   "con": "aquila",
+   "rank": 4,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3
+    }
+   ],
+   "si": 4
+  },
+  "antares": {
+   "by": "α",
+   "name": "안타레스",
+   "con": "scorpius",
+   "rank": 1,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 5
+    },
+    {
+     "t": "poison",
+     "v": 4
+    }
+   ],
+   "si": 4
+  },
+  "acrab": {
+   "by": "β",
+   "name": "아크라브",
+   "con": "scorpius",
+   "rank": 2,
+   "type": "공격",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "aoe",
+     "v": 4
+    },
+    {
+     "t": "aoePoisonFx",
+     "v": 3
+    }
+   ],
+   "si": 0
+  },
+  "dschubba": {
+   "by": "δ",
+   "name": "드슈바",
+   "con": "scorpius",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "poison",
+     "v": 4
+    }
+   ],
+   "si": 1
+  },
+  "larawag": {
+   "by": "ε",
+   "name": "라라와그",
+   "con": "scorpius",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "poison",
+     "v": 2
+    }
+   ],
+   "si": 6
+  },
+  "shaula": {
+   "by": "λ",
+   "name": "샤울라",
+   "con": "scorpius",
+   "rank": 5,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 2
+    },
+    {
+     "t": "poison",
+     "v": 1
+    }
+   ],
+   "si": 13
+  },
+  "markab": {
+   "by": "α",
+   "name": "마르카브",
+   "con": "pegasus",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 13
+    }
+   ],
+   "si": 0
+  },
+  "scheat": {
+   "by": "β",
+   "name": "셰아트",
+   "con": "pegasus",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "costDown",
+     "v": 1
+    }
+   ],
+   "si": 1
+  },
+  "algenib": {
+   "by": "γ",
+   "name": "알게니브",
+   "con": "pegasus",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "costDown",
+     "v": 1
+    }
+   ],
+   "si": 2
+  },
+  "enif": {
+   "by": "ε",
+   "name": "에니프",
+   "con": "pegasus",
+   "rank": 4,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "dmgRand",
+     "v": 7
+    }
+   ],
+   "si": 6
+  },
+  "alpheratz": {
+   "by": "α",
+   "name": "알페라츠",
+   "con": "andromeda",
+   "rank": 1,
+   "type": "수비",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 4
+    },
+    {
+     "t": "seal"
+    }
+   ],
+   "si": 0,
+   "alsoCon": "pegasus"
+  },
+  "mirach": {
+   "by": "β",
+   "name": "미라크",
+   "con": "andromeda",
+   "rank": 2,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 2
+    },
+    {
+     "t": "draw",
+     "n": 1
+    }
+   ],
+   "extraTxt": "페가수스자리 성좌 판정에도 계산",
+   "si": 2
+  },
+  "almach": {
+   "by": "γ",
+   "name": "알마크",
+   "con": "andromeda",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "block",
+     "v": 4
+    },
+    {
+     "t": "weak",
+     "n": 1
+    }
+   ],
+   "si": 3
+  },
+  "anddelta": {
+   "by": "δ",
+   "con": "andromeda",
+   "rank": 4,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "thorns",
+     "v": 2
+    }
+   ],
+   "si": 1
+  },
+  "fomalhaut": {
+   "by": "α",
+   "name": "포말하우트",
+   "con": "piscis",
+   "rank": 1,
+   "type": "수비",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 9
+    },
+    {
+     "t": "heal",
+     "v": 3
+    }
+   ],
+   "si": 0
+  },
+  "piscdelta": {
+   "by": "δ",
+   "con": "piscis",
+   "rank": 2,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "heal",
+     "v": 3
+    }
+   ],
+   "si": 5
+  },
+  "schedar": {
+   "by": "α",
+   "name": "셰다르",
+   "con": "cassiopeia",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 9
+    },
+    {
+     "t": "draw",
+     "n": 1
+    }
+   ],
+   "si": 1
+  },
+  "caph": {
+   "by": "β",
+   "name": "카프",
+   "con": "cassiopeia",
+   "rank": 2,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "varDmg",
+     "opts": [
+      8,
+      12,
+      16
+     ]
+    }
+   ],
+   "extraTxt": "변광 — 셋 중 무작위",
+   "si": 0
+  },
+  "tsih": {
+   "by": "γ",
+   "name": "치흐",
+   "con": "cassiopeia",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 7
+    }
+   ],
+   "si": 2
+  },
+  "ruchbah": {
+   "by": "δ",
+   "name": "루크바",
+   "con": "cassiopeia",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 6
+    }
+   ],
+   "si": 3
+  },
+  "dubhe": {
+   "by": "α",
+   "name": "두베",
+   "con": "ursa",
+   "rank": 1,
+   "type": "수비",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 11
+    }
+   ],
+   "si": 0
+  },
+  "merak": {
+   "by": "β",
+   "name": "메라크",
+   "con": "ursa",
+   "rank": 2,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "draw",
+     "n": 1
+    }
+   ],
+   "si": 1
+  },
+  "phecda": {
+   "by": "γ",
+   "name": "페크다",
+   "con": "ursa",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 4
+    },
+    {
+     "t": "thorns",
+     "v": 2
+    }
+   ],
+   "si": 2
+  },
+  "megrez": {
+   "by": "δ",
+   "name": "메그레즈",
+   "con": "ursa",
+   "rank": 4,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 5
+    }
+   ],
+   "si": 3
+  },
+  "mizar": {
+   "by": "ζ",
+   "name": "미자르-알코르",
+   "con": "ursa",
+   "rank": 5,
+   "type": "수비",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 2
+    }
+   ],
+   "si": 5,
+   "countAs": 2
+  },
+  "polaris": {
+   "by": "α",
+   "name": "북극성",
+   "con": "ursaminor",
+   "rank": 1,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "needDown",
+     "v": 1
+    }
+   ],
+   "si": 0
+  },
+  "kochab": {
+   "by": "β",
+   "name": "코카브",
+   "con": "ursaminor",
+   "rank": 2,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "block",
+     "v": 2
+    }
+   ],
+   "si": 4
+  },
+  "pherkad": {
+   "by": "γ",
+   "name": "페르카드",
+   "con": "ursaminor",
+   "rank": 3,
+   "type": "스킬",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    }
+   ],
+   "si": 5
+  },
+  "yildun": {
+   "by": "δ",
+   "name": "일둔",
+   "con": "ursaminor",
+   "rank": 4,
+   "type": "공격",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "dmgRand",
+     "v": 2
+    },
+    {
+     "t": "scry"
+    }
+   ],
+   "si": 1
+  },
+  "rukbat": {
+   "by": "α",
+   "name": "루크바트",
+   "con": "sagittarius",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 14,
+     "pierce": true
+    }
+   ],
+   "si": 12
+  },
+  "alnasl": {
+   "by": "γ",
+   "name": "알나슬",
+   "con": "sagittarius",
+   "rank": 2,
+   "type": "공격",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "aoe",
+     "v": 7,
+     "pierce": true
+    }
+   ],
+   "si": 5
+  },
+  "kausmedia": {
+   "by": "δ",
+   "name": "카우스 메디아",
+   "con": "sagittarius",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3,
+     "pierce": true
+    },
+    {
+     "t": "block",
+     "v": 3
+    }
+   ],
+   "si": 3
+  },
+  "kausaustralis": {
+   "by": "ε",
+   "name": "카우스 아우스트랄리스",
+   "con": "sagittarius",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "buffAtk",
+     "v": 3
+    }
+   ],
+   "si": 0
+  },
+  "ascella": {
+   "by": "ζ",
+   "name": "아스켈라",
+   "con": "sagittarius",
+   "rank": 5,
+   "type": "스킬",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "buffAtk",
+     "v": 4
+    }
+   ],
+   "si": 2
+  },
+  "alphecca": {
+   "by": "α",
+   "name": "알페카",
+   "con": "corona",
+   "rank": 1,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "block",
+     "v": 3
+    }
+   ],
+   "si": 0
+  },
+  "nusakan": {
+   "by": "β",
+   "name": "누사칸",
+   "con": "corona",
+   "rank": 2,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "buffAtk",
+     "v": 3
+    }
+   ],
+   "si": 1
+  },
+  "crbgamma": {
+   "by": "γ",
+   "con": "corona",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "block",
+     "v": 2
+    }
+   ],
+   "si": 2
+  },
+  "crbdelta": {
+   "by": "δ",
+   "con": "corona",
+   "rank": 4,
+   "type": "수비",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    }
+   ],
+   "si": 3
+  },
+  "alchiba": {
+   "by": "α",
+   "name": "알키바",
+   "con": "corvus",
+   "rank": 1,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "sacMana",
+     "v": 1
+    }
+   ],
+   "extraTxt": "버리기 1(선택): 성간 물질 1 회복",
+   "si": 4
+  },
+  "kraz": {
+   "by": "β",
+   "name": "크라즈",
+   "con": "corvus",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "sacDmg",
+     "v": 7
+    }
+   ],
+   "extraTxt": "버리기 1(선택): 피해 +7",
+   "si": 1
+  },
+  "gienahcorvi": {
+   "by": "γ",
+   "name": "기에나 코르비",
+   "con": "corvus",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 5
+    },
+    {
+     "t": "sacDmg",
+     "v": 4
+    }
+   ],
+   "extraTxt": "버리기 1(선택): 피해 +4",
+   "si": 0
+  },
+  "algorab": {
+   "by": "δ",
+   "name": "알고랍",
+   "con": "corvus",
+   "rank": 4,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 2
+    },
+    {
+     "t": "sacDmg",
+     "v": 3
+    }
+   ],
+   "extraTxt": "버리기 1(선택): 피해 +3",
+   "si": 2
+  },
+  "acubens": {
+   "by": "α",
+   "name": "아쿠벤스",
+   "con": "cancer",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "aoe",
+     "v": 4
+    },
+    {
+     "t": "vulnAllFx",
+     "n": 1
+    },
+    {
+     "t": "weakAllFx",
+     "n": 1
+    }
+   ],
+   "si": 3
+  },
+  "altarf": {
+   "by": "β",
+   "name": "알타르프",
+   "con": "cancer",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "vuln",
+     "n": 1
+    }
+   ],
+   "si": 0
+  },
+  "asellusbor": {
+   "by": "γ",
+   "name": "아셀루스 보레알리스",
+   "con": "cancer",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "vuln",
+     "n": 1
+    }
+   ],
+   "si": 2
+  },
+  "asellusaus": {
+   "by": "δ",
+   "name": "아셀루스 아우스트랄리스",
+   "con": "cancer",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3
+    },
+    {
+     "t": "vuln",
+     "n": 1
+    }
+   ],
+   "si": 1
+  },
+  "tegmine": {
+   "by": "ζ",
+   "name": "테그민",
+   "con": "cancer",
+   "rank": 5,
+   "type": "스킬",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "weak",
+     "n": 1
+    }
+   ],
+   "si": 5
+  },
+  "capella": {
+   "by": "α",
+   "name": "카펠라",
+   "con": "auriga",
+   "rank": 1,
+   "type": "수비",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "block",
+     "v": 8
+    },
+    {
+     "t": "halfBlockDmg"
+    }
+   ],
+   "si": 0
+  },
+  "menkalinan": {
+   "by": "β",
+   "name": "멘칼리난",
+   "con": "auriga",
+   "rank": 2,
+   "type": "수비",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "dmg",
+     "v": 3
+    }
+   ],
+   "si": 1
+  },
+  "almaaz": {
+   "by": "ε",
+   "name": "알마즈",
+   "con": "auriga",
+   "rank": 3,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "halfBlockDmg"
+    }
+   ],
+   "si": 4
+  },
+  "haedus": {
+   "by": "η",
+   "name": "하에두스",
+   "con": "auriga",
+   "rank": 4,
+   "type": "수비",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    }
+   ],
+   "si": 6
+  },
+  "mirfak": {
+   "by": "α",
+   "name": "미르파크",
+   "con": "perseus",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmgExec",
+     "v": 10,
+     "plus": 8
+    }
+   ],
+   "extraTxt": "HP가 절반 이하인 적에게는 피해 +8",
+   "si": 0
+  },
+  "algol": {
+   "by": "β",
+   "name": "알골",
+   "con": "perseus",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "weak",
+     "n": 2
+    }
+   ],
+   "si": 1
+  },
+  "atik": {
+   "by": "ο",
+   "name": "아티크",
+   "con": "perseus",
+   "rank": 3,
+   "type": "스킬",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "vuln",
+     "n": 1
+    },
+    {
+     "t": "seal"
+    }
+   ],
+   "si": 2
+  },
+  "gorgonea": {
+   "by": "ρ",
+   "name": "고르고네아",
+   "con": "perseus",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3
+    },
+    {
+     "t": "vuln",
+     "n": 1
+    }
+   ],
+   "si": 7
+  },
+  "alderamin": {
+   "by": "α",
+   "name": "알데라민",
+   "con": "cepheus",
+   "rank": 1,
+   "type": "성좌",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "power",
+     "v": 3
+    }
+   ],
+   "si": 0
+  },
+  "alfirk": {
+   "by": "β",
+   "name": "알피르크",
+   "con": "cepheus",
+   "rank": 2,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "varBlock",
+     "opts": [
+      3,
+      6,
+      9
+     ]
+    }
+   ],
+   "extraTxt": "세페이드 변광 — 셋 중 무작위",
+   "si": 1
+  },
+  "errai": {
+   "by": "γ",
+   "name": "에라이",
+   "con": "cepheus",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "thorns",
+     "v": 3
+    }
+   ],
+   "si": 2
+  },
+  "cepdelta": {
+   "by": "δ",
+   "con": "cepheus",
+   "rank": 4,
+   "type": "수비",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 2
+    },
+    {
+     "t": "thorns",
+     "v": 1
+    }
+   ],
+   "si": 5
+  },
+  "thuban": {
+   "by": "α",
+   "name": "투반",
+   "con": "draco",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "aoe",
+     "v": 7
+    },
+    {
+     "t": "aoeBurn",
+     "v": 3
+    }
+   ],
+   "si": 9
+  },
+  "rastaban": {
+   "by": "β",
+   "name": "라스타반",
+   "con": "draco",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3
+    },
+    {
+     "t": "burn",
+     "v": 2
+    }
+   ],
+   "si": 1
+  },
+  "eltanin": {
+   "by": "γ",
+   "name": "엘타닌",
+   "con": "draco",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "aoeBurn",
+     "v": 3
+    }
+   ],
+   "si": 0
+  },
+  "altais": {
+   "by": "δ",
+   "name": "알타이스",
+   "con": "draco",
+   "rank": 4,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 2
+    },
+    {
+     "t": "burn",
+     "v": 1
+    }
+   ],
+   "si": 4
+  },
+  "menkar": {
+   "by": "α",
+   "name": "멘카르",
+   "con": "cetus",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 7
+    },
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "heal",
+     "v": 3
+    }
+   ],
+   "si": 0
+  },
+  "diphda": {
+   "by": "β",
+   "name": "디프다",
+   "con": "cetus",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "varDmg",
+     "opts": [
+      4,
+      9,
+      14
+     ]
+    }
+   ],
+   "extraTxt": "변광의 원조 — 셋 중 무작위",
+   "si": 1
+  },
+  "baten": {
+   "by": "ζ",
+   "name": "바텐 카이토스",
+   "con": "cetus",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 5
+    },
+    {
+     "t": "heal",
+     "v": 2
+    }
+   ],
+   "si": 5
+  },
+  "denebalgenubi": {
+   "by": "η",
+   "name": "데네브 알게누비",
+   "con": "cetus",
+   "rank": 4,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 2
+    },
+    {
+     "t": "heal",
+     "v": 1
+    }
+   ],
+   "si": 7
+  }
+ },
+ "CONSTELLATIONS": {
+  "orion": {
+   "name": "오리온자리",
+   "short": "오리온",
+   "season": "겨울",
+   "need": 3,
+   "bonus": {
+    "t": "aoeDmgBurn",
+    "v": 13,
+    "burn": 3
+   },
+   "bonusTxt": "모든 적에게 피해 13 + 화상 3"
+  },
+  "canis": {
+   "name": "큰개자리",
+   "short": "큰개",
+   "season": "겨울",
+   "need": 2,
+   "bonus": {
+    "t": "dmgLowestDraw",
+    "v": 10
+   },
+   "bonusTxt": "HP 최저 적에게 피해 10, 처치 시 1장 뽑기"
+  },
+  "gemini": {
+   "name": "쌍둥이자리",
+   "short": "쌍둥이",
+   "season": "겨울",
+   "need": 3,
+   "bonus": {
+    "t": "copyRandom",
+    "n": 2,
+    "mana": 1
+   },
+   "bonusTxt": "손패 무작위 2장 복제 + 성간 물질 1"
+  },
+  "taurus": {
+   "name": "황소자리",
+   "short": "황소",
+   "season": "겨울",
+   "need": 3,
+   "bonus": {
+    "t": "dmgHighestVuln",
+    "v": 18,
+    "vuln": 2
+   },
+   "bonusTxt": "HP 최고 적에게 피해 18 + 취약 2턴"
+  },
+  "leo": {
+   "name": "사자자리",
+   "short": "사자",
+   "season": "봄",
+   "need": 3,
+   "bonus": {
+    "t": "aoeDmgWeak",
+    "v": 11,
+    "weak": 2
+   },
+   "bonusTxt": "모든 적에게 피해 11 + 약화 2턴"
+  },
+  "virgo": {
+   "name": "처녀자리",
+   "short": "처녀",
+   "season": "봄",
+   "need": 3,
+   "bonus": {
+    "t": "manaHeal",
+    "mana": 2,
+    "heal": 9,
+    "draw": 1
+   },
+   "bonusTxt": "성간 물질 2 + HP 9 회복 + 1장 뽑기"
+  },
+  "bootes": {
+   "name": "목동자리",
+   "short": "목동",
+   "season": "봄",
+   "need": 2,
+   "bonus": {
+    "t": "buffAtkB",
+    "v": 10
+   },
+   "bonusTxt": "이번 턴 다음 공격 카드 피해 +10"
+  },
+  "lyra": {
+   "name": "거문고자리",
+   "short": "거문고",
+   "season": "여름",
+   "need": 2,
+   "bonus": {
+    "t": "drawWeakAll",
+    "draw": 2,
+    "weak": 1
+   },
+   "bonusTxt": "2장 뽑기 + 적 전체 약화 1턴"
+  },
+  "cygnus": {
+   "name": "백조자리",
+   "short": "백조",
+   "season": "여름",
+   "need": 2,
+   "bonus": {
+    "t": "blockDraw",
+    "block": 9,
+    "draw": 2
+   },
+   "bonusTxt": "성막 9 + 2장 뽑기"
+  },
+  "aquila": {
+   "name": "독수리자리",
+   "short": "독수리",
+   "season": "여름",
+   "need": 2,
+   "bonus": {
+    "t": "dmgRandom",
+    "v": 9,
+    "pierce": true
+   },
+   "bonusTxt": "무작위 적에게 관통 피해 9"
+  },
+  "scorpius": {
+   "name": "전갈자리",
+   "short": "전갈",
+   "season": "여름",
+   "need": 3,
+   "bonus": {
+    "t": "aoePoison",
+    "v": 5
+   },
+   "bonusTxt": "적 전체에 중독 5"
+  },
+  "pegasus": {
+   "name": "페가수스자리",
+   "short": "페가수스",
+   "season": "가을",
+   "need": 2,
+   "bonus": {
+    "t": "manaDraw",
+    "mana": 2,
+    "draw": 1
+   },
+   "bonusTxt": "성간 물질 2 회복 + 1장 뽑기"
+  },
+  "andromeda": {
+   "name": "안드로메다자리",
+   "short": "안드로메다",
+   "season": "가을",
+   "need": 2,
+   "bonus": {
+    "t": "blockSeal",
+    "v": 5
+   },
+   "bonusTxt": "성막 5 + 무작위 적의 의도 봉인"
+  },
+  "piscis": {
+   "name": "남쪽물고기자리",
+   "short": "남쪽물고기",
+   "season": "가을",
+   "need": 1,
+   "bonus": {
+    "t": "block",
+    "v": 3
+   },
+   "bonusTxt": "성막 3"
+  },
+  "cassiopeia": {
+   "name": "카시오페이아자리",
+   "short": "카시오페이아",
+   "season": "주극",
+   "need": 2,
+   "bonus": {
+    "t": "dmgRandom",
+    "v": 11
+   },
+   "bonusTxt": "무작위 적에게 피해 11"
+  },
+  "ursa": {
+   "name": "큰곰자리",
+   "short": "큰곰",
+   "season": "주극",
+   "need": 3,
+   "bonus": {
+    "t": "blockThorns",
+    "v": 13,
+    "thorns": 5
+   },
+   "bonusTxt": "성막 13 + 가시 5"
+  },
+  "ursaminor": {
+   "name": "작은곰자리",
+   "short": "작은곰",
+   "season": "주극",
+   "need": 2,
+   "bonus": {
+    "t": "drawCostDown",
+    "draw": 2
+   },
+   "bonusTxt": "카드 2장 뽑기 + 다음 카드 비용 −1"
+  },
+  "sagittarius": {
+   "name": "궁수자리",
+   "short": "궁수",
+   "season": "여름",
+   "need": 3,
+   "bonus": {
+    "t": "aoeDmg",
+    "v": 12,
+    "pierce": true
+   },
+   "bonusTxt": "모든 적에게 관통 피해 12"
+  },
+  "corona": {
+   "name": "왕관자리",
+   "short": "왕관",
+   "season": "여름",
+   "need": 2,
+   "bonus": {
+    "t": "needDownB",
+    "v": 1,
+    "draw": 1
+   },
+   "bonusTxt": "이번 턴 모든 성좌의 완성 필요 수 −1 + 1장 뽑기"
+  },
+  "corvus": {
+   "name": "까마귀자리",
+   "short": "까마귀",
+   "season": "봄",
+   "need": 2,
+   "bonus": {
+    "t": "drawMana",
+    "draw": 2,
+    "mana": 1
+   },
+   "bonusTxt": "카드 2장 뽑기 + 성간 물질 1"
+  },
+  "cancer": {
+   "name": "게자리",
+   "short": "게",
+   "season": "봄",
+   "need": 3,
+   "bonus": {
+    "t": "vulnWeakAll",
+    "vuln": 2,
+    "weak": 2,
+    "v": 6
+   },
+   "bonusTxt": "모든 적에게 피해 6 + 취약 2턴 + 약화 2턴"
+  },
+  "auriga": {
+   "name": "마차부자리",
+   "short": "마차부",
+   "season": "겨울",
+   "need": 2,
+   "bonus": {
+    "t": "dmgRandBlock"
+   },
+   "bonusTxt": "무작위 적에게 지금 성막만큼 피해"
+  },
+  "perseus": {
+   "name": "페르세우스자리",
+   "short": "페르세우스",
+   "season": "가을",
+   "need": 2,
+   "bonus": {
+    "t": "execLowest",
+    "v": 12,
+    "mana": 1,
+    "draw": 1
+   },
+   "bonusTxt": "HP 최저 적에게 피해 12 — 처치 시 물질 1 + 1장 뽑기"
+  },
+  "cepheus": {
+   "name": "케페우스자리",
+   "short": "케페우스",
+   "season": "주극",
+   "need": 2,
+   "bonus": {
+    "t": "squareBlock",
+    "v": 6
+   },
+   "bonusTxt": "성막 6 + 다음 턴 시작 시 성막 유지"
+  },
+  "draco": {
+   "name": "용자리",
+   "short": "용",
+   "season": "주극",
+   "need": 2,
+   "bonus": {
+    "t": "aoeDmgBurn",
+    "v": 7,
+    "burn": 3
+   },
+   "bonusTxt": "모든 적에게 피해 7 + 화상 3"
+  },
+  "cetus": {
+   "name": "고래자리",
+   "short": "고래",
+   "season": "가을",
+   "need": 2,
+   "bonus": {
+    "t": "dmgHeal",
+    "v": 9,
+    "heal": 5
+   },
+   "bonusTxt": "적 하나에게 피해 9 + HP 5 회복"
+  }
+ },
+ "ENEMIES": {
+  "m42": {
+   "name": "오리온 대성운 M42",
+   "hp": 225,
+   "atk": 17,
+   "boss": true,
+   "season": "겨울",
+   "minionMax": 2,
+   "summonN": 2,
+   "minionCap": 3,
+   "defend": {
+    "every": 4,
+    "v": 16
+   },
+   "enrageMax": 11,
+   "sealHand": 1,
+   "phase": {
+    "at": 0.5,
+    "atk": 4,
+    "minionCap": 4,
+    "sealHand": 2,
+    "txt": "성운이 크게 부푼다 — 아기별이 더 많이 태어나고 장막이 두꺼워진다!"
+   },
+   "act1": {
+    "hp": 140,
+    "atk": 12
+   }
+  },
+  "pleiades": {
+   "name": "플레이아데스 성단",
+   "hp": 95,
+   "atk": 10,
+   "season": "겨울",
+   "minionMax": 2,
+   "summonN": 2,
+   "minionCap": 3,
+   "elite": true,
+   "defend": {
+    "every": 4,
+    "v": 10
+   },
+   "split": {
+    "at": 0.5,
+    "n": 2,
+    "block": 12,
+    "txt": "일곱 자매가 갈라진다 — 아기별 둘이 튀어나온다!"
+   }
+  },
+  "hyades": {
+   "name": "히아데스 성단",
+   "hp": 180,
+   "atk": 14,
+   "season": "겨울",
+   "pattern": [
+    14,
+    14,
+    20
+   ],
+   "elite": true,
+   "defend": {
+    "every": 3,
+    "v": 13
+   },
+   "conSeal": {
+    "every": 4
+   }
+  },
+  "babystar": {
+   "name": "아기별",
+   "hp": 10,
+   "atk": 5
+  },
+  "asteroid": {
+   "name": "떠도는 소행성",
+   "hp": 30,
+   "atk": 5
+  },
+  "mercury": {
+   "name": "수성",
+   "hp": 26,
+   "atk": 6,
+   "pattern": [
+    6,
+    8
+   ]
+  },
+  "venus": {
+   "name": "금성",
+   "hp": 41,
+   "atk": 7
+  },
+  "mars": {
+   "name": "화성",
+   "hp": 48,
+   "atk": 10,
+   "pattern": [
+    10,
+    10,
+    13
+   ]
+  },
+  "jupiter": {
+   "name": "목성",
+   "hp": 72,
+   "atk": 8,
+   "pattern": [
+    8,
+    8,
+    13
+   ]
+  },
+  "saturn": {
+   "name": "토성",
+   "hp": 58,
+   "atk": 7,
+   "pattern": [
+    7,
+    7,
+    11
+   ]
+  },
+  "moonlet": {
+   "name": "미아 위성",
+   "hp": 46,
+   "atk": 7,
+   "pattern": [
+    7,
+    11
+   ]
+  },
+  "comet": {
+   "name": "얼음 혜성",
+   "hp": 66,
+   "atk": 10,
+   "pattern": [
+    10,
+    10,
+    14
+   ]
+  },
+  "shard": {
+   "name": "성운 파편",
+   "hp": 29,
+   "atk": 6
+  },
+  "uranus": {
+   "name": "천왕성",
+   "hp": 79,
+   "atk": 10,
+   "pattern": [
+    10,
+    10,
+    13
+   ]
+  },
+  "neptune": {
+   "name": "해왕성",
+   "hp": 90,
+   "atk": 11
+  },
+  "pluto": {
+   "name": "명왕성",
+   "hp": 67,
+   "atk": 10,
+   "pattern": [
+    10,
+    12
+   ]
+  },
+  "titan": {
+   "name": "타이탄",
+   "hp": 73,
+   "atk": 10,
+   "pattern": [
+    10,
+    10,
+    12
+   ]
+  },
+  "io": {
+   "name": "이오",
+   "hp": 61,
+   "atk": 11,
+   "pattern": [
+    11,
+    8
+   ]
+  },
+  "rogue": {
+   "name": "떠돌이 행성",
+   "hp": 97,
+   "atk": 11,
+   "pattern": [
+    11,
+    11,
+    15
+   ]
+  },
+  "oort": {
+   "name": "오르트 구름 파편",
+   "hp": 44,
+   "atk": 8
+  },
+  "m1": {
+   "name": "게 성운 M1",
+   "hp": 205,
+   "atk": 16,
+   "season": "겨울",
+   "pattern": [
+    16,
+    16,
+    22
+   ],
+   "elite": true,
+   "defend": {
+    "every": 3,
+    "v": 14
+   },
+   "pulsar": {
+    "every": 4
+   }
+  },
+  "m13": {
+   "name": "헤르쿨레스 구상성단 M13",
+   "hp": 155,
+   "atk": 12,
+   "season": "여름",
+   "minionMax": 2,
+   "summonN": 2,
+   "minionCap": 3,
+   "elite": true,
+   "defend": {
+    "every": 4,
+    "v": 12
+   },
+   "huddle": 0.18
+  },
+  "blackhole": {
+   "name": "은하핵의 블랙홀",
+   "hp": 330,
+   "atk": 23,
+   "boss": true,
+   "season": "여름",
+   "pattern": [
+    21,
+    21,
+    28
+   ],
+   "defend": {
+    "every": 3,
+    "v": 20
+   },
+   "drain": {
+    "every": 4,
+    "v": 1
+   },
+   "swallow": {
+    "every": 5,
+    "n": 2
+   },
+   "reverse": true,
+   "phase": {
+    "at": 0.4,
+    "gravity": true,
+    "atk": 3,
+    "txt": "지평선이 넓어진다 — 이제 매 턴 물질이 빨려 들어간다!"
+   }
+  },
+  "whitedwarf": {
+   "name": "백색왜성",
+   "hp": 88,
+   "atk": 11,
+   "season": "겨울",
+   "pattern": [
+    11,
+    11,
+    15
+   ]
+  },
+  "neutron": {
+   "name": "중성자별",
+   "hp": 78,
+   "atk": 12,
+   "season": "여름",
+   "pattern": [
+    12,
+    9
+   ]
+  },
+  "magnetar": {
+   "name": "마그네타",
+   "hp": 84,
+   "atk": 11,
+   "season": "봄",
+   "pattern": [
+    11,
+    11,
+    15
+   ]
+  },
+  "darkneb": {
+   "name": "암흑 성운",
+   "hp": 110,
+   "atk": 10,
+   "season": "가을",
+   "pattern": [
+    10,
+    10,
+    13
+   ]
+  },
+  "snr": {
+   "name": "초신성 잔해",
+   "hp": 98,
+   "atk": 11,
+   "season": "겨울",
+   "pattern": [
+    11,
+    11,
+    16
+   ]
+  },
+  "ghost": {
+   "name": "유령 은하",
+   "hp": 74,
+   "atk": 13,
+   "season": "가을"
+  },
+  "lmc": {
+   "name": "마젤란 조각",
+   "hp": 58,
+   "atk": 10,
+   "season": "봄"
+  },
+  "satgal": {
+   "name": "위성 은하",
+   "hp": 24,
+   "atk": 6
+  },
+  "m31": {
+   "name": "안드로메다 은하 M31",
+   "hp": 165,
+   "atk": 12,
+   "season": "가을",
+   "elite": true,
+   "defend": {
+    "every": 4,
+    "v": 13
+   },
+   "minionMax": 2,
+   "summonN": 1,
+   "minionCap": 2,
+   "minionId": "satgal",
+   "creep": {
+    "v": 2,
+    "max": 10
+   }
+  },
+  "quasar": {
+   "name": "퀘이사 3C 273",
+   "hp": 170,
+   "atk": 13,
+   "season": "봄",
+   "pattern": [
+    13,
+    13,
+    18
+   ],
+   "elite": true,
+   "defend": {
+    "every": 5,
+    "v": 16
+   },
+   "jet": {
+    "every": 3,
+    "v": 19
+   },
+   "sealHand": 2
+  },
+  "darkmatter": {
+   "name": "암흑 물질",
+   "hp": 880,
+   "atk": 26,
+   "boss": true,
+   "pattern": [
+    24,
+    24,
+    33
+   ],
+   "defend": {
+    "every": 3,
+    "v": 26
+   },
+   "veil": true,
+   "nullify": {
+    "every": 4
+   },
+   "phase": {
+    "at": 0.4,
+    "atk": 6,
+    "sealHand": 2,
+    "txt": "형체 없는 것이 하늘 전체를 덮는다 — 이름이 지워진다!"
+   }
+  }
+ },
+ "ENC_EASY": [
+  [
+   "mercury"
+  ],
+  [
+   "venus"
+  ],
+  [
+   "shard",
+   "shard"
+  ]
+ ],
+ "ENC_NORMAL": [
+  [
+   "mars"
+  ],
+  [
+   "jupiter"
+  ],
+  [
+   "venus",
+   "mercury"
+  ],
+  [
+   "saturn",
+   "mercury"
+  ],
+  [
+   "comet"
+  ],
+  [
+   "moonlet",
+   "shard"
+  ]
+ ],
+ "ENC_HARD": [
+  [
+   "jupiter",
+   "shard"
+  ],
+  [
+   "comet",
+   "mercury"
+  ],
+  [
+   "saturn",
+   "moonlet"
+  ],
+  [
+   "mars",
+   "mars"
+  ],
+  [
+   "moonlet",
+   "moonlet",
+   "shard"
+  ]
+ ],
+ "ENC2_EASY": [
+  [
+   "uranus"
+  ],
+  [
+   "pluto"
+  ],
+  [
+   "oort",
+   "oort"
+  ],
+  [
+   "titan"
+  ]
+ ],
+ "ENC2_NORMAL": [
+  [
+   "neptune"
+  ],
+  [
+   "rogue"
+  ],
+  [
+   "io",
+   "oort"
+  ],
+  [
+   "titan",
+   "pluto"
+  ],
+  [
+   "uranus",
+   "oort"
+  ],
+  [
+   "io",
+   "io"
+  ]
+ ],
+ "ENC2_HARD": [
+  [
+   "rogue",
+   "oort"
+  ],
+  [
+   "neptune",
+   "io"
+  ],
+  [
+   "uranus",
+   "titan"
+  ],
+  [
+   "rogue",
+   "pluto"
+  ],
+  [
+   "io",
+   "io",
+   "oort"
+  ]
+ ],
+ "ENC3_EASY": [
+  [
+   "lmc",
+   "lmc"
+  ],
+  [
+   "whitedwarf"
+  ],
+  [
+   "ghost"
+  ],
+  [
+   "neutron"
+  ]
+ ],
+ "ENC3_NORMAL": [
+  [
+   "darkneb"
+  ],
+  [
+   "snr"
+  ],
+  [
+   "magnetar",
+   "lmc"
+  ],
+  [
+   "neutron",
+   "ghost"
+  ],
+  [
+   "whitedwarf",
+   "lmc"
+  ],
+  [
+   "ghost",
+   "ghost"
+  ]
+ ],
+ "ENC3_HARD": [
+  [
+   "snr",
+   "lmc"
+  ],
+  [
+   "darkneb",
+   "neutron"
+  ],
+  [
+   "whitedwarf",
+   "lmc"
+  ],
+  [
+   "ghost",
+   "ghost"
+  ],
+  [
+   "magnetar",
+   "neutron"
+  ]
+ ],
+ "ELITES": [
+  "pleiades",
+  "hyades"
+ ],
+ "ELITES2": [
+  "m1",
+  "m13"
+ ],
+ "ELITES3": [
+  "m31",
+  "quasar"
+ ],
+ "POLAR_DECK": [
+  "caph",
+  "tsih",
+  "ruchbah",
+  "merak",
+  "phecda",
+  "mizar",
+  "kochab",
+  "pherkad",
+  "yildun"
+ ],
+ "ITEMS": {
+  "nebulaWater": {
+   "name": "성운수",
+   "icon": "🧪",
+   "desc": "HP 15 회복",
+   "price": 30
+  },
+  "meteorShard": {
+   "name": "유성 조각",
+   "icon": "☄️",
+   "desc": "무작위 적에게 피해 12",
+   "price": 30
+  },
+  "starAmulet": {
+   "name": "별빛 부적",
+   "icon": "🛡️",
+   "desc": "성막 10",
+   "price": 30
+  },
+  "sandOfTime": {
+   "name": "시간의 모래",
+   "icon": "⏳",
+   "desc": "이번 턴 성간 물질 +2",
+   "price": 35
+  },
+  "novaFragment": {
+   "name": "초신성 조각",
+   "icon": "💥",
+   "desc": "모든 적에게 피해 8",
+   "price": 40
+  },
+  "starShower": {
+   "name": "별빛 소나기",
+   "icon": "🌠",
+   "desc": "카드 2장 뽑기",
+   "price": 30
+  },
+  "dimLens": {
+   "name": "수축 렌즈",
+   "icon": "🔍",
+   "desc": "적 전체 약화 1턴",
+   "price": 35
+  },
+  "starTear": {
+   "name": "별의 눈물",
+   "desc": "HP 25 회복",
+   "price": 55
+  },
+  "darkCrystal": {
+   "name": "암흑물질 결정",
+   "desc": "성막 18",
+   "price": 50
+  },
+  "novaCap": {
+   "name": "초신성 뇌관",
+   "desc": "적 하나에게 피해 25",
+   "price": 55
+  },
+  "windHorn": {
+   "name": "항성풍 나팔",
+   "desc": "적 전체 취약 1턴",
+   "price": 45
+  },
+  "orbitCalc": {
+   "name": "궤도 계산기",
+   "desc": "이번 턴 모든 성좌의 완성 필요 수 −1",
+   "price": 50
+  },
+  "cometIce": {
+   "name": "혜성의 얼음",
+   "desc": "적 전체 약화 2턴",
+   "price": 45
+  }
+ },
+ "RELICS": {
+  "compass": {
+   "name": "북두의 나침반",
+   "icon": "🧭",
+   "desc": "전투 시작 시 성막 5",
+   "price": 70
+  },
+  "lens": {
+   "name": "별지기의 렌즈",
+   "icon": "🔭",
+   "desc": "매 전투 첫 턴 카드 1장 더 뽑기",
+   "price": 70
+  },
+  "ember": {
+   "name": "살아있는 성화",
+   "icon": "🔥",
+   "desc": "매 턴 첫 공격 카드 피해 +2",
+   "price": 80
+  },
+  "waterjar": {
+   "name": "은하수 물병",
+   "icon": "🏺",
+   "desc": "휴식 회복 +10",
+   "price": 60
+  },
+  "charm": {
+   "name": "유성 부적",
+   "icon": "🪬",
+   "desc": "전투 시작 시 무작위 적에게 피해 5",
+   "price": 65
+  },
+  "magnet": {
+   "name": "별먼지 자석",
+   "icon": "🧲",
+   "desc": "전투 보상 별빛 가루 +10",
+   "price": 60
+  },
+  "prism": {
+   "name": "황도광 프리즘",
+   "desc": "성좌를 완성할 때마다 성막 4",
+   "price": 85
+  },
+  "pouch": {
+   "name": "별먼지 주머니",
+   "desc": "전투 첫 턴 성간 물질 +1",
+   "price": 75
+  },
+  "protractor": {
+   "name": "은빛 각도기",
+   "desc": "3턴마다 카드 1장 더 뽑기",
+   "price": 70
+  },
+  "necklace": {
+   "name": "운석 목걸이",
+   "desc": "매 턴 가시 2",
+   "price": 65
+  },
+  "journal": {
+   "name": "관측 일지",
+   "desc": "전투에서 이기면 HP 4 회복",
+   "price": 60
+  },
+  "mirror": {
+   "name": "흑요석 거울",
+   "desc": "전투 시작 시 모든 적 약화 1턴",
+   "price": 70
+  },
+  "chain": {
+   "name": "천구의 사슬",
+   "desc": "전투 시작 시 모든 적 취약 1턴",
+   "price": 70
+  },
+  "rings": {
+   "name": "항성 나이테",
+   "desc": "얻는 즉시 최대 HP +8 (그만큼 회복)",
+   "price": 60
+  },
+  "flint": {
+   "name": "별지기의 부싯돌",
+   "desc": "전투 시작 시 무작위 적에게 화상 4",
+   "price": 65
+  },
+  "atlas": {
+   "name": "은하수 지도",
+   "desc": "상점의 모든 값이 20% 싸다",
+   "price": 75
+  },
+  "orrery": {
+   "name": "혼천의",
+   "desc": "매 턴 성간 물질 +1",
+   "boss": true
+  },
+  "polarshard": {
+   "name": "북극성의 파편",
+   "desc": "모든 성좌의 완성 필요 수 −1 (하한 1)",
+   "boss": true
+  },
+  "eternal": {
+   "name": "영원한 성막",
+   "desc": "턴이 바뀌어도 성막이 사라지지 않는다",
+   "boss": true
+  },
+  "supernova": {
+   "name": "초신성의 심장",
+   "desc": "전투 시작 시 모든 적에게 피해 18",
+   "boss": true
+  },
+  "galaxylens": {
+   "name": "은하수 렌즈",
+   "desc": "매 턴 카드 1장 더 뽑는다",
+   "boss": true
+  },
+  "zodiacseal": {
+   "name": "황도의 인장",
+   "desc": "매 턴 첫 카드의 비용 −1",
+   "boss": true
+  }
+ },
+ "COMPANIONS": {
+  "galileo": {
+   "name": "갈릴레오 갈릴레이",
+   "icon": "🔭",
+   "short": "턴 종료 시<br>무작위 적 별빛 3",
+   "desc": "망원경의 아버지. 매 턴 종료 시 망원경으로 겨눈 무작위 적에게 별빛 3 피해."
+  },
+  "brahe": {
+   "name": "튀코 브라헤",
+   "icon": "📐",
+   "short": "매 턴 시작 시<br>성막 2",
+   "desc": "맨눈 관측의 제왕. 정밀한 성표로 매 턴 시작 시 성막 2를 두른다."
+  },
+  "herschel": {
+   "name": "캐럴라인 허셜",
+   "icon": "☄️",
+   "short": "짝수 턴 시작 시<br>+1장 뽑기",
+   "desc": "혜성 사냥꾼. 짝수 턴 시작 시 혜성처럼 카드 1장이 날아든다."
+  },
+  "kepler": {
+   "name": "요하네스 케플러",
+   "short": "3턴마다<br>성간 물질 +2",
+   "desc": "행성 운동 법칙의 발견자. 궤도가 한 바퀴 돌 때마다 — 3턴마다 성간 물질 2를 되돌려준다."
+  },
+  "copernicus": {
+   "name": "니콜라우스 코페르니쿠스",
+   "short": "매 턴 시작 시<br>손패 1장 교체",
+   "desc": "하늘의 중심을 옮긴 사람. 매 턴 시작 시 손패에서 한 장을 버리고 새로 한 장을 뽑는다."
+  },
+  "hubble": {
+   "name": "에드윈 허블",
+   "short": "전투 시작 시<br>+2장 뽑기",
+   "desc": "우주가 팽창한다는 것을 밝힌 사람. 첫 턴에 손이 두 장 더 넓어진다."
+  },
+  "leavitt": {
+   "name": "헨리에타 리비트",
+   "short": "이번 턴 첫 성좌 완성 시<br>성간 물질 +1",
+   "desc": "세페이드 변광성으로 우주의 자를 만든 사람. 성좌를 이을 때마다 그 빛을 물질로 되돌려준다."
+  }
+ },
+ "UP_COST_ONLY": [
+  "polaris",
+  "pollux",
+  "sheliak",
+  "albireo",
+  "scheat",
+  "kochab"
+ ],
+ "UP_NUM": [
+  "dmg",
+  "aoe",
+  "dmgRand",
+  "block",
+  "poison",
+  "burn",
+  "heal",
+  "thorns",
+  "buffAtk",
+  "buffDef",
+  "power",
+  "powerAtk",
+  "dmgPerCon",
+  "blockPerCon",
+  "aoeBurn",
+  "dmgExec",
+  "dmgKill",
+  "aoePoisonFx"
+ ],
+ "SEASONS": [
+  "봄",
+  "여름",
+  "가을",
+  "겨울"
+ ],
+ "OPP": {
+  "봄": "가을",
+  "가을": "봄",
+  "여름": "겨울",
+  "겨울": "여름"
+ }
+}

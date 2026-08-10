@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+body { margin:0; }
+a { color:#cbd7f5; } a:hover { color:#fff; }
+@keyframes cdraw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+@keyframes cstar { from { opacity:0; transform:scale(.3);} to { opacity:1; transform:scale(1);} }
+@keyframes cfig { from { opacity:0; } to { opacity:var(--fo); } }
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ pageBg }};font-family:'Cormorant Garamond',Georgia,serif;padding:64px 56px 96px;box-sizing:border-box;color:#e8ecfa">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:56px;border-bottom:1px solid rgba(200,214,255,0.18);padding-bottom:24px">
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(200,214,255,0.55);margin-bottom:14px">Constellation + figure · 17</div>
+      <h1 style="font-size:52px;font-weight:300;margin:0;letter-spacing:0.02em;line-height:1.1">별자리 · 삽화 정렬</h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.9;color:rgba(200,214,255,0.5);max-width:340px;text-align:right">
+      선이 이어진 뒤 삽화가 떠오릅니다.<br>Tweaks에서 삽화 농도와 크기를 조절하세요.
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:40px 32px">
+    <sc-for list="{{ items }}" as="c" hint-placeholder-count="17">
+      <figure style="margin:0;background:{{ cardBg }};border:1px solid rgba(200,214,255,0.12);border-radius:4px;padding:18px 18px 14px;display:flex;flex-direction:column;gap:12px">
+        <div style="position:relative;width:100%;aspect-ratio:320/300">
+        <img src="{{ c.href }}" alt="" style="position:absolute;left:{{ c.ix }};top:{{ c.iy }};width:{{ c.iw }};height:{{ c.ih }};object-fit:contain;transform:{{ c.itr }};--fo:{{ figOpacity }};opacity:{{ figOpacity }};animation:cfig 1.4s ease backwards;animation-delay:{{ c.figDelay }}" />
+        <svg viewBox="0 0 320 300" style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible">
+          <sc-for list="{{ c.lines }}" as="l" hint-placeholder-count="10">
+            <line x1="{{ l.x1 }}" y1="{{ l.y1 }}" x2="{{ l.x2 }}" y2="{{ l.y2 }}" stroke="{{ lineColor }}" stroke-width="{{ lineWidth }}" vector-effect="non-scaling-stroke" stroke-linecap="round" style="--len:{{ l.len }}px;stroke-dasharray:{{ l.len }}px;stroke-dashoffset:0;animation:cdraw .8s cubic-bezier(.4,0,.2,1) backwards;animation-delay:{{ l.delay }}"></line>
+          </sc-for>
+          <sc-for list="{{ c.stars }}" as="s" hint-placeholder-count="10">
+            <g style="animation:cstar .6s ease backwards;animation-delay:{{ s.delay }};opacity:1;transform-origin:{{ s.origin }}">
+              <circle cx="{{ s.x }}" cy="{{ s.y }}" r="{{ s.halo }}" fill="{{ starColor }}" opacity="0.10"></circle>
+              <circle cx="{{ s.x }}" cy="{{ s.y }}" r="{{ s.mid }}" fill="{{ starColor }}" opacity="0.28"></circle>
+              <circle cx="{{ s.x }}" cy="{{ s.y }}" r="{{ s.r }}" fill="{{ starColor }}"></circle>
+            </g>
+          </sc-for>
+        </svg>
+        </div>
+        <figcaption style="display:flex;flex-direction:column;align-items:flex-start;gap:5px;border-top:1px solid rgba(200,214,255,0.10);padding-top:10px">
+          <span style="font-size:22px;font-weight:400;letter-spacing:0.02em;white-space:nowrap">{{ c.ko }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(200,214,255,0.45)">{{ c.la }} · {{ c.count }}</span>
+        </figcaption>
+      </figure>
+    </sc-for>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;transparentBackground&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;누끼 출력&quot;},&quot;figureOpacity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.55,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;삽화&quot;},&quot;figureScale&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.75,&quot;min&quot;:0.4,&quot;max&quot;:1.6,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;삽화&quot;},&quot;starScale&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.5,&quot;max&quot;:2,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;별&quot;},&quot;lineWidth&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1.2,&quot;min&quot;:0.5,&quot;max&quot;:4,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;별&quot;},&quot;lineColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;rgba(206,220,255,0.9)&quot;,&quot;options&quot;:[&quot;rgba(206,220,255,0.9)&quot;,&quot;#ffffff&quot;,&quot;rgba(255,232,180,0.9)&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;starColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#f4f1e4&quot;,&quot;options&quot;:[&quot;#f4f1e4&quot;,&quot;#ffffff&quot;,&quot;#ffe9b8&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+const DATA = [
+  {ko:"큰개자리", la:"Canis Major", slug:"canis-major", adj:{s:1.5,dx:0,dy:-10}, stars:{
+    a:[6.752,-16.716,-1.46], b:[6.378,-17.956,1.98], g:[7.063,-15.633,4.11],
+    d:[7.140,-26.393,1.83], e:[6.977,-28.972,1.50], h:[7.401,-29.303,2.45],
+    z:[6.338,-30.063,3.02], o:[7.050,-23.833,3.02], i:[6.936,-17.054,4.37]},
+   lines:[["b","a"],["a","g"],["g","i"],["a","o"],["o","d"],["d","h"],["d","e"],["e","z"]]},
+
+  {ko:"오리온자리", la:"Orion", slug:"orion", adj:{s:1.45,dx:0,dy:0}, stars:{
+    a:[5.919,7.407,0.50], b:[5.242,-8.202,0.13], g:[5.418,6.350,1.64],
+    d:[5.533,-0.299,2.23], e:[5.604,-1.202,1.69], z:[5.679,-1.943,1.77],
+    k:[5.796,-9.670,2.06], l:[5.585,9.934,3.39], p:[4.831,6.961,3.19], m:[6.038,9.647,4.12]},
+   lines:[["l","a"],["l","g"],["g","d"],["d","e"],["e","z"],["z","a"],["z","k"],["d","b"],["k","b"],["g","p"],["a","m"]]},
+
+  {ko:"쌍둥이자리", la:"Gemini", slug:"gemini", adj:{s:1.35,dx:0,dy:0}, stars:{
+    a:[7.577,31.888,1.58], b:[7.755,28.026,1.14], g:[6.629,16.399,1.93],
+    d:[7.335,21.982,3.53], e:[6.732,25.131,3.06], z:[7.068,20.570,3.90],
+    h:[6.248,22.507,3.28], m:[6.383,22.507,2.87], i:[7.428,27.798,3.79],
+    k:[7.744,24.398,3.57], l:[7.303,16.540,3.58], x:[6.755,12.896,3.36]},
+   lines:[["a","i"],["i","e"],["e","m"],["m","h"],["a","b"],["b","d"],["d","z"],["z","g"],["b","k"],["d","l"],["l","x"]]},
+
+  {ko:"황소자리", la:"Taurus", slug:"taurus", adj:{s:1.5,dx:0,dy:0}, stars:{
+    a:[4.599,16.509,0.85], b:[5.438,28.608,1.65], z:[5.627,21.143,3.00],
+    th:[4.477,15.871,3.40], g:[4.330,15.628,3.65], d:[4.382,17.543,3.76],
+    e:[4.477,19.180,3.53], l:[4.011,12.490,3.47], x:[3.456,9.733,3.73],
+    o:[3.413,9.029,3.60], et:[3.791,24.105,2.87]},
+   lines:[["b","e"],["e","d"],["d","g"],["g","l"],["l","x"],["x","o"],["a","th"],["th","g"],["z","a"],["e","et"]]},
+
+  {ko:"전갈자리", la:"Scorpius", slug:"scorpius", adj:{s:1.3,dx:0,dy:0}, stars:{
+    a:[16.490,-26.432,1.06], b:[16.090,-19.805,2.60], d:[16.005,-22.622,2.30],
+    p:[15.981,-26.114,2.89], s:[16.353,-25.593,2.90], t:[16.598,-28.216,2.82],
+    e:[16.836,-34.293,2.29], m:[16.865,-38.048,3.00], z:[16.911,-42.361,3.60],
+    h:[17.203,-43.239,3.33], th:[17.622,-42.998,1.86], i:[17.793,-40.127,3.03],
+    k:[17.708,-39.030,2.41], l:[17.560,-37.104,1.62], u:[17.512,-37.296,2.69]},
+   lines:[["b","d"],["d","p"],["d","s"],["s","a"],["a","t"],["t","e"],["e","m"],["m","z"],["z","h"],["h","th"],["th","i"],["i","k"],["k","u"],["u","l"]]},
+
+  {ko:"사자자리", la:"Leo", slug:"leo", adj:{s:1.45,dx:0,dy:0}, stars:{
+    a:[10.140,11.967,1.36], b:[11.818,14.572,2.14], g:[10.333,19.841,2.08],
+    d:[11.235,20.524,2.56], th:[11.237,15.430,3.33], z:[10.278,23.417,3.44],
+    m:[9.880,26.007,3.88], e:[9.764,23.774,2.98], h:[10.123,16.763,3.48]},
+   lines:[["a","h"],["h","g"],["g","z"],["z","m"],["m","e"],["g","d"],["d","b"],["b","th"],["th","a"]]},
+
+  {ko:"처녀자리", la:"Virgo", slug:"virgo", adj:{s:1.4,dx:0,dy:0}, stars:{
+    a:[13.420,-11.161,0.98], b:[11.845,1.765,3.60], g:[12.694,-1.449,2.74],
+    d:[12.927,3.397,3.38], e:[13.036,10.959,2.83], z:[13.578,-0.596,3.37],
+    h:[12.333,-0.667,3.89], i:[14.269,-6.001,4.07], m:[14.717,-5.658,3.87]},
+   lines:[["b","h"],["h","g"],["g","d"],["d","e"],["g","a"],["a","z"],["z","i"],["i","m"]]},
+
+  {ko:"목동자리", la:"Boötes", slug:"bootes", adj:{s:1.4,dx:0,dy:0}, stars:{
+    a:[14.261,19.182,-0.05], b:[15.032,40.390,3.49], g:[14.535,38.308,3.03],
+    d:[15.258,33.315,3.47], e:[14.750,27.074,2.37], z:[14.685,13.728,3.78],
+    h:[13.911,18.398,2.68], r:[14.529,30.371,3.58]},
+   lines:[["a","e"],["e","d"],["d","b"],["b","g"],["g","r"],["r","a"],["a","h"],["a","z"]]},
+
+  {ko:"거문고자리", la:"Lyra", slug:"lyra", adj:{s:1.6,dx:0,dy:0}, stars:{
+    a:[18.615,38.784,0.03], b:[18.834,33.363,3.52], g:[18.982,32.690,3.24],
+    d:[18.909,36.899,4.30], z:[18.746,37.605,4.36], e:[18.740,39.670,4.60]},
+   lines:[["a","z"],["z","d"],["d","g"],["g","b"],["b","z"],["a","e"]]},
+
+  {ko:"백조자리", la:"Cygnus", slug:"cygnus", adj:{s:1.3,dx:0,dy:0}, stars:{
+    a:[20.690,45.280,1.25], b:[19.512,27.960,3.18], g:[20.371,40.257,2.23],
+    d:[19.750,45.131,2.87], e:[20.770,33.970,2.48], z:[21.215,30.227,3.20],
+    i:[19.494,51.730,3.76], k:[19.286,53.368,3.77]},
+   lines:[["a","g"],["g","b"],["g","d"],["d","i"],["i","k"],["g","e"],["e","z"]]},
+
+  {ko:"독수리자리", la:"Aquila", slug:"aquila", adj:{s:1.4,dx:0,dy:0}, stars:{
+    a:[19.846,8.868,0.77], b:[19.921,6.407,3.71], g:[19.771,10.613,2.72],
+    d:[19.425,3.115,3.36], z:[19.090,13.863,2.99], th:[20.188,-0.821,3.23],
+    h:[19.877,1.006,3.90], l:[19.104,-4.883,3.43], e:[18.994,15.068,4.02]},
+   lines:[["b","a"],["a","g"],["g","z"],["z","e"],["g","d"],["d","h"],["h","th"],["d","l"]]},
+
+  {ko:"페가수스자리", la:"Pegasus", slug:"pegasus", adj:{s:1.35,dx:0,dy:0}, stars:{
+    a:[23.079,15.205,2.48], b:[23.063,28.083,2.42], g:[0.221,15.184,2.83],
+    al:[0.140,29.091,2.06], e:[21.736,9.875,2.38], z:[22.691,10.831,3.40],
+    h:[22.717,30.221,2.93], th:[22.170,6.198,3.52], m:[22.833,24.602,3.48]},
+   lines:[["a","b"],["b","al"],["al","g"],["g","a"],["b","h"],["b","m"],["a","z"],["z","th"],["th","e"]]},
+
+  {ko:"큰곰자리", la:"Ursa Major", slug:"ursa-major", adj:{s:1.3,dx:0,dy:0}, stars:{
+    a:[11.062,61.751,1.79], b:[11.031,56.383,2.37], g:[11.897,53.695,2.44],
+    d:[12.257,57.033,3.31], e:[12.900,55.960,1.77], z:[13.399,54.925,2.27],
+    h:[13.792,49.313,1.86], i:[8.986,48.042,3.14], th:[9.547,51.677,3.17],
+    u:[9.849,59.039,3.80], ps:[11.161,44.499,3.01], m:[10.372,41.500,3.05],
+    l:[10.285,42.914,3.45], n:[11.307,33.094,3.49], x:[11.303,31.529,3.79]},
+   lines:[["a","b"],["b","g"],["g","d"],["d","a"],["d","e"],["e","z"],["z","h"],["a","u"],["u","th"],["th","i"],["b","ps"],["ps","m"],["m","l"],["g","n"],["n","x"]]},
+
+  {ko:"작은곰자리", la:"Ursa Minor", slug:"ursa-minor", adj:{s:1.5,dx:0,dy:0}, stars:{
+    a:[2.530,89.264,1.98], b:[14.845,74.156,2.07], g:[15.345,71.834,3.00],
+    d:[17.537,86.586,4.36], e:[16.766,82.037,4.23], z:[15.734,77.794,4.29],
+    h:[16.291,75.755,4.95]},
+   lines:[["a","d"],["d","e"],["e","z"],["z","b"],["b","g"],["g","h"],["h","z"]]},
+
+  {ko:"카시오페이아자리", la:"Cassiopeia", slug:"cassiopeia", adj:{s:1.7,dx:0,dy:0}, stars:{
+    a:[0.675,56.537,2.24], b:[0.153,59.150,2.28], g:[0.945,60.717,2.15],
+    d:[1.430,60.235,2.68], e:[1.907,63.670,3.35]},
+   lines:[["b","a"],["a","g"],["g","d"],["d","e"]]},
+
+  {ko:"안드로메다자리", la:"Andromeda", slug:"andromeda", adj:{s:1.35,dx:0,dy:0}, stars:{
+    a:[0.140,29.091,2.06], b:[1.162,35.621,2.05], g:[2.065,42.330,2.10],
+    d:[0.655,30.861,3.27], m:[0.949,38.499,3.86], n:[0.831,41.079,4.53],
+    p:[0.612,33.719,4.34]},
+   lines:[["a","d"],["d","b"],["b","g"],["d","p"],["p","n"],["b","m"],["m","n"]]},
+
+  {ko:"남쪽물고기자리", la:"Piscis Austrinus", slug:"piscis-austrinus", adj:{s:1.35,dx:0,dy:0}, stars:{
+    a:[22.961,-29.622,1.16], e:[22.678,-27.044,4.17], i:[21.746,-33.026,4.34],
+    th:[21.786,-30.899,5.00], m:[22.136,-32.988,4.50], b:[22.526,-32.346,4.29],
+    g:[22.879,-32.876,4.46], d:[22.930,-32.540,4.20]},
+   lines:[["a","d"],["d","g"],["g","b"],["b","m"],["m","i"],["i","th"],["th","e"],["e","a"]]}
+];
+
+const D = Math.PI / 180;
+function vec([ra, dec]) {
+  const r = ra * 15 * D, d = dec * D;
+  return [Math.cos(d) * Math.cos(r), Math.cos(d) * Math.sin(r), Math.sin(d)];
+}
+function norm(v) { const m = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0]/m, v[1]/m, v[2]/m]; }
+function dot(a, b) { return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]; }
+function cross(a, b) { return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+
+function project(entry, W, H, pad, scale, figScale) {
+  const keys = Object.keys(entry.stars);
+  const vs = keys.map(k => vec(entry.stars[k]));
+  const c = norm(vs.reduce((a, v) => [a[0]+v[0], a[1]+v[1], a[2]+v[2]], [0,0,0]));
+  let east = cross([0,0,1], c);
+  if (Math.hypot(east[0], east[1], east[2]) < 1e-6) east = [1,0,0];
+  east = norm(east);
+  const north = cross(c, east);
+  const raw = {};
+  keys.forEach((k, i) => {
+    const v = vs[i], f = 2 / (1 + dot(v, c));
+    raw[k] = [-f * dot(v, east), -f * dot(v, north)];
+  });
+  const xs = keys.map(k => raw[k][0]), ys = keys.map(k => raw[k][1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const s = Math.min((W - pad*2) / Math.max(maxX-minX, 1e-6), (H - pad*2) / Math.max(maxY-minY, 1e-6));
+  const ox = (W - (maxX-minX)*s) / 2 - minX*s;
+  const oy = (H - (maxY-minY)*s) / 2 - minY*s;
+  const pts = {};
+  keys.forEach(k => { pts[k] = [raw[k][0]*s + ox, raw[k][1]*s + oy]; });
+
+  const px = keys.map(k => pts[k][0]), py = keys.map(k => pts[k][1]);
+  const bx0 = Math.min(...px), bx1 = Math.max(...px);
+  const by0 = Math.min(...py), by1 = Math.max(...py);
+  const box = Math.min(Math.max(bx1-bx0, by1-by0) * (entry.adj.s * figScale), Math.min(W, H) - 6);
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const cx = (bx0+bx1)/2 + (entry.adj.dx || 0), cy = (by0+by1)/2 + (entry.adj.dy || 0);
+  const bxL = clamp(cx - box/2, 3, W - box - 3), byT = clamp(cy - box/2, 3, H - box - 3);
+
+  const stars = keys.map((k, i) => {
+    const mag = entry.stars[k][2];
+    const r = Math.max(1.1, (4.8 - 0.62 * mag)) * scale;
+    return { key: k, x: +pts[k][0].toFixed(2), y: +pts[k][1].toFixed(2),
+      r: +r.toFixed(2), mid: +(r*2.1).toFixed(2), halo: +(r*4.4).toFixed(2),
+      origin: pts[k][0].toFixed(1) + "px " + pts[k][1].toFixed(1) + "px",
+      delay: (0.05 * i).toFixed(2) + "s" };
+  });
+  const lines = entry.lines.map((L, i) => {
+    const a = pts[L[0]], b = pts[L[1]];
+    return {
+      x1: +a[0].toFixed(2), y1: +a[1].toFixed(2),
+      x2: +b[0].toFixed(2), y2: +b[1].toFixed(2),
+      len: Math.hypot(b[0]-a[0], b[1]-a[1]).toFixed(2),
+      delay: (0.35 + 0.09 * i).toFixed(2) + "s"
+    };
+  });
+  return {
+    stars, lines, count: keys.length + " stars",
+    ix: (100*bxL/W).toFixed(2) + "%", iy: (100*byT/H).toFixed(2) + "%",
+    iw: (100*box/W).toFixed(2) + "%", ih: (100*box/H).toFixed(2) + "%",
+    itr: entry.adj.flip ? "scaleX(-1)" : "none",
+    figDelay: (0.35 + 0.09 * entry.lines.length + 0.2).toFixed(2) + "s"
+  };
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const transparent = p.transparentBackground ?? false;
+    const scale = p.starScale ?? 1;
+    const figScale = p.figureScale ?? 0.75;
+    const items = DATA.map(e => Object.assign(
+      { ko: e.ko, la: e.la, href: "figures-lit/" + e.slug + ".png" },
+      project(e, 320, 300, 34, scale, figScale)
+    ));
+    return {
+      items,
+      pageBg: transparent ? "transparent" : "#0b1024",
+      cardBg: transparent ? "transparent" : "rgba(255,255,255,0.02)",
+      lineColor: p.lineColor ?? "rgba(206,220,255,0.9)",
+      lineWidth: p.lineWidth ?? 1.2,
+      starColor: p.starColor ?? "#f4f1e4",
+      figOpacity: p.figureOpacity ?? 0.55
+    };
+  }
+}
+
+</script>
+</body>
+</html>
