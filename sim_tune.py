@@ -244,9 +244,8 @@ def sim_act(act, deck, hp, relics, allies, rng, stats, cfg):
         elif kind == 'forge':
             deck = try_forge(deck) or deck
         elif kind == 'rest':
-            if try_forge(deck) is not None and hp >= 40:
-                deck = try_forge(deck)
-            elif hp < 50:
+            # v0.30: 휴식의 '합성' 선택지 폐지 (사용자 지시) — 합성은 대장간 노드에서만
+            if hp < 50:
                 hp = min(70, hp + cfg.get('resth', 30))
             else:
                 j = rng.randrange(len(deck))

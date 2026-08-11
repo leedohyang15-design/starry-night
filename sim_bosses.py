@@ -81,14 +81,16 @@ def main():
     ]
     # 막이 오를수록 덱·유물·조력자가 함께 자란다.
     # 중간보스는 **막 중반** 덱으로, 보스는 **막 끝** 덱으로 재야 실제 조우 시점과 맞는다.
-    END = {1: dict(fuse=3, up=3, cards=5, relics=['compass', 'ember'], allies=['brahe'], hp=62),
-           2: dict(fuse=5, up=7, cards=5, relics=['compass', 'ember', 'orrery', 'lens'],
+    # v0.30: 휴식 합성 폐지 → 합성 기회 = 막당 대장간 1(경로 확률 ~1/3, 플레이어가 길을 고르므로 상향) + 2막 이벤트
+    #        구 가정 fuse 3/5/7(END)·1/3/5(MID)은 휴식 합성 시대 수치 — 1/2/3·0/1/2로 하향 (밸런스로그 19차)
+    END = {1: dict(fuse=1, up=3, cards=5, relics=['compass', 'ember'], allies=['brahe'], hp=62),
+           2: dict(fuse=2, up=7, cards=5, relics=['compass', 'ember', 'orrery', 'lens'],
                    allies=['brahe', 'kepler'], hp=60),
-           3: dict(fuse=7, up=12, cards=5, relics=['compass', 'ember', 'orrery', 'lens', 'galaxylens', 'polarshard'],
+           3: dict(fuse=3, up=12, cards=5, relics=['compass', 'ember', 'orrery', 'lens', 'galaxylens', 'polarshard'],
                    allies=['brahe', 'kepler', 'herschel'], hp=58)}
-    MID = {1: dict(fuse=1, up=1, cards=3, relics=['compass'], allies=['brahe'], hp=52),
-           2: dict(fuse=3, up=4, cards=3, relics=['compass', 'ember', 'orrery'], allies=['brahe', 'kepler'], hp=50),
-           3: dict(fuse=5, up=8, cards=4, relics=['compass', 'ember', 'orrery', 'lens', 'galaxylens'],
+    MID = {1: dict(fuse=0, up=1, cards=3, relics=['compass'], allies=['brahe'], hp=52),
+           2: dict(fuse=1, up=4, cards=3, relics=['compass', 'ember', 'orrery'], allies=['brahe', 'kepler'], hp=50),
+           3: dict(fuse=2, up=8, cards=4, relics=['compass', 'ember', 'orrery', 'lens', 'galaxylens'],
                    allies=['brahe', 'kepler', 'herschel'], hp=50)}
     print('[조우 시점에 맞춘 덱으로 잰 승률 — 그리디 AI라 하한선]')
     for act, foe, label in setups:
