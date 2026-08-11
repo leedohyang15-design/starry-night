@@ -21,7 +21,15 @@
 - `const_lines.json` + `gen_const_lines.py` — 별자리 선 데이터 (실제 J2000 좌표 **별자리 중심 입체 투영** — v0.23에서 교체). 큰곰은 전신 18성(Stellarium modern 표준). py는 현재 uma + v0.18 신규 9개 좌표 보유 — 새 별자리는 py에 좌표 추가 후 재실행
 - `PRODUCT.md` — 제품 진실 (Impeccable `init` 산출물: 사용자·목적·포지셔닝·제약·브랜드 약속·미확정 항목)
 - `.impeccable/critique/` — 디자인 크리틱 스냅샷 (v0.25 = 19/40). `polish`가 이걸 백로그로 읽는다
-- `.claude/skills/` — 팀별 스킬 (디자인/제작/밸런스/애니메이션). "디자인팀 소집"처럼 부르면 해당 워크플로를 따름
+- 팀 스킬(디자인팀·제작팀·밸런스팀)은 **`constellation-game-studio` 플러그인**으로 설치돼 있다 — 저장소가 아니라 Claude Code 쪽에 붙어 있으므로, **새 기계에서는 플러그인을 따로 설치**해야 "제작팀 소집"이 먹는다
+- **GitHub**: <https://github.com/leedohyang15-design/starry-night> · 플레이 <https://leedohyang15-design.github.io/starry-night/>
+
+## 두 대 이상에서 작업할 때 (2026-08-10)
+
+- **시작 전 `git pull`, 끝나면 바로 `git push`.** 게임이 1.25MB 단일 HTML 한 파일이라 양쪽에서 동시에 고치면 git이 병합하지 못하고, 사실상 수동 복구가 불가능하다. **두 곳에서 동시에 만지지 않는다.**
+- 저장소에 **없는 것**: 구버전 빌드 27개 · 구 카드목록 · 구 시뮬 스냅샷 · `.claude/settings.local.json`. 되돌아갈 구버전이 필요하면 원본 PC에만 있다
+- 저장소의 게임 파일 이름은 **`starry-night-v0.28.html`**(ASCII)이다 — GitHub Pages URL 인코딩을 피하려고 영문으로 두었다. 로컬 `전투프로토타입_v0.28.html`과 내용은 같다. **새 버전을 낼 때 둘 다 갱신할 것**
+- git 저장소가 OneDrive 폴더 안에 있다. OneDrive가 `.git`의 작은 파일들을 붙들어 저장소를 깨뜨릴 수 있으므로, **다른 기계에서는 OneDrive 바깥에 clone**할 것
 
 ## 기술 표준 (반드시 유지)
 
