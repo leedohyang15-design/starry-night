@@ -214,16 +214,16 @@ def try_forge(deck):
 def sim_act(act, deck, hp, relics, allies, rng, stats, cfg):
     season_off = rng.randrange(4)
     potions = cfg.get('potions', 2)
-    # v0.21: 막당 13행(관문 15) · 특수 노드 = 상점3·휴식5·이벤트4·대장간1 / 중간보스 3
-    for r in range(13):
+    # v0.32: 막당 10행(관문 12) · 특수 노드 = 상점2·휴식4·이벤트3·대장간1 / 중간보스 3
+    for r in range(10):
         if r == 0:
             kind = 'battle'
         else:
             x = rng.random()
-            kind = ('battle' if x < .556 else 'elite' if x < .639 else 'rest' if x < .778
-                    else 'event' if x < .889 else 'shop' if x < .972 else 'forge')
+            kind = ('battle' if x < .519 else 'elite' if x < .630 else 'rest' if x < .778
+                    else 'event' if x < .889 else 'shop' if x < .963 else 'forge')
         if kind in ('battle', 'elite'):
-            tier = 'easy' if r <= 2 else 'normal' if r <= 8 else 'hard'
+            tier = 'easy' if r <= 2 else 'normal' if r <= 6 else 'hard'
             foes = [rng.choice(S.ELITES[act])] if kind == 'elite' else list(rng.choice(S.ENC[act][tier]))
             s = S.Sim(deck, foes, act=act, hp=hp, season_off=season_off,
                       relics=relics, allies=allies, rng=rng)
