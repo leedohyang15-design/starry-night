@@ -12,7 +12,7 @@ try: sys.stdout.reconfigure(encoding='utf-8')
 except Exception: pass
 import sim_battle_v2 as S
 
-# 막 끝 기준 덱 — 맵이 13행(관문 15)이 되며 전투 8회 × 카드 2장이 기대치
+# 막 끝 기준 덱 — v0.32 맵 10행(관문 12), 전투 약 6회 기대 (막당 카드 수 하향)
 FOCUS = {1: ['ursa', 'cassiopeia', 'canis'], 2: ['sagittarius', 'lyra'], 3: ['orion', 'virgo']}
 
 
@@ -83,10 +83,10 @@ def main():
     # 중간보스는 **막 중반** 덱으로, 보스는 **막 끝** 덱으로 재야 실제 조우 시점과 맞는다.
     # v0.30: 휴식 합성 폐지 → 합성 기회 = 막당 대장간 1(경로 확률 ~1/3, 플레이어가 길을 고르므로 상향) + 2막 이벤트
     #        구 가정 fuse 3/5/7(END)·1/3/5(MID)은 휴식 합성 시대 수치 — 1/2/3·0/1/2로 하향 (밸런스로그 19차)
-    END = {1: dict(fuse=1, up=3, cards=5, relics=['compass', 'ember'], allies=['brahe'], hp=62),
-           2: dict(fuse=2, up=7, cards=5, relics=['compass', 'ember', 'orrery', 'lens'],
+    END = {1: dict(fuse=1, up=3, cards=4, relics=['compass', 'ember'], allies=['brahe'], hp=62),
+           2: dict(fuse=2, up=6, cards=4, relics=['compass', 'ember', 'orrery', 'lens'],
                    allies=['brahe', 'kepler'], hp=60),
-           3: dict(fuse=3, up=12, cards=5, relics=['compass', 'ember', 'orrery', 'lens', 'galaxylens', 'polarshard'],
+           3: dict(fuse=3, up=10, cards=4, relics=['compass', 'ember', 'orrery', 'lens', 'galaxylens', 'polarshard'],
                    allies=['brahe', 'kepler', 'herschel'], hp=58)}
     MID = {1: dict(fuse=0, up=1, cards=3, relics=['compass'], allies=['brahe'], hp=52),
            2: dict(fuse=1, up=4, cards=3, relics=['compass', 'ember', 'orrery'], allies=['brahe', 'kepler'], hp=50),

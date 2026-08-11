@@ -896,22 +896,22 @@ def try_forge(deck):
 
 
 def sim_act(act, deck, hp, relics, allies, rng, stats):
-    """한 막 = 실제 맵 경로 재현: 3열×**13행**(v0.21~) 중 한 줄만 밟는다 + 보스 전 휴식 + 보스.
-    genMap의 노드 분포(1~12행 36칸 = 전투 20 · 중간보스 3 · 휴식 5 · 이벤트 4 · 상점 3 · 대장간 1)를
-    행 단위 확률로 환산: 전투 .556 / 중간보스 .083 / 휴식 .139 / 이벤트 .111 / 상점 .083 / 대장간 .028.
-    조우 티어는 빌드와 동일하게 0~2행 쉬움 / 3~8행 보통 / 9행~ 강함. (2026-08-11, 구 9행 모델 폐기)
+    """한 막 = 실제 맵 경로 재현: 3열×**10행**(v0.32~) 중 한 줄만 밟는다 + 보스 전 휴식 + 보스.
+    genMap의 노드 분포(1~9행 27칸 = 전투 14 · 중간보스 3 · 휴식 4 · 이벤트 3 · 상점 2 · 대장간 1)를
+    행 단위 확률로 환산: 전투 .519 / 중간보스 .111 / 휴식 .148 / 이벤트 .111 / 상점 .074 / 대장간 .037.
+    조우 티어는 빌드와 동일하게 0~2행 쉬움 / 3~6행 보통 / 7행~ 강함. (v0.32에서 13행 → 10행 축소)
     """
     season_off = rng.randrange(4)
     dust = 0
-    for r in range(13):
+    for r in range(10):
         if r == 0:
             kind = 'battle'
         else:
             x = rng.random()
-            kind = ('battle' if x < .556 else 'elite' if x < .639 else 'rest' if x < .778
-                    else 'event' if x < .889 else 'shop' if x < .972 else 'forge')
+            kind = ('battle' if x < .519 else 'elite' if x < .630 else 'rest' if x < .778
+                    else 'event' if x < .889 else 'shop' if x < .963 else 'forge')
         if kind in ('battle', 'elite'):
-            tier = 'easy' if r <= 2 else 'normal' if r <= 8 else 'hard'
+            tier = 'easy' if r <= 2 else 'normal' if r <= 6 else 'hard'
             foes = [rng.choice(ELITES[act])] if kind == 'elite' else list(rng.choice(ENC[act][tier]))
             s = Sim(deck, foes, act=act, hp=hp, season_off=season_off, relics=relics, allies=allies, rng=rng)
             won = s.run()
