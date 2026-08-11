@@ -50,7 +50,7 @@ PORTRAIT_KEYS = [['galileo', 'brahe', 'herschel', 'kepler'],
 BG_KEYS = [['봄', '여름'], ['가을', '겨울']]
 
 PORT_MAX = 340      # 초상 긴 변
-PORT_TOL = 10       # 배경 flood fill 허용오차 (이웃 대비) — 그라디언트 배경을 따라간다
+PORT_TOL = 3        # 배경 flood fill 허용오차 (이웃 대비). v0.32: 10 → 3 — 검정 배경 픽셀 시트에서 10이면 어두운 머리칼·외투까지 배경으로 먹는다 (tol 3 = 기본 시트가 정확히 7덩어리)
 PORT_Q = 84
 BG_W = 960          # 배경 가로
 BG_Q = 78
@@ -169,7 +169,9 @@ def _order_chars(comps, H, W):
         for k, info in zip(row, chunk):
             m = np.zeros((H, W), dtype=bool)
             m[info['idx'][:, 0], info['idx'][:, 1]] = True
-            ordered[k] = dict(mask=m, cy=info['cy'], cx=info['cx'])
+            ib = info['idx']
+            abox = (ib[:, 0].min(), ib[:, 0].max() + 1, ib[:, 1].min(), ib[:, 1].max() + 1)
+            ordered[k] = dict(mask=m, cy=info['cy'], cx=info['cx'], abox=abox)   # abox = 인물 본체(앵커)의 상자
     return ordered
 
 
@@ -212,40 +214,67 @@ def build_portraits(dump=None, src=None, tag='p'):
     return out
 
 
+def _char_sets(a, margin=0.4):
+    """시트 하나에서 인물 7명 세트: 큰 성분 7개를 앵커로 잡고, 잔조각(0.05%~)을 가장 가까운 앵커에 귀속.
+    단 앵커 상자를 40% 넓힌 범위 **밖**의 조각은 버린다 — 떠도는 부스러기가 캔버스를 부풀리면
+    게임의 contain 스케일로 인물이 작아진다"""
+    H, W, _ = a.shape
+    anchors = _order_chars(_detect(a, 0.004), H, W)
+    for n, idx in _detect(a, 0.0005):
+        cy, cx = idx[:, 0].mean(), idx[:, 1].mean()
+        k = min(anchors, key=lambda q: (anchors[q]['cy'] - cy) ** 2 + (anchors[q]['cx'] - cx) ** 2)
+        y0, y1, x0, x1 = anchors[k]['abox']
+        my, mx = (y1 - y0) * margin, (x1 - x0) * margin
+        if y0 - my <= cy <= y1 + my and x0 - mx <= cx <= x1 + mx:
+            anchors[k]['mask'][idx[:, 0], idx[:, 1]] = True
+    return anchors
+
+
+def _pad_bc(im, W, H):
+    """바닥 중앙 정렬로 (W,H) 캔버스에 패딩 — 게임 스프라이트 anchor(50% 100%)와 일치"""
+    out = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    out.paste(im, ((W - im.size[0]) // 2, H - im.size[1]), im)
+    return out
+
+
 def build_portrait_pairs(dump=None):
-    """v0.31: 기본(입다뭄)·입엶 두 시트를 **짝지어** 뽑는다.
-    입엶 시트는 인물이 여러 조각(얼굴·옷깃·소품)으로 떨어져 검출되므로,
-    작은 성분까지 전부 모아 **기본 시트의 인물 중심에 귀속**시켜 합친다.
-    자를 때는 두 시트 마스크의 **합집합 상자 하나**로 둘 다 잘라 프레임 크기·위치를 일치시킨다
-    (배율·anchor가 같아야 입 벙긋 때 몸이 튀지 않는다)."""
+    """v0.31: 기본(입다뭄)·입엶 두 시트를 짝지어 뽑는다. v0.32: 두 시트의 캔버스 크기가 달라도 된다 —
+    시트별로 독립 검출·귀속한 뒤, **같은 배율**(기본 프레임 기준)로 줄이고 **바닥 중앙 정렬 패딩**으로
+    두 프레임의 캔버스를 일치시킨다 (입 벙긋 때 몸이 튀지 않는 조건 = 배율·anchor 동일)."""
     A = np.asarray(Image.open(PORTRAIT_SRC).convert('RGB')).astype(np.int16)
     B = np.asarray(Image.open(PORTRAIT_OPEN_SRC).convert('RGB')).astype(np.int16)
-    assert A.shape == B.shape, f'두 시트 크기가 다르다: {A.shape} vs {B.shape}'
-    H, W, _ = A.shape
-    chars = _order_chars(_detect(A, 0.004), H, W)
-    # 입엶 시트: 잔부스러기(0.05%)까지 모아 가장 가까운 인물에 귀속
-    openm = {k: np.zeros((H, W), dtype=bool) for k in chars}
-    for n, idx in _detect(B, 0.0005):
-        cy, cx = idx[:, 0].mean(), idx[:, 1].mean()
-        k = min(chars, key=lambda q: (chars[q]['cy'] - cy) ** 2 + (chars[q]['cx'] - cx) ** 2)
-        openm[k][idx[:, 0], idx[:, 1]] = True
+    charsA = _char_sets(A)
+    charsB = _char_sets(B)
     base_out, open_out = [], []
-    for k, info in chars.items():
-        both = info['mask'] | openm[k]
-        idx = np.argwhere(both)
-        pad = 2
-        box = (max(0, idx[:, 0].min() - pad), min(H, idx[:, 0].max() + 1 + pad),
-               max(0, idx[:, 1].min() - pad), min(W, idx[:, 1].max() + 1 + pad))
-        sc = min(1.0, PORT_MAX / max(box[1] - box[0], box[3] - box[2]))
-        imA, rawA = _to_webp(_crop_rgba(A, info['mask'], box), sc)
-        imB, rawB = _to_webp(_crop_rgba(B, openm[k], box), sc)
-        assert imA.size == imB.size
-        cov = openm[k].sum() / max(1, info['mask'].sum())
-        print(f'  짝 {k:11s} 상자 {box[3]-box[2]}x{box[1]-box[0]} → {imA.size[0]}x{imA.size[1]}'
-              f'  기본 {len(rawA)//1024}KB · 입엶 {len(rawB)//1024}KB · 면적비 {cov:.2f}')
+    for k in charsA:
+        ia = np.argwhere(charsA[k]['mask']); ib = np.argwhere(charsB[k]['mask'])
+        boxA = (ia[:, 0].min(), ia[:, 0].max() + 1, ia[:, 1].min(), ia[:, 1].max() + 1)
+        boxB = (ib[:, 0].min(), ib[:, 0].max() + 1, ib[:, 1].min(), ib[:, 1].max() + 1)
+        rgbaA = _crop_rgba(A, charsA[k]['mask'], boxA)
+        rgbaB = _crop_rgba(B, charsB[k]['mask'], boxB)
+        # v0.32: tol 3에서는 병합 마스크가 이미 온전하다 — 기준 = 전체 마스크 상자 (앵커 조각 오인 방지)
+        aA, aB = boxA, boxB
+        sc = min(1.0, PORT_MAX / max(rgbaA.shape[0], rgbaA.shape[1]))          # 기본 프레임 기준 배율
+        scB = sc * (aA[1] - aA[0]) / max(1, (aB[1] - aB[0]))                    # 입엶은 키를 기본에 맞춘다
+        imA = Image.fromarray(rgbaA, 'RGBA'); imB = Image.fromarray(rgbaB, 'RGBA')
+        imA = imA.resize((max(1, round(imA.size[0] * sc)), max(1, round(imA.size[1] * sc))), Image.LANCZOS) if sc < 1.0 else imA
+        imB = imB.resize((max(1, round(imB.size[0] * scB)), max(1, round(imB.size[1] * scB))), Image.LANCZOS)
+        # 정렬 기준점 = 인물 본체의 바닥 중앙 (크롭 좌표계 → 배율 적용)
+        pA = (((aA[2] + aA[3]) / 2 - boxA[2]) * sc, (aA[1] - boxA[0]) * sc)
+        pB = (((aB[2] + aB[3]) / 2 - boxB[2]) * scB, (aB[1] - boxB[0]) * scB)
+        # 두 프레임을 같은 캔버스에: B를 (pA-pB)만큼 이동시켜 기준점 일치 → 전체 경계로 캔버스 산출
+        dx, dy = pA[0] - pB[0], pA[1] - pB[1]
+        x0 = min(0, dx); y0 = min(0, dy)
+        Wc = int(round(max(imA.size[0], dx + imB.size[0]) - x0))
+        Hc = int(round(max(imA.size[1], dy + imB.size[1]) - y0))
+        cA = Image.new('RGBA', (Wc, Hc), (0, 0, 0, 0)); cA.paste(imA, (int(round(-x0)), int(round(-y0))), imA)
+        cB = Image.new('RGBA', (Wc, Hc), (0, 0, 0, 0)); cB.paste(imB, (int(round(dx - x0)), int(round(dy - y0))), imB)
+        bufA = io.BytesIO(); cA.save(bufA, 'WEBP', quality=PORT_Q, method=6); rawA = bufA.getvalue()
+        bufB = io.BytesIO(); cB.save(bufB, 'WEBP', quality=PORT_Q, method=6); rawB = bufB.getvalue()
+        print(f'  짝 {k:11s} {Wc}x{Hc}  기본 {len(rawA)//1024}KB · 입엶 {len(rawB)//1024}KB')
         if dump:
-            imA.save(os.path.join(dump, 'p_' + k + '.webp'))
-            imB.save(os.path.join(dump, 'po_' + k + '.webp'))
+            cA.save(os.path.join(dump, 'p_' + k + '.webp'))
+            cB.save(os.path.join(dump, 'po_' + k + '.webp'))
         base_out.append((k, 'data:image/webp;base64,' + base64.b64encode(rawA).decode()))
         open_out.append((k, 'data:image/webp;base64,' + base64.b64encode(rawB).decode()))
     return base_out, open_out
