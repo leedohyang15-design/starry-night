@@ -148,55 +148,107 @@ def components(mask, min_area):
     return out
 
 
-def build_portraits(dump=None, src=None, tag='p'):
-    """v0.22: 배경이 흰색에서 **갈색 그라디언트**로 바뀌어 행/열 분리 방식을 폐기.
-    전경 연결 성분 7개를 직접 찾아 각자의 경계 상자로 자른다 (배치에 의존하지 않는다).
-    v0.31: src 인자로 시트를 골라 기본/입엶 두 벌을 같은 방식으로 뽑는다."""
-    a = np.asarray(Image.open(src or PORTRAIT_SRC).convert('RGB')).astype(np.int16)
-    H, W, _ = a.shape
+def _detect(a, min_frac):
+    """flood fill 배경 제거 → 전경 연결 성분 목록"""
     bg = flood_bg(a, tol=PORT_TOL)
-    fg = ~bg
+    return components(~bg, min_area=int(a.shape[0] * a.shape[1] * min_frac))
+
+
+def _order_chars(comps, H, W):
+    """성분 상위 7개를 행(y)→열(x) 순으로 키에 배정, 문자별 (마스크, 중심) 반환"""
     keys = [k for row in PORTRAIT_KEYS for k in row]
-    comps = components(fg, min_area=int(H * W * 0.004))
-    if len(comps) < len(keys):
-        raise SystemExit(f'초상 덩어리 {len(comps)}개만 검출 (기대 {len(keys)}) — tol 조정 필요')
     comps = comps[:len(keys)]
-    # 행/열 정렬: y 중심으로 행을 나누고 각 행에서 x 순
     infos = []
     for n, idx in comps:
-        cy = idx[:, 0].mean(); cx = idx[:, 1].mean()
-        infos.append(dict(n=n, idx=idx, cy=cy, cx=cx))
+        infos.append(dict(idx=idx, cy=idx[:, 0].mean(), cx=idx[:, 1].mean()))
     infos.sort(key=lambda d: d['cy'])
-    ordered, at = [], 0
+    ordered, at = {}, 0
     for row in PORTRAIT_KEYS:
         chunk = sorted(infos[at:at + len(row)], key=lambda d: d['cx'])
         at += len(row)
-        ordered.extend(zip(row, chunk))
-    out = []
-    for k, info in ordered:
-        idx = info['idx']
-        m = np.zeros((H, W), dtype=bool)
-        m[idx[:, 0], idx[:, 1]] = True
-        cy0, cy1 = idx[:, 0].min(), idx[:, 0].max() + 1
-        cx0, cx1 = idx[:, 1].min(), idx[:, 1].max() + 1
-        sub = m[cy0:cy1, cx0:cx1]
-        alpha = sub.astype(np.float64)
-        er = boxsum(alpha, 1) / 9.0                      # 1px 침식 + 페더
-        alpha = np.where(er < 0.999, alpha * er, alpha)
-        alpha = np.clip(boxsum(alpha, 1) / 9.0, 0, 1)
-        rgb = a[cy0:cy1, cx0:cx1].astype(np.uint8)
-        rgba = np.dstack([rgb, (alpha * 255).astype(np.uint8)])
-        im = Image.fromarray(rgba, 'RGBA')
+        for k, info in zip(row, chunk):
+            m = np.zeros((H, W), dtype=bool)
+            m[info['idx'][:, 0], info['idx'][:, 1]] = True
+            ordered[k] = dict(mask=m, cy=info['cy'], cx=info['cx'])
+    return ordered
+
+
+def _crop_rgba(a, mask, box):
+    """같은 상자(box)로 자르고 자기 마스크로 알파 — 1px 침식 + 페더 (구현은 v0.22와 동일)"""
+    y0, y1, x0, x1 = box
+    sub = mask[y0:y1, x0:x1]
+    alpha = sub.astype(np.float64)
+    er = boxsum(alpha, 1) / 9.0
+    alpha = np.where(er < 0.999, alpha * er, alpha)
+    alpha = np.clip(boxsum(alpha, 1) / 9.0, 0, 1)
+    rgb = a[y0:y1, x0:x1].astype(np.uint8)
+    return np.dstack([rgb, (alpha * 255).astype(np.uint8)])
+
+
+def _to_webp(rgba, scale):
+    im = Image.fromarray(rgba, 'RGBA')
+    if scale < 1.0:
         w, h = im.size
-        sc = min(1.0, PORT_MAX / max(w, h))
-        if sc < 1.0:
-            im = im.resize((max(1, round(w * sc)), max(1, round(h * sc))), Image.LANCZOS)
-        buf = io.BytesIO(); im.save(buf, 'WEBP', quality=PORT_Q, method=6)
-        raw = buf.getvalue()
-        print(f'  초상 {k:11s} {w}x{h} → {im.size[0]}x{im.size[1]}  {len(raw)//1024}KB')
+        im = im.resize((max(1, round(w * scale)), max(1, round(h * scale))), Image.LANCZOS)
+    buf = io.BytesIO(); im.save(buf, 'WEBP', quality=PORT_Q, method=6)
+    return im, buf.getvalue()
+
+
+def build_portraits(dump=None, src=None, tag='p'):
+    """단일 시트 모드 (구 방식 그대로) — 입엶 시트가 없을 때의 폴백"""
+    a = np.asarray(Image.open(src or PORTRAIT_SRC).convert('RGB')).astype(np.int16)
+    H, W, _ = a.shape
+    chars = _order_chars(_detect(a, 0.004), H, W)
+    out = []
+    for k, info in chars.items():
+        idx = np.argwhere(info['mask'])
+        box = (idx[:, 0].min(), idx[:, 0].max() + 1, idx[:, 1].min(), idx[:, 1].max() + 1)
+        rgba = _crop_rgba(a, info['mask'], box)
+        sc = min(1.0, PORT_MAX / max(rgba.shape[0], rgba.shape[1]))
+        im, raw = _to_webp(rgba, sc)
+        print(f'  초상 {k:11s} {box[3]-box[2]}x{box[1]-box[0]} → {im.size[0]}x{im.size[1]}  {len(raw)//1024}KB')
         if dump: im.save(os.path.join(dump, tag + '_' + k + '.webp'))
         out.append((k, 'data:image/webp;base64,' + base64.b64encode(raw).decode()))
     return out
+
+
+def build_portrait_pairs(dump=None):
+    """v0.31: 기본(입다뭄)·입엶 두 시트를 **짝지어** 뽑는다.
+    입엶 시트는 인물이 여러 조각(얼굴·옷깃·소품)으로 떨어져 검출되므로,
+    작은 성분까지 전부 모아 **기본 시트의 인물 중심에 귀속**시켜 합친다.
+    자를 때는 두 시트 마스크의 **합집합 상자 하나**로 둘 다 잘라 프레임 크기·위치를 일치시킨다
+    (배율·anchor가 같아야 입 벙긋 때 몸이 튀지 않는다)."""
+    A = np.asarray(Image.open(PORTRAIT_SRC).convert('RGB')).astype(np.int16)
+    B = np.asarray(Image.open(PORTRAIT_OPEN_SRC).convert('RGB')).astype(np.int16)
+    assert A.shape == B.shape, f'두 시트 크기가 다르다: {A.shape} vs {B.shape}'
+    H, W, _ = A.shape
+    chars = _order_chars(_detect(A, 0.004), H, W)
+    # 입엶 시트: 잔부스러기(0.05%)까지 모아 가장 가까운 인물에 귀속
+    openm = {k: np.zeros((H, W), dtype=bool) for k in chars}
+    for n, idx in _detect(B, 0.0005):
+        cy, cx = idx[:, 0].mean(), idx[:, 1].mean()
+        k = min(chars, key=lambda q: (chars[q]['cy'] - cy) ** 2 + (chars[q]['cx'] - cx) ** 2)
+        openm[k][idx[:, 0], idx[:, 1]] = True
+    base_out, open_out = [], []
+    for k, info in chars.items():
+        both = info['mask'] | openm[k]
+        idx = np.argwhere(both)
+        pad = 2
+        box = (max(0, idx[:, 0].min() - pad), min(H, idx[:, 0].max() + 1 + pad),
+               max(0, idx[:, 1].min() - pad), min(W, idx[:, 1].max() + 1 + pad))
+        sc = min(1.0, PORT_MAX / max(box[1] - box[0], box[3] - box[2]))
+        imA, rawA = _to_webp(_crop_rgba(A, info['mask'], box), sc)
+        imB, rawB = _to_webp(_crop_rgba(B, openm[k], box), sc)
+        assert imA.size == imB.size
+        cov = openm[k].sum() / max(1, info['mask'].sum())
+        print(f'  짝 {k:11s} 상자 {box[3]-box[2]}x{box[1]-box[0]} → {imA.size[0]}x{imA.size[1]}'
+              f'  기본 {len(rawA)//1024}KB · 입엶 {len(rawB)//1024}KB · 면적비 {cov:.2f}')
+        if dump:
+            imA.save(os.path.join(dump, 'p_' + k + '.webp'))
+            imB.save(os.path.join(dump, 'po_' + k + '.webp'))
+        base_out.append((k, 'data:image/webp;base64,' + base64.b64encode(rawA).decode()))
+        open_out.append((k, 'data:image/webp;base64,' + base64.b64encode(rawB).decode()))
+    return base_out, open_out
 
 
 # ═════════════════ 계절 배경 ═════════════════
@@ -251,15 +303,13 @@ def main():
     if target is None and dump is None:
         cands = sorted(glob.glob(os.path.join(HERE, '전투프로토타입_v*.html')))
         target = max(cands, key=os.path.getmtime) if cands else None
-    print('조력자 초상(기본) —', os.path.basename(PORTRAIT_SRC))
-    ports = build_portraits(dump, PORTRAIT_SRC, 'p')
     opens = None
     if PORTRAIT_OPEN_SRC:
-        print('조력자 초상(입엶) —', os.path.basename(PORTRAIT_OPEN_SRC))
-        opens = build_portraits(dump, PORTRAIT_OPEN_SRC, 'po')
-        assert len(opens) == len(ports), '입엶 시트의 인물 수가 기본과 다르다'
+        print('조력자 초상 짝(기본+입엶) —', os.path.basename(PORTRAIT_SRC), '+', os.path.basename(PORTRAIT_OPEN_SRC))
+        ports, opens = build_portrait_pairs(dump)
     else:
-        print('입엶 시트 없음 — PORTRAIT_OPEN은 건너뛴다 (입 벙긋 비활성)')
+        print('조력자 초상(기본만) —', os.path.basename(PORTRAIT_SRC), '· 입엶 시트 없음 — 입 벙긋 비활성')
+        ports = build_portraits(dump, PORTRAIT_SRC, 'p')
     print('계절 배경 —')
     bgs = build_backgrounds(dump)
     if not target:
