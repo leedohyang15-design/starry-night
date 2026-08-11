@@ -7,13 +7,15 @@ embed_assets.py — 실사 에셋(조력자 초상 · 계절 배경)을 누끼/�
   python embed_assets.py --dump out/       # HTML 주입 없이 잘린 이미지만 저장(검수용)
 
 입력
-  조력자.png  1536×1024 · 2행(4인/3인). v0.22부터 배경이 **갈색 그라디언트**(구 흰 배경·한글 라벨 폐지)
-              → 테두리 flood fill(이웃 대비 tol)로 배경 제거 → **전경 연결 성분 7개를 직접 검출**해 각자 크롭 → WebP(알파)
+  조력자(입다뭄, 기본).png  기본 프레임(입 다뭄). 없으면 구 조력자.png를 대신 쓴다
+  조력자2(입엶).png         입 연 프레임(v0.31 입 벙긋용, 선택) — 배치는 기본 시트와 같아야 한다
+              두 시트 모두: 테두리 flood fill(이웃 대비 tol)로 배경 제거 → **전경 연결 성분 7개를 직접 검출**해 각자 크롭 → WebP(알파)
   배경.png    1661×947 · 2×2 · 흰 구분선 · 각 칸 금테
               → 구분선/금테 안쪽 크롭 → 가로 960 리사이즈 → WebP
 
 플레이스홀더(대상 HTML)
   const PORTRAIT_IMG={};/*PORTRAIT_IMG*/
+  const PORTRAIT_OPEN={};/*PORTRAIT_OPEN*/   (v0.31 — 입 연 시트가 있을 때만 주입)
   const SEASON_BG={};/*SEASON_BG*/
 """
 import base64, io, os, re, sys, glob
@@ -27,7 +29,19 @@ except Exception:
     pass
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PORTRAIT_SRC = os.path.join(HERE, '조력자.png')
+def _find(*names):
+    for nm in names:
+        for ext in ('.png', '.webp', '.jpg', '.jpeg'):
+            c = os.path.join(HERE, nm + ext)
+            if os.path.exists(c):
+                return c
+        hits = glob.glob(os.path.join(HERE, nm + '*'))
+        if hits:
+            return hits[0]
+    return None
+
+PORTRAIT_SRC = _find('조력자(입다뭄, 기본)', '조력자(입다뭄,기본)') or os.path.join(HERE, '조력자.png')
+PORTRAIT_OPEN_SRC = _find('조력자2(입엶)', '조력자2')                      # 선택 — 없으면 입 벙긋 비활성
 BG_SRC = os.path.join(HERE, '배경.png')
 
 # 그림의 라벨 순서 (1행 4인 / 2행 3인)
@@ -134,10 +148,11 @@ def components(mask, min_area):
     return out
 
 
-def build_portraits(dump=None):
+def build_portraits(dump=None, src=None, tag='p'):
     """v0.22: 배경이 흰색에서 **갈색 그라디언트**로 바뀌어 행/열 분리 방식을 폐기.
-    전경 연결 성분 7개를 직접 찾아 각자의 경계 상자로 자른다 (배치에 의존하지 않는다)."""
-    a = np.asarray(Image.open(PORTRAIT_SRC).convert('RGB')).astype(np.int16)
+    전경 연결 성분 7개를 직접 찾아 각자의 경계 상자로 자른다 (배치에 의존하지 않는다).
+    v0.31: src 인자로 시트를 골라 기본/입엶 두 벌을 같은 방식으로 뽑는다."""
+    a = np.asarray(Image.open(src or PORTRAIT_SRC).convert('RGB')).astype(np.int16)
     H, W, _ = a.shape
     bg = flood_bg(a, tol=PORT_TOL)
     fg = ~bg
@@ -179,7 +194,7 @@ def build_portraits(dump=None):
         buf = io.BytesIO(); im.save(buf, 'WEBP', quality=PORT_Q, method=6)
         raw = buf.getvalue()
         print(f'  초상 {k:11s} {w}x{h} → {im.size[0]}x{im.size[1]}  {len(raw)//1024}KB')
-        if dump: im.save(os.path.join(dump, 'p_' + k + '.webp'))
+        if dump: im.save(os.path.join(dump, tag + '_' + k + '.webp'))
         out.append((k, 'data:image/webp;base64,' + base64.b64encode(raw).decode()))
     return out
 
@@ -236,13 +251,22 @@ def main():
     if target is None and dump is None:
         cands = sorted(glob.glob(os.path.join(HERE, '전투프로토타입_v*.html')))
         target = max(cands, key=os.path.getmtime) if cands else None
-    print('조력자 초상 —')
-    ports = build_portraits(dump)
+    print('조력자 초상(기본) —', os.path.basename(PORTRAIT_SRC))
+    ports = build_portraits(dump, PORTRAIT_SRC, 'p')
+    opens = None
+    if PORTRAIT_OPEN_SRC:
+        print('조력자 초상(입엶) —', os.path.basename(PORTRAIT_OPEN_SRC))
+        opens = build_portraits(dump, PORTRAIT_OPEN_SRC, 'po')
+        assert len(opens) == len(ports), '입엶 시트의 인물 수가 기본과 다르다'
+    else:
+        print('입엶 시트 없음 — PORTRAIT_OPEN은 건너뛴다 (입 벙긋 비활성)')
     print('계절 배경 —')
     bgs = build_backgrounds(dump)
     if not target:
         print('덤프만 수행:', dump); return
     inject(target, 'PORTRAIT_IMG', ports)
+    if opens:
+        inject(target, 'PORTRAIT_OPEN', opens)
     inject(target, 'SEASON_BG', bgs)
     print('대상:', os.path.basename(target), os.path.getsize(target) // 1024, 'KB')
 
