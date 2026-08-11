@@ -21,7 +21,7 @@ except Exception: pass
 from collections import defaultdict
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-D = json.load(open(os.path.join(HERE, 'sim_data_v024.json'), encoding='utf-8'))
+D = json.load(open(os.path.join(HERE, 'sim_data_v025.json'), encoding='utf-8'))   # 저장소에 있는 최신 덤프 (v0.25~29 데이터 동일)
 STARS, CONS, ENEMIES = D['STARS'], D['CONSTELLATIONS'], D['ENEMIES']
 SEASONS, OPP = D['SEASONS'], D['OPP']
 ENC = {3: {'easy': D['ENC3_EASY'], 'normal': D['ENC3_NORMAL'], 'hard': D['ENC3_HARD']},
@@ -862,7 +862,7 @@ def wpick_rank(pool, rng, exclude=()):
 def roll_reward(rng, deck=None):
     pool = list(STARS)
     if deck and BIAS > 0 and rng.random() < BIAS:
-        owned = {STARS[cid]['con'] for cid, _ in deck}
+        owned = {STARS[norm(c)['id']]['con'] for c in deck}   # 합성 카드(딕셔너리)도 센다
         sub = [i for i in pool if STARS[i]['con'] in owned]
         if sub:
             pool = sub
@@ -872,27 +872,46 @@ def roll_reward(rng, deck=None):
 def pick_reward(deck, picks, rng):
     """AI 픽 정책: 덱에 이미 있는 별자리를 우선(성좌 완성 지향), 동률이면 등급 높은 쪽"""
     cnt = defaultdict(int)
-    for cid, _ in deck:
-        cnt[STARS[cid]['con']] += 1
+    for c in deck:
+        cnt[STARS[norm(c)['id']]['con']] += 1
     return max(picks, key=lambda i: (cnt[STARS[i]['con']], -STARS[i].get('rank', 5), rng.random()))
 
 
+def try_forge(deck):
+    """대장간: 같은 별자리 2장 → 합성 1장. 3성 별자리 · 보유 수 많은 쪽 우선. 못 하면 None"""
+    groups = defaultdict(list)
+    for i, c in enumerate(deck):
+        c = norm(c)
+        if not c.get('id2'):                       # 재합성 불가 (빌드 규칙)
+            groups[STARS[c['id']]['con']].append(i)
+    cand = [(CONS[k]['need'], len(g), k, g) for k, g in groups.items() if len(g) >= 2]
+    if not cand:
+        return None
+    _, _, k, g = max(cand, key=lambda t: (t[0], t[1]))
+    ia, ib = g[0], g[1]
+    A, B = norm(deck[ia]), norm(deck[ib])
+    out = [c for i, c in enumerate(deck) if i not in (ia, ib)]
+    out.append({'id': A['id'], 'up': A.get('up', False), 'id2': B['id'], 'up2': B.get('up', False)})
+    return out
+
+
 def sim_act(act, deck, hp, relics, allies, rng, stats):
-    """한 막 = 실제 맵 경로 재현: 3열×9행 중 **한 줄만 밟는다**(9노드) + 보스 전 휴식 + 보스.
-    genMap의 노드 분포(24칸 중 상점2·휴식3·이벤트4, 중간보스 3)를 열 단위 확률로 환산:
-      0행 = 전투 고정 / 1~8행 = 전투 50% · 중간보스 12.5% · 휴식 12.5% · 이벤트 16.7% · 상점 8.3%
+    """한 막 = 실제 맵 경로 재현: 3열×**13행**(v0.21~) 중 한 줄만 밟는다 + 보스 전 휴식 + 보스.
+    genMap의 노드 분포(1~12행 36칸 = 전투 20 · 중간보스 3 · 휴식 5 · 이벤트 4 · 상점 3 · 대장간 1)를
+    행 단위 확률로 환산: 전투 .556 / 중간보스 .083 / 휴식 .139 / 이벤트 .111 / 상점 .083 / 대장간 .028.
+    조우 티어는 빌드와 동일하게 0~2행 쉬움 / 3~8행 보통 / 9행~ 강함. (2026-08-11, 구 9행 모델 폐기)
     """
     season_off = rng.randrange(4)
     dust = 0
-    for r in range(9):
+    for r in range(13):
         if r == 0:
             kind = 'battle'
         else:
             x = rng.random()
-            kind = ('battle' if x < .50 else 'elite' if x < .625 else 'rest' if x < .75
-                    else 'event' if x < .917 else 'shop')
+            kind = ('battle' if x < .556 else 'elite' if x < .639 else 'rest' if x < .778
+                    else 'event' if x < .889 else 'shop' if x < .972 else 'forge')
         if kind in ('battle', 'elite'):
-            tier = 'easy' if r <= 1 else 'normal' if r <= 5 else 'hard'
+            tier = 'easy' if r <= 2 else 'normal' if r <= 8 else 'hard'
             foes = [rng.choice(ELITES[act])] if kind == 'elite' else list(rng.choice(ENC[act][tier]))
             s = Sim(deck, foes, act=act, hp=hp, season_off=season_off, relics=relics, allies=allies, rng=rng)
             won = s.run()
@@ -900,19 +919,23 @@ def sim_act(act, deck, hp, relics, allies, rng, stats):
             if not won:
                 return None, hp
             hp = s.hp
-            dust += (60 if kind == 'elite' else 25) * (1.5 if act == 2 else 1)
+            dust += (60 if kind == 'elite' else 25) * (2 if act == 3 else 1.5 if act == 2 else 1)
             if kind == 'elite':
                 pool = [x for x in D['RELICS'] if x not in relics and not D['RELICS'][x].get('boss')]
                 if pool:
                     relics.add(rng.choice(pool))
             picks = [roll_reward(rng, deck) for _ in range(3)]
             deck.append((pick_reward(deck, picks, rng), False))
+        elif kind == 'forge':
+            deck = try_forge(deck) or deck
         elif kind == 'rest':
             if hp < 50:
-                hp = min(70, hp + 20 + (10 if 'waterjar' in relics else 0))
+                hp = min(70, hp + 30 + (10 if 'waterjar' in relics else 0))   # v0.21: 휴식 회복 30
             else:
-                j = rng.randrange(len(deck))
-                deck[j] = (deck[j][0], True)
+                cands = [j for j, c in enumerate(deck) if not norm(c).get('id2') and not norm(c).get('up')]
+                if cands:
+                    j = rng.choice(cands)
+                    deck[j] = (norm(deck[j])['id'], True)
         elif kind == 'event':
             hp = min(70, hp + 10) if rng.random() < .5 else hp
             dust += 40
@@ -921,7 +944,7 @@ def sim_act(act, deck, hp, relics, allies, rng, stats):
                 dust -= 65
                 picks = [roll_reward(rng, deck) for _ in range(3)]
                 deck.append((pick_reward(deck, picks, rng), False))
-    hp = min(70, hp + 20)                            # 보스 전 휴식 고정
+    hp = min(70, hp + 30 + (10 if 'waterjar' in relics else 0))   # 보스 전 고정 휴식 노드 (빌드: rest 30)
     s = Sim(deck, [BOSS[act]], act=act, hp=hp, season_off=season_off, relics=relics, allies=allies, rng=rng)
     won = s.run()
     merge_stats(stats, s, act)
@@ -960,7 +983,7 @@ def main():
     stats = {'comp': defaultdict(int), 'had': defaultdict(int), 'turns': [],
              'boss_turns': defaultdict(list)}
     if a.runs:
-        act1 = act2 = 0
+        act1 = act2 = act3 = 0
         for i in range(a.runs):
             deck = [(c, False) for c in D['POLAR_DECK']]
             allies = [rng.choice(list(D['COMPANIONS']))]
@@ -969,20 +992,33 @@ def main():
             if deck2 is None:
                 continue
             act1 += 1
-            # 2막: 보스 유물 + 조력자 2인째
+            # 2막: 보스 유물 + 조력자 2인째 + 막 사이 회복 22 (빌드 v0.21)
             bosspool = [r for r in D['RELICS'] if D['RELICS'][r].get('boss')]
             if bosspool:
                 relics.add(rng.choice(bosspool))
             pool2 = [c for c in D['COMPANIONS'] if c not in allies]
             if pool2:
                 allies.append(rng.choice(pool2))
-            hp = min(70, hp + 15)
-            deck3, _ = sim_act(2, deck2, hp, relics, allies, rng, stats)
-            if deck3 is not None:
-                act2 += 1
-        print(f'런 {a.runs}회 — 1막 클리어 {act1} ({act1/a.runs*100:.1f}%) · 2막 클리어 {act2} ({act2/a.runs*100:.1f}%)')
+            hp = min(70, hp + 22)
+            deck3, hp = sim_act(2, deck2, hp, relics, allies, rng, stats)
+            if deck3 is None:
+                continue
+            act2 += 1
+            # 3막: 보스 유물 + 조력자 3인째 (v0.21 신설 — 구 모델은 2막에서 끝났다)
+            bosspool = [r for r in D['RELICS'] if D['RELICS'][r].get('boss') and r not in relics]
+            if bosspool:
+                relics.add(rng.choice(bosspool))
+            pool3 = [c for c in D['COMPANIONS'] if c not in allies]
+            if pool3:
+                allies.append(rng.choice(pool3))
+            hp = min(70, hp + 22)
+            deck4, _ = sim_act(3, deck3, hp, relics, allies, rng, stats)
+            if deck4 is not None:
+                act3 += 1
+        print(f'런 {a.runs}회 — 1막 클리어 {act1} ({act1/a.runs*100:.1f}%) · 2막 클리어 {act2} ({act2/a.runs*100:.1f}%)'
+              f' · 완주 {act3} ({act3/a.runs*100:.1f}%)')
         print(f'평균 전투 턴수 {sum(stats["turns"])/max(1,len(stats["turns"])):.1f}')
-        for act in (1, 2):
+        for act in (1, 2, 3):
             bt = stats['boss_turns'][act]
             if bt:
                 print(f'  {act}막 보스전 평균 {sum(bt)/len(bt):.1f}턴')
@@ -1028,12 +1064,12 @@ def validate(rng):
     s2.play(1)   # 북극성 — 필요 수 −1
     s2.play(0)   # 미자르 2성 계산 → 큰곰 3−1=2 완성
     print(f'  북극성+미자르 → 큰곰 완성={"ursa" in s2.completed} (기대 True)')
-    s3 = Sim([('nunki', False)], ['m42'], act=1, rng=rng)
-    s3.start_turn(); s3.hand = [('nunki', False)]; s3.energy = 9
+    s3 = Sim([('wezen', False)], ['m42'], act=1, rng=rng)   # v0.25 축소로 nunki가 빠져 웨젠(관통 5)으로 교체
+    s3.start_turn(); s3.hand = [('wezen', False)]; s3.energy = 9
     s3.enemies[0].block = 50
     hp0 = s3.enemies[0].hp
     s3.play(0)
-    print(f'  관통이 아머 무시: 피해 {hp0-s3.enemies[0].hp} (기대 6) · 적 성막 {s3.enemies[0].block} (기대 50)')
+    print(f'  관통이 아머 무시: 피해 {hp0-s3.enemies[0].hp} (기대 5) · 적 성막 {s3.enemies[0].block} (기대 50)')
     s4 = Sim([('menkar', False)], ['jupiter'], act=2, season_off=2, rng=rng)  # 가을 시작
     s4.start_turn()
     print(f'  2막 계절: turn1={s4.season()} (기대 가을) · 고래 제철 피해 {s4.sadj(9,"가을")} (기대 12)')

@@ -214,7 +214,7 @@ def try_forge(deck):
 def sim_act(act, deck, hp, relics, allies, rng, stats, cfg):
     season_off = rng.randrange(4)
     potions = cfg.get('potions', 2)
-    # v0.21: 막당 13행(관문 15) · 특수 노드 = 상점3·휴식4·이벤트4·대장간1 / 중간보스 4
+    # v0.21: 막당 13행(관문 15) · 특수 노드 = 상점3·휴식5·이벤트4·대장간1 / 중간보스 3
     for r in range(13):
         if r == 0:
             kind = 'battle'
@@ -260,7 +260,7 @@ def sim_act(act, deck, hp, relics, allies, rng, stats, cfg):
                 potions += 1
         else:
             deck.extend(con_reward(deck, rng, 1) if cfg['reward'] == 'con' else card_reward(deck, rng))
-    hp = min(70, hp + 20)
+    hp = min(70, hp + 30 + (10 if 'waterjar' in relics else 0))   # 보스 전 고정 휴식 노드 (빌드: rest 30)
     s = S.Sim(deck, [S.BOSS[act]], act=act, hp=hp, season_off=season_off,
               relics=relics, allies=allies, rng=rng)
     won = s.run()
