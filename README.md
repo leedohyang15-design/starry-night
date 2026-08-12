@@ -33,7 +33,7 @@
 
 | | |
 |---|---|
-| `starry-night-v0.32.html` | 게임 본체. 단일 HTML 하나에 전부 들어 있다 (약 1.4MB) — 구버전 v0.28~v0.31도 보존 |
+| `starry-night-v0.34.html` | 게임 본체. 단일 HTML 하나에 전부 들어 있다 (약 1.4MB) — 구버전 v0.28~v0.33도 보존 |
 | `index.html` | 시작 페이지 |
 | `const_lines.json` · `gen_const_lines.py` · `gen_fx_lines.py` | 별자리 선 데이터(J2000)와 투영·주입 스크립트 |
 | `gen_pixel_art.py` | 적 도트 스프라이트 34종 절차 생성기 |

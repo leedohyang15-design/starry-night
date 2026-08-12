@@ -1028,6 +1028,7 @@
    "type": "스킬",
    "cost": 1,
    "target": false,
+   "alsoCon": "pegasus",
    "fx": [
     {
      "t": "block",
