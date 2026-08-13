@@ -2085,6 +2085,478 @@
     }
    ],
    "si": 7
+  },
+  "hamal": {
+   "by": "α",
+   "name": "하말",
+   "con": "aries",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 13
+    },
+    {
+     "t": "vuln",
+     "n": 2
+    }
+   ],
+   "si": 0
+  },
+  "sheratan": {
+   "by": "β",
+   "name": "셰라탄",
+   "con": "aries",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 6,
+     "reso": 4
+    }
+   ],
+   "si": 1
+  },
+  "mesarthim": {
+   "by": "γ",
+   "name": "메사르팀",
+   "con": "aries",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 5
+    },
+    {
+     "t": "vuln",
+     "n": 1
+    }
+   ],
+   "si": 2
+  },
+  "botein": {
+   "by": "δ",
+   "name": "보테인",
+   "con": "aries",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 7
+    }
+   ],
+   "si": 3
+  },
+  "arieps": {
+   "by": "ε",
+   "con": "aries",
+   "rank": 5,
+   "type": "공격",
+   "cost": 0,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3,
+     "reso": 2
+    }
+   ],
+   "si": 4
+  },
+  "zubenelgenubi": {
+   "by": "α",
+   "name": "주벤엘게누비",
+   "con": "libra",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 9
+    },
+    {
+     "t": "block",
+     "v": 9
+    }
+   ],
+   "si": 0
+  },
+  "zubeneschamali": {
+   "by": "β",
+   "name": "주벤에샤마리",
+   "con": "libra",
+   "rank": 2,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 8
+    },
+    {
+     "t": "block",
+     "v": 8
+    }
+   ],
+   "si": 1
+  },
+  "zubenelakrab": {
+   "by": "γ",
+   "name": "주벤엘아크랍",
+   "con": "libra",
+   "rank": 3,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 4
+    },
+    {
+     "t": "block",
+     "v": 4
+    }
+   ],
+   "si": 2
+  },
+  "libdelta": {
+   "by": "δ",
+   "con": "libra",
+   "rank": 4,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3,
+     "glow": 2
+    },
+    {
+     "t": "block",
+     "v": 3,
+     "glow": 2
+    }
+   ],
+   "si": 3
+  },
+  "brachium": {
+   "by": "σ",
+   "name": "브라키움",
+   "con": "libra",
+   "rank": 5,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 3
+    },
+    {
+     "t": "block",
+     "v": 3
+    }
+   ],
+   "si": 4
+  },
+  "algedi": {
+   "by": "α",
+   "name": "알게디",
+   "con": "capricornus",
+   "rank": 1,
+   "type": "수비",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 10
+    },
+    {
+     "t": "heal",
+     "v": 5
+    }
+   ],
+   "si": 0
+  },
+  "dabih": {
+   "by": "β",
+   "name": "다비흐",
+   "con": "capricornus",
+   "rank": 2,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 6
+    },
+    {
+     "t": "heal",
+     "v": 2
+    }
+   ],
+   "si": 1
+  },
+  "nashira": {
+   "by": "γ",
+   "name": "나시라",
+   "con": "capricornus",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 5
+    },
+    {
+     "t": "heal",
+     "v": 2
+    }
+   ],
+   "si": 2
+  },
+  "denebalgedi": {
+   "by": "δ",
+   "name": "데네브 알게디",
+   "con": "capricornus",
+   "rank": 4,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 7
+    }
+   ],
+   "si": 3
+  },
+  "captheta": {
+   "by": "θ",
+   "con": "capricornus",
+   "rank": 5,
+   "type": "수비",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    }
+   ],
+   "si": 4
+  },
+  "sadalmelik": {
+   "by": "α",
+   "name": "사달멜리크",
+   "con": "aquarius",
+   "rank": 1,
+   "type": "스킬",
+   "cost": 2,
+   "target": false,
+   "fx": [
+    {
+     "t": "mana",
+     "v": 1
+    },
+    {
+     "t": "block",
+     "v": 5
+    },
+    {
+     "t": "draw",
+     "n": 1
+    }
+   ],
+   "si": 0
+  },
+  "sadalsuud": {
+   "by": "β",
+   "name": "사달수우드",
+   "con": "aquarius",
+   "rank": 2,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "mana",
+     "v": 1
+    },
+    {
+     "t": "block",
+     "v": 2
+    }
+   ],
+   "si": 1
+  },
+  "sadachbia": {
+   "by": "γ",
+   "name": "사다크비아",
+   "con": "aquarius",
+   "rank": 3,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 6
+    }
+   ],
+   "si": 2
+  },
+  "skat": {
+   "by": "δ",
+   "name": "스카트",
+   "con": "aquarius",
+   "rank": 4,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1,
+     "glow": 1
+    }
+   ],
+   "si": 3
+  },
+  "albali": {
+   "by": "ε",
+   "name": "알발리",
+   "con": "aquarius",
+   "rank": 5,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 5
+    }
+   ],
+   "si": 4
+  },
+  "alrescha": {
+   "by": "α",
+   "name": "알레샤",
+   "con": "pisces",
+   "rank": 1,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "block",
+     "v": 2
+    },
+    {
+     "t": "scry"
+    }
+   ],
+   "si": 0
+  },
+  "fumalsamakah": {
+   "by": "β",
+   "name": "푸말사마카",
+   "con": "pisces",
+   "rank": 2,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 4
+    },
+    {
+     "t": "scry"
+    }
+   ],
+   "si": 1
+  },
+  "piscgamma": {
+   "by": "γ",
+   "con": "pisces",
+   "rank": 3,
+   "type": "수비",
+   "cost": 0,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 2
+    },
+    {
+     "t": "scry"
+    }
+   ],
+   "si": 2
+  },
+  "alpherg": {
+   "by": "η",
+   "name": "알페르그",
+   "con": "pisces",
+   "rank": 4,
+   "type": "스킬",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "scry"
+    }
+   ],
+   "si": 3
+  },
+  "torcular": {
+   "by": "ο",
+   "name": "토르쿨라르",
+   "con": "pisces",
+   "rank": 5,
+   "type": "수비",
+   "cost": 1,
+   "target": false,
+   "fx": [
+    {
+     "t": "block",
+     "v": 3
+    },
+    {
+     "t": "scry"
+    }
+   ],
+   "si": 4
   }
  },
  "CONSTELLATIONS": {
@@ -2392,6 +2864,64 @@
     "heal": 5
    },
    "bonusTxt": "적 하나에게 피해 9 + HP 5 회복"
+  },
+  "aries": {
+   "name": "양자리",
+   "short": "양",
+   "season": "가을",
+   "need": 3,
+   "bonus": {
+    "t": "dmgHighest",
+    "v": 20
+   },
+   "bonusTxt": "HP 최고 적에게 피해 20"
+  },
+  "libra": {
+   "name": "천칭자리",
+   "short": "천칭",
+   "season": "봄",
+   "need": 3,
+   "bonus": {
+    "t": "dmgRandBlock2",
+    "v": 10,
+    "block": 10
+   },
+   "bonusTxt": "무작위 적에게 피해 10 + 성막 10"
+  },
+  "capricornus": {
+   "name": "염소자리",
+   "short": "염소",
+   "season": "가을",
+   "need": 3,
+   "bonus": {
+    "t": "blockHeal",
+    "v": 12,
+    "heal": 6
+   },
+   "bonusTxt": "성막 12 + HP 6 회복"
+  },
+  "aquarius": {
+   "name": "물병자리",
+   "short": "물병",
+   "season": "가을",
+   "need": 3,
+   "bonus": {
+    "t": "manaDraw",
+    "mana": 2,
+    "draw": 2
+   },
+   "bonusTxt": "성간 물질 2 + 2장 뽑기"
+  },
+  "pisces": {
+   "name": "물고기자리",
+   "short": "물고기",
+   "season": "봄",
+   "need": 3,
+   "bonus": {
+    "t": "drawCostDown",
+    "draw": 3
+   },
+   "bonusTxt": "3장 뽑기 + 다음 카드 비용 −1"
   }
  },
  "ENEMIES": {
@@ -2459,7 +2989,8 @@
    },
    "conSeal": {
     "every": 4
-   }
+   },
+   "bullseye": 6
   },
   "babystar": {
    "name": "아기별",
@@ -2629,7 +3160,11 @@
     "every": 4,
     "v": 12
    },
-   "huddle": 0.18
+   "huddle": 0.18,
+   "pull": {
+    "every": 4,
+    "heal": 8
+   }
   },
   "blackhole": {
    "name": "은하핵의 블랙홀",
@@ -3010,6 +3545,12 @@
    "desc": "HP 15 회복",
    "price": 30
   },
+  "hourglass": {
+   "name": "계절의 모래시계",
+   "icon": "⏳",
+   "desc": "계절이 즉시 한 칸 넘어간다 (1막에선 무효)",
+   "price": 45
+  },
   "meteorShard": {
    "name": "유성 조각",
    "icon": "☄️",
@@ -3153,6 +3694,11 @@
    "name": "항성 나이테",
    "desc": "얻는 즉시 최대 HP +8 (그만큼 회복)",
    "price": 60
+  },
+  "slowsky": {
+   "name": "사계의 천구의",
+   "desc": "계절이 두 턴에 한 번만 넘어간다",
+   "price": 75
   },
   "flint": {
    "name": "별지기의 부싯돌",
