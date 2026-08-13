@@ -150,10 +150,9 @@ class Sim:
         self.con_seal_all = False
         self.con_seal_all_next = False
         self.dawn = DAWN.get(act)
-        if any(ENEMIES[e].get('reverse') for e in enemies):
-            self.season_dir = -1
-        else:
-            self.season_dir = 1
+        # v0.37: 블랙홀 '계절 왜곡' — seasonWarp 턴마다 계절이 한 칸 밀린다 (구 역행 폐지)
+        self.season_warp = next((ENEMIES[e].get('seasonWarp') for e in enemies
+                                 if ENEMIES[e].get('seasonWarp')), None)
         # 통계
         self.completed_log = defaultdict(int)     # 실제 완성 횟수
         self.had_cards = defaultdict(int)         # 그 별자리 카드를 손에 쥔 턴 수
@@ -163,7 +162,11 @@ class Sim:
     def season(self):
         if self.act == 1:
             return None                            # 1막은 계절 없음 (v0.19)
-        return SEASONS[(((self.turn - 1) * self.season_dir + self.season_off) % 4 + 4) % 4]
+        # v0.37: 계절은 전투당 하나로 고정 (턴 순환 폐지) — 블랙홀 왜곡만 전투 중 계절을 민다
+        idx = self.season_off
+        if self.season_warp and self.turn > 1:
+            idx += (self.turn - 1) // self.season_warp
+        return SEASONS[idx % 4]
 
     def smod(self, ss):
         cur = self.season()
@@ -175,7 +178,7 @@ class Sim:
 
     def sadj(self, v, ss):
         m = self.smod(ss)
-        return math.ceil(v * 1.25) if m == 1 else math.floor(v * 0.75) if m == -1 else v
+        return math.ceil(v * 1.5) if m == 1 else math.floor(v * 0.75) if m == -1 else v   # v0.37: 제철 +50%
 
     # ── 유틸 ──
     def alive(self):
@@ -303,7 +306,7 @@ class Sim:
         if not ss:
             return v
         m = self.smod(ss)
-        return math.ceil(v * 1.25) if m == 1 else math.floor(v * 0.75) if m == -1 else v
+        return math.ceil(v * 1.5) if m == 1 else math.floor(v * 0.75) if m == -1 else v   # v0.37: 제철 +50%
 
     def set_intent(self, e):
         sp = e.sp
@@ -916,7 +919,7 @@ def sim_act(act, deck, hp, relics, allies, rng, stats):
     행 단위 확률로 환산: 전투 .519 / 중간보스 .111 / 휴식 .148 / 이벤트 .111 / 상점 .074 / 대장간 .037.
     조우 티어는 빌드와 동일하게 0~2행 쉬움 / 3~6행 보통 / 7행~ 강함. (v0.32에서 13행 → 10행 축소)
     """
-    season_off = rng.randrange(4)
+    season_off = rng.randrange(4)                # v0.37: 전투마다 한 칸씩 넘어간다 (전투 동안 고정)
     dust = 0
     for r in range(10):
         if r == 0:
@@ -929,6 +932,7 @@ def sim_act(act, deck, hp, relics, allies, rng, stats):
             tier = 'easy' if r <= 2 else 'normal' if r <= 6 else 'hard'
             foes = [rng.choice(ELITES[act])] if kind == 'elite' else list(rng.choice(ENC[act][tier]))
             s = Sim(deck, foes, act=act, hp=hp, season_off=season_off, relics=relics, allies=allies, rng=rng)
+            season_off += 1                          # v0.37: 활동(전투)당 한 계절
             won = s.run()
             merge_stats(stats, s, act)
             if not won:
@@ -1087,7 +1091,7 @@ def validate(rng):
     print(f'  관통이 아머 무시: 피해 {hp0-s3.enemies[0].hp} (기대 5) · 적 성막 {s3.enemies[0].block} (기대 50)')
     s4 = Sim([('menkar', False)], ['jupiter'], act=2, season_off=2, rng=rng)  # 가을 시작
     s4.start_turn()
-    print(f'  2막 계절: turn1={s4.season()} (기대 가을) · 고래 제철 피해 {s4.sadj(9,"가을")} (기대 12)')
+    print(f'  2막 계절: turn1={s4.season()} (기대 가을) · 고래 제철 피해 {s4.sadj(9,"가을")} (기대 14 — v0.37 +50%)')
     s5 = Sim([('menkar', False)], ['jupiter'], act=1, rng=rng)
     s5.start_turn()
     print(f'  1막 계절: {s5.season()} (기대 None) · 보정 {s5.sadj(9,"가을")} (기대 9)')

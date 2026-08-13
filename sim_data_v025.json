@@ -168,6 +168,46 @@
    ],
    "si": 4
   },
+  "procyon": {
+   "by": "α",
+   "name": "프로키온",
+   "con": "canisminor",
+   "rank": 1,
+   "type": "공격",
+   "cost": 2,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 11
+    },
+    {
+     "t": "draw",
+     "n": 1
+    }
+   ],
+   "si": 0
+  },
+  "gomeisa": {
+   "by": "β",
+   "name": "고메이사",
+   "con": "canisminor",
+   "rank": 2,
+   "type": "공격",
+   "cost": 1,
+   "target": true,
+   "fx": [
+    {
+     "t": "dmg",
+     "v": 5
+    },
+    {
+     "t": "block",
+     "v": 3
+    }
+   ],
+   "si": 1
+  },
   "castor": {
    "by": "α",
    "name": "카스토르",
@@ -2583,6 +2623,17 @@
    },
    "bonusTxt": "HP 최저 적에게 피해 10, 처치 시 1장 뽑기"
   },
+  "canisminor": {
+   "name": "작은개자리",
+   "short": "작은개",
+   "season": "겨울",
+   "need": 1,
+   "bonus": {
+    "t": "dmgRandom",
+    "v": 5
+   },
+   "bonusTxt": "무작위 적에게 피해 5"
+  },
   "gemini": {
    "name": "쌍둥이자리",
    "short": "쌍둥이",
@@ -3189,7 +3240,7 @@
     "every": 5,
     "n": 2
    },
-   "reverse": true,
+   "seasonWarp": 3,
    "phase": {
     "at": 0.4,
     "gravity": true,
@@ -3697,7 +3748,7 @@
   },
   "slowsky": {
    "name": "사계의 천구의",
-   "desc": "계절이 두 턴에 한 번만 넘어간다",
+   "desc": "계절이 두 전투에 한 번만 넘어간다",
    "price": 75
   },
   "flint": {
