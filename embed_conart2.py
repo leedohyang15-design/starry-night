@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""embed_conart2.py — v0.38 별자리 판화 시트 2장(별자리 그림/별자리그림1·2.png)을 32장으로 잘라 CON_IMG 주입.
-검은 배경 판화 스타일이라 누끼 대신 **불투명 WebP + CSS mix-blend-mode:screen**(검정=투명과 동일)을 쓴다
-— 알파 평면이 빠져 파일이 절반 이하가 된다. 빌드 CSS의 .cfig/.stagefig/.conimg에 blend가 걸려 있어야 한다.
+"""embed_conart2.py — v0.40 별자리 판화 시트 2장(별자리 그림/plate1·2-cutout.png, **사용자 누끼 = 진짜 알파**)을
+32장으로 잘라 CON_IMG 주입. 알파를 그대로 쓰고 WebP(알파)로 내보낸다 — v0.38의 screen 블렌드 우회는 폐기
+(빌드 CSS의 .cfig/.stagefig/.conimg mix-blend-mode:screen도 함께 제거할 것).
 각 칸 아래의 별자리 이름 라벨은 잘라낸다(라벨 = 칸 하단의 낮은 텍스트 띠).
 사용: python embed_conart2.py <빌드html>  ·  --dump out/ 로 검수용 저장
 """
@@ -12,21 +12,21 @@ from PIL import Image
 
 # 행 밴드는 수동 확정(라벨 띠 제외한 그림 영역) — 자동 행 검출은 행이 서로 붙어 실패했다
 SHEETS = [
-    ('별자리 그림/별자리그림1.png', [
-        ((22, 263),  ['canis','orion','gemini','taurus','scorpius']),
-        ((308, 518), ['leo','virgo','bootes','lyra','cygnus','aquila']),
-        ((552, 751), ['pegasus','ursa','ursaminor','cassiopeia','andromeda']),
-        ((809, 976), ['piscis','pisces']),
+    ('별자리 그림/plate1-cutout.png', [
+        ((22, 264),  ['canis','orion','gemini','taurus','scorpius']),
+        ((308, 521), ['leo','virgo','bootes','lyra','cygnus','aquila']),
+        ((552, 753), ['pegasus','ursa','ursaminor','cassiopeia','andromeda']),
+        ((809, 977), ['piscis','pisces']),
     ]),
-    ('별자리 그림/별자리그림2.png', [
-        ((32, 309),  ['aries','libra','capricornus','aquarius','canisminor']),
-        ((365, 616), ['auriga','corvus','cancer','sagittarius','corona']),
+    ('별자리 그림/plate2-cutout.png', [
+        ((32, 310),  ['aries','libra','capricornus','aquarius','canisminor']),
+        ((365, 617), ['auriga','corvus','cancer','sagittarius','corona']),
         ((682, 951), ['perseus','cetus','cepheus','draco']),
     ]),
 ]
-LUM_T = 28        # 배경 판정 밝기
-MAXSIDE = 380
-QUALITY = 70
+LUM_T = 28   # (알파 모드에선 미사용)        # 배경 판정 밝기
+MAXSIDE = 330
+QUALITY = 62
 
 def bands(on, min_gap, min_len):
     """불리언 프로파일의 참 구간들 — min_gap 미만 틈은 이어붙이고 min_len 미만은 버린다"""
@@ -47,23 +47,27 @@ def main():
     html = next((a for a in sys.argv[1:] if a.endswith('.html')), None)
     arts = {}
     for path, layout in SHEETS:
-        im = np.asarray(Image.open(path).convert('RGB')).astype(np.uint16)
-        mask = im.max(2) > LUM_T
+        rgba = np.asarray(Image.open(path).convert('RGBA'))
+        im = rgba[:, :, :3].astype(np.uint16)
+        mask = rgba[:, :, 3] > 8
         for (y0, y1), keys in layout:
             cols = bands(mask[y0:y1].sum(0) > 8, 16, 40)
             assert len(cols) == len(keys), (path, y0, len(cols), len(keys))
             for (x0, x1), key in zip(cols, keys):
-                sub = im[y0:y1, x0:x1]
+                cell = rgba[y0:y1, x0:x1]
                 m2 = mask[y0:y1, x0:x1]
                 yb = bands(m2.sum(1) > 2, 6, 4)   # 칸 하단에 삐져 들어온 라벨 글자 조각 제거
                 if len(yb) >= 2 and (yb[-1][1] - yb[-1][0]) <= 40:
                     yc = yb[-2][1]
-                    sub, m2 = sub[:yc], m2[:yc]
+                    cell, m2 = cell[:yc], m2[:yc]
                 ys, xs = np.where(m2)
-                sub = sub[ys.min():ys.max()+1, xs.min():xs.max()+1]
-                pic = Image.fromarray(sub.astype(np.uint8), 'RGB')   # 불투명 — 표시 시 screen 블렌드
+                cell = cell[ys.min():ys.max()+1, xs.min():xs.max()+1]
+                pic = Image.fromarray(cell, 'RGBA')
                 sc = MAXSIDE / max(pic.size)
                 if sc < 1: pic = pic.resize((round(pic.width*sc), round(pic.height*sc)), Image.LANCZOS)
+                # 알파 4단계 양자화 — 페더의 미세 계조가 WebP 알파 평면을 크게 만든다 (시각 차이는 미미)
+                a2 = pic.getchannel('A').point(lambda v: 0 if v < 40 else 96 if v < 128 else 192 if v < 208 else 255)
+                pic.putalpha(a2)
                 if dump:
                     os.makedirs(outdir, exist_ok=True); pic.save(os.path.join(outdir, key+'.png'))
 
