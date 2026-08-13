@@ -6,7 +6,7 @@
 
 ## 파일 안내
 
-- `전투프로토타입_v0.38.html` — **현재 빌드** (단일 HTML 약 1.1MB, 브라우저로 열면 플레이). 시작 화면: 튜토리얼 / **1막 → 2막 → 3막 여정** / 보스전 단판 / 도감 138종. **드래그 전용 발동**·바이어 등급·담기/버리기 보상·도트 천체 34종·대장간 합성·보스 기믹 9종·적 계절 보정·조력자 3인 수다·이벤트 18종·유물 22종. 구버전 v0.5~v0.37 보존 ※ v0.29·v0.30은 원격에서 `starry-night-v0.xx.html`로 먼저 만들어졌다 — **원본 PC에서 한글 파일명 사본을 복사로 만들 것**
+- `전투프로토타입_v0.39.html` — **현재 빌드** (단일 HTML 약 1.2MB, 브라우저로 열면 플레이). 시작 화면: 튜토리얼 / **1막 → 2막 → 3막 여정** / 보스전 단판 / 도감 138종. **드래그 전용 발동**·바이어 등급·담기/버리기 보상·도트 천체 34종·대장간 합성·보스 기믹 9종·적 계절 보정·조력자 3인 수다·이벤트 18종·유물 22종. 구버전 v0.5~v0.38 보존 ※ v0.29·v0.30은 원격에서 `starry-night-v0.xx.html`로 먼저 만들어졌다 — **원본 PC에서 한글 파일명 사본을 복사로 만들 것**
 - `Constellation Effect.dc.html` + `gen_fx_lines.py` + `성좌연출_v0.22.png` — **성좌 완성 연출 레퍼런스**(사용자 제공)와 기하 생성기. `const_lines.json` 하나에서 **CONST_LINES(카드용)·CONST_FX(성좌판·연출용)** 를 동시에 주입해 **세 화면의 별자리를 통일**한다(별 인덱스 공유). **별자리 그림을 손보려면 `python gen_const_lines.py` → `python gen_fx_lines.py <빌드html>` 순서로 재실행**
 - `gen_pixel_art.py` + `도트천체_v0.21.png` — **적 도트 스프라이트 생성기**(절차적). 24×24(쫄몹)·28×28(보스) 격자를 프리미티브로 그려 런렝스 SVG로 주입. **적 그림을 바꾸려면 이 파일의 레시피만 고치고 `python gen_pixel_art.py <빌드html>` 재실행**
 - `조력자/<이름>-talk-sheet.png` 7벌 + `embed_talk_sheets.py` — **v0.38 조력자 4프레임**(2048×512 = 512² × [기본·입엶·입활짝·눈감음], 투명 배경). 공통 크롭 (88,0,424,512) → 1/2 NEAREST → WebP 무손실 주입(`PORTRAIT_IMG/OPEN/WIDE/BLINK`). 말하기 = 엶→활짝→엶→다뭄 4박 135ms(`mouthTalk`), 대기 = 평균 3.5초마다 140ms 깜빡임(전역 인터벌). **그림 교체 시 시트 갈아끼우고 `python embed_talk_sheets.py <빌드html>` 재실행** (구 `조력자.png`+`embed_assets.py` 2프레임 파이프라인은 v0.37 이하 전용)
@@ -21,6 +21,7 @@
 - `const_lines.json` + `gen_const_lines.py` — 별자리 선 데이터 (실제 J2000 좌표 **별자리 중심 입체 투영** — v0.23에서 교체). 큰곰은 전신 18성(Stellarium modern 표준). py는 현재 uma + v0.18 신규 9개 좌표 보유 — 새 별자리는 py에 좌표 추가 후 재실행
 - `PRODUCT.md` — 제품 진실 (Impeccable `init` 산출물: 사용자·목적·포지셔닝·제약·브랜드 약속·미확정 항목)
 - `.impeccable/critique/` — 디자인 크리틱 스냅샷 (v0.25 = 19/40). `polish`가 이걸 백로그로 읽는다
+- `폰트/Galmuri11(.‑Bold).woff2` + `embed_font.py` — **v0.39 픽셀 폰트**(갈무리, OFL 라이선스). 빌드에 실제 등장하는 글자만 서브셋해 base64 @font-face로 내장(약 56KB — 오프라인 단일 파일 유지). **한글 문구를 추가·수정한 버전을 낼 때마다 `python embed_font.py <빌드html>` 재실행** (서브셋에 없는 글자는 시스템 폰트로 빠져 픽셀풍이 깨진다). UI 픽셀 테마(모서리 직각·하드 섀도·픽셀 렌더링)는 `<style>` 끝의 "v0.39 픽셀 테마" 블록
 - 팀 스킬(디자인팀·제작팀·밸런스팀)은 **`constellation-game-studio` 플러그인**으로 설치돼 있다 — 저장소가 아니라 Claude Code 쪽에 붙어 있으므로, **새 기계에서는 플러그인을 따로 설치**해야 "제작팀 소집"이 먹는다
 - **GitHub**: <https://github.com/leedohyang15-design/starry-night> · 플레이 <https://leedohyang15-design.github.io/starry-night/>
 
@@ -28,7 +29,7 @@
 
 - **시작 전 `git pull`, 끝나면 바로 `git push`.** 게임이 1.25MB 단일 HTML 한 파일이라 양쪽에서 동시에 고치면 git이 병합하지 못하고, 사실상 수동 복구가 불가능하다. **두 곳에서 동시에 만지지 않는다.**
 - 저장소에 **없는 것**: 구버전 빌드 27개 · 구 카드목록 · 구 시뮬 스냅샷 · `.claude/settings.local.json`. 되돌아갈 구버전이 필요하면 원본 PC에만 있다
-- 저장소의 게임 파일 이름은 **`starry-night-v0.38.html`**(ASCII)이다 — GitHub Pages URL 인코딩을 피하려고 영문으로 두었다. 로컬 `전투프로토타입_v0.38.html`과 내용은 같다. **새 버전을 낼 때 둘 다 갱신할 것** (구버전 v0.28~v0.37도 저장소에 보존)
+- 저장소의 게임 파일 이름은 **`starry-night-v0.39.html`**(ASCII)이다 — GitHub Pages URL 인코딩을 피하려고 영문으로 두었다. 로컬 `전투프로토타입_v0.39.html`과 내용은 같다. **새 버전을 낼 때 둘 다 갱신할 것** (구버전 v0.28~v0.38도 저장소에 보존)
 - git 저장소가 OneDrive 폴더 안에 있다. OneDrive가 `.git`의 작은 파일들을 붙들어 저장소를 깨뜨릴 수 있으므로, **다른 기계에서는 OneDrive 바깥에 clone**할 것
 
 ## 기술 표준 (반드시 유지)
