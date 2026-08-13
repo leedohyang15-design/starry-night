@@ -405,6 +405,15 @@ class Sim:
     def eff_cost(self, d):
         return max(0, d['cost'] - 1) if self.cost_down > 0 else d['cost']
 
+    def fv(self, f, d):
+        """v0.36 공명(reso — 이번 턴 같은 별자리를 먼저 냈다면 +) · 잔광(glow — 이번 턴 완성했다면 +)"""
+        v = f.get('v', f.get('n', 0)) or 0
+        if f.get('reso') and self.turn_counts[d['con']] >= (d.get('countAs', 1) + 1):
+            v += f['reso']
+        if f.get('glow') and self.completed:
+            v += f['glow']
+        return v
+
     def play(self, idx, target=None):
         card = self.hand[idx]
         d = cdata(card)
@@ -432,7 +441,7 @@ class Sim:
         for f in d['fx']:
             t = f['t']
             if t == 'dmg':
-                v = sA(f['v'])
+                v = sA(self.fv(f, d))
                 if comp and d.get('comp', {}).get('dmgPlus'):
                     v += d['comp']['dmgPlus']
                 if d.get('ursaEver') and 'ursa' in self.ever:
@@ -471,7 +480,7 @@ class Sim:
                 for e in self.alive():
                     e.burn += v; e.burn_t = 2
             elif t == 'block':
-                v = sA(f['v'])
+                v = sA(self.fv(f, d))
                 if comp and d.get('comp', {}).get('blockPlus'):
                     v += d['comp']['blockPlus']
                 if d['type'] == '수비' and self.def_buff:
@@ -526,7 +535,7 @@ class Sim:
                 if a:
                     a.sealed = True
             elif t == 'draw':
-                self.draw(f['n'])
+                self.draw(self.fv(f, d))
             elif t == 'mana':
                 self.energy += f['v']
             elif t == 'heal':
@@ -671,6 +680,12 @@ class Sim:
             self.block += b['block']; self.draw(b['draw'])
         elif t == 'block':
             self.block += b['v']
+        elif t == 'blockHeal':   # v0.36 염소
+            self.block += b['v']; self.hp = min(self.maxhp, self.hp + b['heal'])
+        elif t == 'dmgRandBlock2':   # v0.36 천칭
+            a2 = self.rng.choice(self.alive()) if self.alive() else None
+            if a2: self.hit(a2, b['v'])
+            self.block += b['block']
         elif t == 'blockThorns':
             self.block += b['v']; self.thorns += b['thorns']
         elif t == 'draw':
