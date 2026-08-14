@@ -15,7 +15,7 @@ SHEETS = [
     ('별자리 그림/plate1-cutout.png', [
         ((19, 264),  ['canis','orion','gemini','taurus','scorpius']),
         ((306, 521), ['leo','virgo','bootes','lyra','cygnus','aquila']),
-        ((548, 753), ['pegasus','ursa','ursaminor','cassiopeia','andromeda']),
+        ((524, 753), ['pegasus','ursa','ursaminor','cassiopeia','andromeda']),
         ((804, 977), ['piscis','pisces']),
     ]),
     ('별자리 그림/plate2-cutout.png', [
@@ -52,6 +52,8 @@ def main():
         mask = rgba[:, :, 3] > 8
         for (y0, y1), keys in layout:
             cols = bands(mask[y0:y1].sum(0) > 8, 16, 40)
+            if len(cols) != len(keys):   # v0.42: 라벨 글자가 열 사이를 이으면 라벨 띠(상단 60px)를 빼고 재시도
+                cols = bands(mask[y0+60:y1].sum(0) > 8, 16, 40)
             assert len(cols) == len(keys), (path, y0, len(cols), len(keys))
             for (x0, x1), key in zip(cols, keys):
                 cell = rgba[y0:y1, x0:x1]
@@ -60,10 +62,19 @@ def main():
                 if len(yb) >= 2 and (yb[-1][1] - yb[-1][0]) <= 40:
                     yc = yb[-2][1]
                     cell, m2 = cell[:yc], m2[:yc]
-                yb = bands(m2.sum(1) > 2, 6, 4)   # v0.41: 칸 **상단**에 붙은 윗행 라벨 조각도 제거
-                if len(yb) >= 2 and (yb[0][1] - yb[0][0]) <= 40:
-                    yc = yb[1][0]
-                    cell, m2 = cell[yc:], m2[yc:]
+                # v0.42: 상단 라벨은 y띠가 아니라 **연결 성분**으로 제거 — 카시오페이아 왕관처럼
+                # 그림이 라벨과 같은 높이까지 올라오는 칸에서 y띠 절단은 머리를 자른다
+                from scipy import ndimage
+                lab_arr, n = ndimage.label(m2)
+                if n > 1:
+                    sizes = ndimage.sum(m2, lab_arr, range(1, n + 1))
+                    keep = np.ones(n + 1, bool)
+                    for ci, sl in enumerate(ndimage.find_objects(lab_arr)):
+                        h_ = sl[0].stop - sl[0].start
+                        if sizes[ci] < 1400 and h_ <= 48 and sl[0].start < 70:
+                            keep[ci + 1] = False       # 라벨 글자 크기의 조각만 삭제
+                    m2 = keep[lab_arr] & m2
+                    cell = cell.copy(); cell[~m2] = 0
                 ys, xs = np.where(m2)
                 cell = cell[ys.min():ys.max()+1, xs.min():xs.max()+1]
                 pic = Image.fromarray(cell, 'RGBA')
