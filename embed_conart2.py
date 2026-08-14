@@ -13,15 +13,15 @@ from PIL import Image
 # 행 밴드는 수동 확정(라벨 띠 제외한 그림 영역) — 자동 행 검출은 행이 서로 붙어 실패했다
 SHEETS = [
     ('별자리 그림/plate1-cutout.png', [
-        ((22, 264),  ['canis','orion','gemini','taurus','scorpius']),
-        ((308, 521), ['leo','virgo','bootes','lyra','cygnus','aquila']),
-        ((552, 753), ['pegasus','ursa','ursaminor','cassiopeia','andromeda']),
-        ((809, 977), ['piscis','pisces']),
+        ((19, 264),  ['canis','orion','gemini','taurus','scorpius']),
+        ((306, 521), ['leo','virgo','bootes','lyra','cygnus','aquila']),
+        ((548, 753), ['pegasus','ursa','ursaminor','cassiopeia','andromeda']),
+        ((804, 977), ['piscis','pisces']),
     ]),
     ('별자리 그림/plate2-cutout.png', [
         ((32, 310),  ['aries','libra','capricornus','aquarius','canisminor']),
-        ((365, 617), ['auriga','corvus','cancer','sagittarius','corona']),
-        ((682, 951), ['perseus','cetus','cepheus','draco']),
+        ((364, 617), ['auriga','corvus','cancer','sagittarius','corona']),
+        ((678, 951), ['perseus','cetus','cepheus','draco']),
     ]),
 ]
 LUM_T = 28   # (알파 모드에선 미사용)        # 배경 판정 밝기
@@ -60,6 +60,10 @@ def main():
                 if len(yb) >= 2 and (yb[-1][1] - yb[-1][0]) <= 40:
                     yc = yb[-2][1]
                     cell, m2 = cell[:yc], m2[:yc]
+                yb = bands(m2.sum(1) > 2, 6, 4)   # v0.41: 칸 **상단**에 붙은 윗행 라벨 조각도 제거
+                if len(yb) >= 2 and (yb[0][1] - yb[0][0]) <= 40:
+                    yc = yb[1][0]
+                    cell, m2 = cell[yc:], m2[yc:]
                 ys, xs = np.where(m2)
                 cell = cell[ys.min():ys.max()+1, xs.min():xs.max()+1]
                 pic = Image.fromarray(cell, 'RGBA')
