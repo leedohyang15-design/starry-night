@@ -150,6 +150,9 @@ class Sim:
         self.con_seal_all = False
         self.con_seal_all_next = False
         self.dawn = DAWN.get(act)
+        # v0.43 깊은 밤 — 일반 9 · 중간보스 12 · 보스 14턴부터 적 공격 +1 누적
+        self.night_from = (14 if any(ENEMIES[e].get('boss') for e in enemies)
+                           else 12 if any(ENEMIES[e].get('elite') for e in enemies) else 9)
         # v0.37: 블랙홀 '계절 왜곡' — seasonWarp 턴마다 계절이 한 칸 밀린다 (구 역행 폐지)
         self.season_warp = next((ENEMIES[e].get('seasonWarp') for e in enemies
                                  if ENEMIES[e].get('seasonWarp')), None)
@@ -208,7 +211,12 @@ class Sim:
             b = min(e.block, dmg)
             e.block -= b
             dmg -= b
+        was_alive = e.hp > 0
         e.hp = max(0, e.hp - dmg)
+        if was_alive and e.hp == 0 and e.sp.get('deathBurst'):   # v0.43 임종 폭발
+            _bd = max(0, e.sp['deathBurst'] - 0)
+            _b = min(self.block, _bd); self.block -= _b
+            self.hp = max(0, self.hp - (_bd - _b)); self.dmg_taken += _bd - _b
         sp = e.sp
         if e.hp > 0 and sp.get('split') and not getattr(e, 'split_done', False) and e.hp <= e.maxhp * sp['split']['at']:
             e.split_done = True
@@ -240,6 +248,9 @@ class Sim:
             _c = _e.sp.get('creep')
             if _c and self.turn >= 1 and _e.hp > 0:
                 _e.atk_bonus = min(_c['max'], getattr(_e, 'atk_bonus', 0) + _c['v'])
+            _rg = _e.sp.get('regen')                     # v0.43 자기 회복
+            if _rg and self.turn >= 1 and 0 < _e.hp < _e.maxhp:
+                _e.hp = min(_e.maxhp, _e.hp + _rg)
         if self.keep_block:
             self.keep_block = False
         else:
@@ -301,12 +312,14 @@ class Sim:
             self.had_cards[k] += 1
 
     def enemy_atk(self, e, v):
-        """v0.20: 적도 계절을 탄다 — 제철 +25% / 역철 −25%"""
+        """v0.20 적 계절 보정 + v0.43 깊은 밤(문턱부터 매 턴 +1 누적)"""
         ss = e.sp.get('season')
-        if not ss:
-            return v
-        m = self.smod(ss)
-        return math.ceil(v * 1.5) if m == 1 else math.floor(v * 0.75) if m == -1 else v   # v0.37: 제철 +50%
+        if ss:
+            m = self.smod(ss)
+            v = math.ceil(v * 1.5) if m == 1 else math.floor(v * 0.75) if m == -1 else v
+        if self.turn >= self.night_from:
+            v += self.turn - self.night_from + 1
+        return v
 
     def set_intent(self, e):
         sp = e.sp
@@ -916,20 +929,21 @@ def try_forge(deck):
 def sim_act(act, deck, hp, relics, allies, rng, stats):
     """한 막 = 실제 맵 경로 재현: 3열×**10행**(v0.32~) 중 한 줄만 밟는다 + 보스 전 휴식 + 보스.
     genMap의 노드 분포(1~9행 27칸 = 전투 14 · 중간보스 3 · 휴식 4 · 이벤트 3 · 상점 2 · 대장간 1)를
-    행 단위 확률로 환산: 전투 .519 / 중간보스 .111 / 휴식 .148 / 이벤트 .111 / 상점 .074 / 대장간 .037.
+    v0.43: 12행(1~11행 33칸 = 전투 18 · 중간보스 3 · 휴식 5 · 이벤트 4 · 상점 2 · 대장간 1)
+    행 단위 확률: 전투 .545 / 중간보스 .091 / 휴식 .152 / 이벤트 .121 / 상점 .061 / 대장간 .030.
     조우 티어는 빌드와 동일하게 0~2행 쉬움 / 3~6행 보통 / 7행~ 강함. (v0.32에서 13행 → 10행 축소)
     """
     season_off = rng.randrange(4)                # v0.37: 전투마다 한 칸씩 넘어간다 (전투 동안 고정)
     dust = 0
-    for r in range(10):
+    for r in range(12):
         if r == 0:
             kind = 'battle'
         else:
             x = rng.random()
-            kind = ('battle' if x < .519 else 'elite' if x < .630 else 'rest' if x < .778
-                    else 'event' if x < .889 else 'shop' if x < .963 else 'forge')
+            kind = ('battle' if x < .545 else 'elite' if x < .636 else 'rest' if x < .788
+                    else 'event' if x < .909 else 'shop' if x < .970 else 'forge')
         if kind in ('battle', 'elite'):
-            tier = 'easy' if r <= 2 else 'normal' if r <= 6 else 'hard'
+            tier = 'easy' if r <= 3 else 'normal' if r <= 7 else 'hard'
             foes = [rng.choice(ELITES[act])] if kind == 'elite' else list(rng.choice(ENC[act][tier]))
             s = Sim(deck, foes, act=act, hp=hp, season_off=season_off, relics=relics, allies=allies, rng=rng)
             season_off += 1                          # v0.37: 활동(전투)당 한 계절
