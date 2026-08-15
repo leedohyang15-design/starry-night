@@ -479,6 +479,8 @@ class Sim:
                 self.block += v
             elif t == 'dmgMulti':
                 total = sA(f['v'] * f['n'] + f.get('plus', 0))
+                if comp and d.get('comp', {}).get('multiPlus'):     # v0.44 각성
+                    total += d['comp']['multiPlus'] * f['n']
                 if d['type'] == '공격' and self.atk_buff:
                     total += self.atk_buff; self.atk_buff = 0
                 per, rem = total // f['n'], total - (total // f['n']) * f['n']
@@ -487,6 +489,8 @@ class Sim:
                     self.hit(tt, per + (1 if i < rem else 0), f.get('pierce'))
             elif t == 'aoe':
                 v = sA(f['v'])
+                if comp and d.get('comp', {}).get('aoePlus'):       # v0.44 각성
+                    v += d['comp']['aoePlus']
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
                 for e in self.alive():
@@ -551,11 +555,12 @@ class Sim:
                 if a:
                     a.sealed = True
             elif t == 'draw':
-                self.draw(self.fv(f, d))
+                self.draw(self.fv(f, d) + (d.get('comp', {}).get('drawPlus', 0) if comp else 0))   # v0.44 각성
             elif t == 'mana':
                 self.energy += f['v']
             elif t == 'heal':
-                self.hp = min(self.maxhp, self.hp + f['v'])
+                _hv = f['v'] + (d.get('comp', {}).get('healPlus', 0) if comp else 0)   # v0.44 각성
+                self.hp = min(self.maxhp, self.hp + _hv)
             elif t == 'thorns':
                 self.thorns += f['v']
             elif t == 'buffAtk':
