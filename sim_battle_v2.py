@@ -757,6 +757,8 @@ class Sim:
             t = f['t']
             if t in ('dmg', 'dmgPerCon', 'dmgRand', 'dmgExec', 'dmgKill'):
                 s += self.sadj(f['v'], ss) / 6.0 * (1.2 if f.get('pierce') else 1.0)
+            elif t == 'varDmg':                                  # v0.45: 변광 — 기대값으로 평가 (안 세면 AI가 안 낸다)
+                s += self.sadj(sum(f['opts']) / len(f['opts']), ss) / 6.0
             elif t == 'dmgMulti':
                 s += self.sadj(f['v'] * f['n'], ss) / 6.0
             elif t == 'aoe':

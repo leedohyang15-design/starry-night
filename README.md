@@ -33,13 +33,13 @@
 
 | | |
 |---|---|
-| `starry-night-v0.44.html` | 게임 본체. 단일 HTML 하나에 전부 들어 있다 (약 1.3MB) — 구버전 v0.28~v0.43도 보존 |
+| `starry-night-v0.45.html` | 게임 본체. 단일 HTML 하나에 전부 들어 있다 (약 1.3MB) — 구버전 v0.28~v0.44도 보존 |
 | `index.html` | 시작 페이지 |
 | `const_lines.json` · `gen_const_lines.py` · `gen_fx_lines.py` | 별자리 선 데이터(J2000)와 투영·주입 스크립트 |
 | `gen_pixel_art.py` | 적 도트 스프라이트 34종 절차 생성기 |
 | `embed_assets.py` · `embed_conart.py` | 조력자 초상·계절 배경·성좌 각인 누끼 + 임베드 |
 | `sim_battle_v2.py` · `sim_tune.py` · `sim_bosses.py` · `dump_sim_data.js` | 밸런스 시뮬레이터 (빌드에서 데이터를 떠내 규칙을 재현한다) |
-| `카드목록_v1.4.md` | 별 138종 전량 + 등급표 (32개 별자리·키워드 16종·하늘 지표 6종) |
+| `카드목록_v1.5.md` | 별 138종 전량 (조합 유일화·빌드에서 기계 생성) |
 | `아트스타일가이드.md` | 카드 템플릿, 표준 별선, 성좌 완성 연출 스펙 |
 | `CLAUDE.md` · `PRODUCT.md` | 설계 규칙과 제품 맥락 |
 
