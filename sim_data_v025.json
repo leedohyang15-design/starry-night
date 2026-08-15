@@ -109,6 +109,10 @@
      "pierce": true
     }
    ],
+   "comp": {
+    "dmgPlus": 5
+   },
+   "compTxt": "완성한 턴: 피해 +5",
    "si": 0
   },
   "mirzam": {
@@ -186,6 +190,10 @@
      "n": 1
     }
    ],
+   "comp": {
+    "dmgPlus": 4
+   },
+   "compTxt": "완성한 턴: 피해 +4",
    "si": 0
   },
   "gomeisa": {
@@ -223,6 +231,10 @@
      "n": 2
     }
    ],
+   "comp": {
+    "multiPlus": 3
+   },
+   "compTxt": "완성한 턴: 연격 각 +3",
    "si": 0
   },
   "pollux": {
@@ -314,6 +326,10 @@
      "v": 24
     }
    ],
+   "comp": {
+    "dmgPlus": 8
+   },
+   "compTxt": "완성한 턴: 피해 +8",
    "si": 0
   },
   "elnath": {
@@ -510,6 +526,10 @@
      "n": 1
     }
    ],
+   "comp": {
+    "drawPlus": 1
+   },
+   "compTxt": "완성한 턴: 뽑기 +1",
    "si": 0
   },
   "zavijava": {
@@ -602,6 +622,10 @@
      "v": 10
     }
    ],
+   "comp": {
+    "dmgPlus": 5
+   },
+   "compTxt": "완성한 턴: 피해 +5",
    "extraTxt": "이번 전투에서 큰곰자리를 완성했다면 피해 +4",
    "ursaEver": 4,
    "si": 0
@@ -681,6 +705,10 @@
      "n": 2
     }
    ],
+   "comp": {
+    "drawPlus": 1
+   },
+   "compTxt": "완성한 턴: 뽑기 +1",
    "si": 0
   },
   "sheliak": {
@@ -752,6 +780,10 @@
      "n": 2
     }
    ],
+   "comp": {
+    "blockPlus": 5
+   },
+   "compTxt": "완성한 턴: 성막 +5",
    "si": 0
   },
   "albireo": {
@@ -820,6 +852,10 @@
      "n": 2
     }
    ],
+   "comp": {
+    "multiPlus": 2
+   },
+   "compTxt": "완성한 턴: 연격 각 +2",
    "si": 0
   },
   "alshain": {
@@ -890,6 +926,10 @@
      "v": 4
     }
    ],
+   "comp": {
+    "poisonPlus": 3
+   },
+   "compTxt": "완성한 턴: 중독 +3",
    "si": 4
   },
   "acrab": {
@@ -982,6 +1022,10 @@
      "v": 13
     }
    ],
+   "comp": {
+    "dmgPlus": 6
+   },
+   "compTxt": "완성한 턴: 피해 +6",
    "si": 0
   },
   "scheat": {
@@ -1057,6 +1101,10 @@
      "t": "seal"
     }
    ],
+   "comp": {
+    "blockPlus": 5
+   },
+   "compTxt": "완성한 턴: 성막 +5",
    "si": 0,
    "alsoCon": "pegasus"
   },
@@ -1139,6 +1187,10 @@
      "v": 3
     }
    ],
+   "comp": {
+    "healPlus": 3
+   },
+   "compTxt": "완성한 턴: 회복 +3",
    "si": 0
   },
   "piscdelta": {
@@ -1178,6 +1230,10 @@
      "n": 1
     }
    ],
+   "comp": {
+    "dmgPlus": 5
+   },
+   "compTxt": "완성한 턴: 피해 +5",
    "si": 1
   },
   "caph": {
@@ -1247,6 +1303,10 @@
      "v": 11
     }
    ],
+   "comp": {
+    "blockPlus": 6
+   },
+   "compTxt": "완성한 턴: 성막 +6",
    "si": 0
   },
   "merak": {
@@ -1408,6 +1468,10 @@
      "pierce": true
     }
    ],
+   "comp": {
+    "dmgPlus": 6
+   },
+   "compTxt": "완성한 턴: 피해 +6",
    "si": 12
   },
   "alnasl": {
@@ -1502,6 +1566,10 @@
      "v": 3
     }
    ],
+   "comp": {
+    "blockPlus": 4
+   },
+   "compTxt": "완성한 턴: 성막 +4",
    "si": 0
   },
   "nusakan": {
@@ -1664,6 +1732,10 @@
      "n": 1
     }
    ],
+   "comp": {
+    "aoePlus": 3
+   },
+   "compTxt": "완성한 턴: 전체 피해 +3",
    "si": 3
   },
   "altarf": {
@@ -1759,6 +1831,10 @@
      "t": "halfBlockDmg"
     }
    ],
+   "comp": {
+    "blockPlus": 4
+   },
+   "compTxt": "완성한 턴: 성막 +4",
    "si": 0
   },
   "menkalinan": {
@@ -1983,6 +2059,10 @@
      "v": 3
     }
    ],
+   "comp": {
+    "aoePlus": 3
+   },
+   "compTxt": "완성한 턴: 전체 피해 +3",
    "si": 9
   },
   "rastaban": {
@@ -2063,6 +2143,10 @@
      "v": 3
     }
    ],
+   "comp": {
+    "healPlus": 3
+   },
+   "compTxt": "완성한 턴: 회복 +3",
    "si": 0
   },
   "diphda": {
@@ -2144,6 +2228,10 @@
      "n": 2
     }
    ],
+   "comp": {
+    "dmgPlus": 6
+   },
+   "compTxt": "완성한 턴: 피해 +6",
    "si": 0
   },
   "sheratan": {
@@ -2157,8 +2245,8 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 6,
-     "reso": 4
+     "v": 5,
+     "reso": 6
     }
    ],
    "si": 1
@@ -2209,8 +2297,8 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 3,
-     "reso": 2
+     "v": 2,
+     "reso": 4
     }
    ],
    "si": 4
@@ -2233,6 +2321,11 @@
      "v": 9
     }
    ],
+   "comp": {
+    "dmgPlus": 3,
+    "blockPlus": 3
+   },
+   "compTxt": "완성한 턴: 피해·성막 +3",
    "si": 0
   },
   "zubeneschamali": {
@@ -2334,6 +2427,10 @@
      "v": 5
     }
    ],
+   "comp": {
+    "healPlus": 4
+   },
+   "compTxt": "완성한 턴: 회복 +4",
    "si": 0
   },
   "dabih": {
@@ -2387,7 +2484,11 @@
    "fx": [
     {
      "t": "block",
-     "v": 7
+     "v": 5
+    },
+    {
+     "t": "heal",
+     "v": 2
     }
    ],
    "si": 3
@@ -2402,7 +2503,11 @@
    "fx": [
     {
      "t": "block",
-     "v": 3
+     "v": 2
+    },
+    {
+     "t": "heal",
+     "v": 1
     }
    ],
    "si": 4
@@ -2429,6 +2534,10 @@
      "n": 1
     }
    ],
+   "comp": {
+    "drawPlus": 1
+   },
+   "compTxt": "완성한 턴: 뽑기 +1",
    "si": 0
   },
   "sadalsuud": {
@@ -2521,6 +2630,10 @@
      "t": "scry"
     }
    ],
+   "comp": {
+    "drawPlus": 1
+   },
+   "compTxt": "완성한 턴: 뽑기 +1",
    "si": 0
   },
   "fumalsamakah": {
