@@ -3071,6 +3071,10 @@
    "name": "화성",
    "hp": 48,
    "atk": 10,
+   "charge": {
+    "every": 4,
+    "mul": 2.2
+   },
    "pattern": [
     10,
     10,
@@ -3101,6 +3105,7 @@
    "name": "미아 위성",
    "hp": 46,
    "atk": 7,
+   "blockSteal": 5,
    "pattern": [
     7,
     11
@@ -3110,6 +3115,7 @@
    "name": "얼음 혜성",
    "hp": 66,
    "atk": 10,
+   "deathBurst": 8,
    "pattern": [
     10,
     10,
@@ -3119,7 +3125,8 @@
   "shard": {
    "name": "성운 파편",
    "hp": 29,
-   "atk": 6
+   "atk": 6,
+   "deathBurst": 6
   },
   "uranus": {
    "name": "천왕성",
@@ -3149,6 +3156,7 @@
    "name": "타이탄",
    "hp": 73,
    "atk": 10,
+   "blockSteal": 6,
    "pattern": [
     10,
     10,
@@ -3159,6 +3167,10 @@
    "name": "이오",
    "hp": 61,
    "atk": 11,
+   "charge": {
+    "every": 4,
+    "mul": 2.2
+   },
    "pattern": [
     11,
     8
@@ -3168,6 +3180,9 @@
    "name": "떠돌이 행성",
    "hp": 97,
    "atk": 11,
+   "sealOne": {
+    "every": 3
+   },
    "pattern": [
     11,
     11,
@@ -3177,7 +3192,8 @@
   "oort": {
    "name": "오르트 구름 파편",
    "hp": 44,
-   "atk": 8
+   "atk": 8,
+   "deathBurst": 7
   },
   "m1": {
    "name": "게 성운 M1",
@@ -3263,6 +3279,10 @@
    "name": "중성자별",
    "hp": 78,
    "atk": 12,
+   "charge": {
+    "every": 4,
+    "mul": 2.5
+   },
    "season": "여름",
    "pattern": [
     12,
@@ -3273,6 +3293,9 @@
    "name": "마그네타",
    "hp": 84,
    "atk": 11,
+   "sealOne": {
+    "every": 3
+   },
    "season": "봄",
    "pattern": [
     11,
@@ -3284,6 +3307,7 @@
    "name": "암흑 성운",
    "hp": 110,
    "atk": 10,
+   "regen": 5,
    "season": "가을",
    "pattern": [
     10,
@@ -3295,6 +3319,7 @@
    "name": "초신성 잔해",
    "hp": 98,
    "atk": 11,
+   "deathBurst": 9,
    "season": "겨울",
    "pattern": [
     11,
@@ -3306,12 +3331,14 @@
    "name": "유령 은하",
    "hp": 74,
    "atk": 13,
+   "regen": 5,
    "season": "가을"
   },
   "lmc": {
    "name": "마젤란 조각",
    "hp": 58,
    "atk": 10,
+   "blockSteal": 6,
    "season": "봄"
   },
   "satgal": {
