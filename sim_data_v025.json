@@ -38,8 +38,13 @@
    "target": true,
    "fx": [
     {
+     "t": "cond",
+     "when": "playedN",
+     "per": 2
+    },
+    {
      "t": "dmgPerCon",
-     "v": 5
+     "v": 6
     }
    ],
    "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 피해 +1",
@@ -51,15 +56,20 @@
    "con": "orion",
    "rank": 3,
    "type": "공격",
-   "cost": 0,
+   "cost": 1,
    "target": true,
    "fx": [
     {
-     "t": "dmgPerCon",
-     "v": 3
+     "t": "growth",
+     "on": "play",
+     "v": 2,
+     "scope": "battle"
+    },
+    {
+     "t": "dmg",
+     "v": 5
     }
    ],
-   "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 피해 +1",
    "si": 1
   },
   "mintaka": {
@@ -72,8 +82,15 @@
    "target": false,
    "fx": [
     {
+     "t": "cond",
+     "when": "conDone",
+     "add": {
+      "draw": 1
+     }
+    },
+    {
      "t": "blockPerCon",
-     "v": 2
+     "v": 3
     }
    ],
    "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 성막 +1",
@@ -89,11 +106,14 @@
    "target": true,
    "fx": [
     {
-     "t": "dmgPerCon",
-     "v": 4
+     "t": "deckTop",
+     "con": "orion"
+    },
+    {
+     "t": "dmg",
+     "v": 5
     }
    ],
-   "extraTxt": "이번 전투에 오리온 성좌를 완성했다면 피해 +4",
    "everCon": "orion",
    "everPlus": 4,
    "si": 3
@@ -129,12 +149,15 @@
    "target": false,
    "fx": [
     {
-     "t": "draw",
-     "n": 1
+     "t": "aura",
+     "on": "kill",
+     "do": {
+      "draw": 1
+     },
+     "txt": "적을 쓰러뜨릴 때마다 1장 뽑기"
     },
     {
-     "t": "buffAtk",
-     "v": 3
+     "t": "vanish"
     }
    ],
    "si": 1
@@ -149,8 +172,13 @@
    "target": true,
    "fx": [
     {
+     "t": "cond",
+     "when": "enemyPoisoned",
+     "mult": 2
+    },
+    {
      "t": "dmg",
-     "v": 5,
+     "v": 4,
      "pierce": true
     }
    ],
@@ -170,12 +198,16 @@
    "target": true,
    "fx": [
     {
-     "t": "ifAtk",
+     "t": "cond",
+     "when": "enemyAtk",
+     "mult": 2
+    },
+    {
+     "t": "dmg",
      "v": 5,
      "pierce": true
     }
    ],
-   "extraTxt": "적이 공격을 예고 중이면 피해 2배",
    "si": 4
   },
   "procyon": {
@@ -213,9 +245,12 @@
    "target": true,
    "fx": [
     {
+     "t": "recall",
+     "type": "공격"
+    },
+    {
      "t": "dmg",
-     "v": 4,
-     "glow": 3
+     "v": 4
     }
    ],
    "si": 1
@@ -251,13 +286,16 @@
    "target": true,
    "fx": [
     {
-     "t": "dmgMulti",
-     "v": 2,
-     "n": 2
+     "t": "cond",
+     "when": "conDone",
+     "add": {
+      "dmg": 6
+     }
     },
     {
-     "t": "block",
-     "v": 3
+     "t": "dmgMulti",
+     "v": 3,
+     "n": 2
     }
    ],
    "si": 1
@@ -272,6 +310,11 @@
    "target": true,
    "fx": [
     {
+     "t": "cond",
+     "when": "lastCard",
+     "mult": 2
+    },
+    {
      "t": "dmgMulti",
      "v": 4,
      "n": 2
@@ -284,16 +327,17 @@
    "name": "와사트",
    "con": "gemini",
    "rank": 4,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
-     "t": "ifLast",
-     "v": 5
+     "t": "addCard",
+     "id": "starlet",
+     "n": 2
     }
    ],
-   "extraTxt": "손패의 마지막 카드라면 피해 2배",
+   "extraTxt": "짝을 이룬 새끼 별 둘이 손에 들어온다",
    "si": 7
   },
   "mebsuta": {
@@ -306,11 +350,15 @@
    "target": true,
    "fx": [
     {
-     "t": "ifLast",
+     "t": "cond",
+     "when": "handSmall",
+     "mult": 2
+    },
+    {
+     "t": "dmg",
      "v": 3
     }
    ],
-   "extraTxt": "손패의 마지막 카드라면 피해 2배",
    "si": 3
   },
   "aldebaran": {
@@ -346,11 +394,16 @@
    "target": true,
    "fx": [
     {
-     "t": "ifAtk",
-     "v": 9
+     "t": "growth",
+     "on": "play",
+     "v": 1,
+     "scope": "run"
+    },
+    {
+     "t": "dmg",
+     "v": 12
     }
    ],
-   "extraTxt": "적이 공격을 예고 중이면 피해 2배",
    "si": 5
   },
   "hyadum": {
@@ -363,8 +416,8 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 11
+     "t": "blockBurst",
+     "mult": 1.5
     }
    ],
    "si": 2
@@ -379,11 +432,15 @@
    "target": true,
    "fx": [
     {
-     "t": "ifAtk",
-     "v": 5
+     "t": "cond",
+     "when": "selfLowHp",
+     "mult": 2
+    },
+    {
+     "t": "dmg",
+     "v": 6
     }
    ],
-   "extraTxt": "적이 공격을 예고 중이면 피해 2배",
    "si": 4
   },
   "tianguan": {
@@ -391,13 +448,17 @@
    "name": "톈관",
    "con": "taurus",
    "rank": 5,
-   "type": "스킬",
+   "type": "공격",
    "cost": 0,
-   "target": false,
+   "target": true,
    "fx": [
     {
-     "t": "buffAtk",
-     "v": 3
+     "t": "retain",
+     "v": 2
+    },
+    {
+     "t": "dmg",
+     "v": 4
     }
    ],
    "si": 6
@@ -437,21 +498,20 @@
    "rank": 2,
    "type": "스킬",
    "cost": 2,
-   "target": true,
+   "target": false,
    "fx": [
     {
-     "t": "weak",
-     "n": 1
+     "t": "aura",
+     "on": "conDone",
+     "do": {
+      "aoe": 4
+     },
+     "txt": "성좌를 완성할 때마다 모든 적에게 피해 4"
     },
     {
-     "t": "draw",
-     "n": 1
+     "t": "vanish"
     }
    ],
-   "comp": {
-    "weakPlus": 1
-   },
-   "compTxt": "이 카드: 약화 2턴",
    "si": 8
   },
   "algieba": {
@@ -484,6 +544,12 @@
    "target": false,
    "fx": [
     {
+     "t": "cond",
+     "when": "playedN",
+     "per": 2,
+     "to": "aoe"
+    },
+    {
      "t": "aoe",
      "v": 4
     }
@@ -499,6 +565,9 @@
    "cost": 1,
    "target": false,
    "fx": [
+    {
+     "t": "spreadDot"
+    },
     {
      "t": "aoe",
      "v": 3
@@ -544,12 +613,15 @@
    "target": false,
    "fx": [
     {
-     "t": "draw",
-     "n": 1
+     "t": "aura",
+     "on": "conDone",
+     "do": {
+      "heal": 3
+     },
+     "txt": "성좌를 완성할 때마다 HP 3 회복"
     },
     {
-     "t": "heal",
-     "v": 3
+     "t": "vanish"
     }
    ],
    "si": 6
@@ -585,9 +657,8 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 2,
-     "glow": 2
+     "t": "recall",
+     "type": "수비"
     },
     {
      "t": "heal",
@@ -606,8 +677,13 @@
    "target": false,
    "fx": [
     {
+     "t": "cond",
+     "when": "selfLowHp",
+     "mult": 2
+    },
+    {
      "t": "heal",
-     "v": 3
+     "v": 4
     }
    ],
    "si": 4
@@ -689,6 +765,13 @@
    "target": true,
    "fx": [
     {
+     "t": "cond",
+     "when": "conDone",
+     "add": {
+      "dmg": 6
+     }
+    },
+    {
      "t": "dmg",
      "v": 4
     },
@@ -713,15 +796,17 @@
      "n": 2
     },
     {
-     "t": "ifConDone",
-     "mana": 1
+     "t": "cond",
+     "when": "conDone",
+     "add": {
+      "mana": 1
+     }
     }
    ],
    "comp": {
     "drawPlus": 1
    },
    "compTxt": "완성한 턴: 뽑기 +1",
-   "extraTxt": "이번 턴 성좌를 완성했다면 물질 +1",
    "si": 0
   },
   "sheliak": {
@@ -754,11 +839,13 @@
    "target": false,
    "fx": [
     {
-     "t": "ifConDone",
-     "draw": 2
+     "t": "cond",
+     "when": "conDone",
+     "add": {
+      "draw": 2
+     }
     }
    ],
-   "extraTxt": "이번 턴 성좌를 완성했다면 2장 뽑기",
    "si": 3
   },
   "lyrdelta": {
@@ -766,12 +853,19 @@
    "con": "lyra",
    "rank": 4,
    "type": "스킬",
-   "cost": 0,
+   "cost": 2,
    "target": false,
    "fx": [
     {
-     "t": "draw",
-     "n": 1
+     "t": "aura",
+     "on": "kill",
+     "do": {
+      "mana": 1
+     },
+     "txt": "적을 쓰러뜨릴 때마다 성간 물질 1"
+    },
+    {
+     "t": "vanish"
     }
    ],
    "si": 2
@@ -810,15 +904,17 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 6
+     "t": "cond",
+     "when": "conDone",
+     "add": {
+      "draw": 1
+     }
     },
     {
-     "t": "ifConDone",
-     "draw": 1
+     "t": "block",
+     "v": 6
     }
    ],
-   "extraTxt": "이번 턴 성좌를 완성했다면 1장 뽑기",
    "si": 3
   },
   "sadr": {
@@ -831,12 +927,15 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 3
+     "t": "cond",
+     "when": "handSmall",
+     "add": {
+      "draw": 1
+     }
     },
     {
-     "t": "draw",
-     "n": 1
+     "t": "block",
+     "v": 4
     }
    ],
    "si": 1
@@ -905,6 +1004,9 @@
    "target": true,
    "fx": [
     {
+     "t": "returnKill"
+    },
+    {
      "t": "dmgMulti",
      "v": 2,
      "n": 3
@@ -921,6 +1023,11 @@
    "cost": 0,
    "target": true,
    "fx": [
+    {
+     "t": "cond",
+     "when": "lastCard",
+     "mult": 2
+    },
     {
      "t": "dmgMulti",
      "v": 1,
@@ -983,10 +1090,10 @@
    "target": true,
    "fx": [
     {
-     "t": "poisonDouble"
+     "t": "poisonBurst",
+     "mult": 1
     }
    ],
-   "extraTxt": "그 적에게 퍼진 중독을 2배로 끓인다",
    "si": 1
   },
   "larawag": {
@@ -999,12 +1106,13 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 4
+     "t": "cond",
+     "when": "enemyPoisoned",
+     "mult": 2
     },
     {
-     "t": "poison",
-     "v": 2
+     "t": "dmg",
+     "v": 5
     }
    ],
    "si": 6
@@ -1019,12 +1127,11 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 2
+     "t": "spreadDot"
     },
     {
      "t": "poison",
-     "v": 1
+     "v": 3
     }
    ],
    "si": 13
@@ -1058,13 +1165,13 @@
    "name": "셰아트",
    "con": "pegasus",
    "rank": 2,
-   "type": "공격",
+   "type": "스킬",
    "cost": 2,
-   "target": true,
+   "target": false,
    "fx": [
     {
-     "t": "dmg",
-     "v": 4
+     "t": "deckTop",
+     "con": "pegasus"
     },
     {
      "t": "costDown",
@@ -1166,12 +1273,13 @@
    "target": true,
    "fx": [
     {
-     "t": "block",
-     "v": 4
+     "t": "cond",
+     "when": "enemyAtk",
+     "mult": 2
     },
     {
-     "t": "weak",
-     "n": 1
+     "t": "block",
+     "v": 4
     }
    ],
    "si": 3
@@ -1232,16 +1340,15 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 3
+     "t": "aura",
+     "on": "hurt",
+     "do": {
+      "block": 2
+     },
+     "txt": "맞을 때마다 성막 2"
     },
     {
-     "t": "heal",
-     "v": 2
-    },
-    {
-     "t": "thorns",
-     "v": 1
+     "t": "vanish"
     }
    ],
    "si": 5
@@ -1301,12 +1408,13 @@
    "target": true,
    "fx": [
     {
-     "t": "varDmg",
-     "opts": [
-      4,
-      7,
-      10
-     ]
+     "t": "cond",
+     "when": "playedN",
+     "per": 3
+    },
+    {
+     "t": "dmg",
+     "v": 5
     }
    ],
    "si": 2
@@ -1321,12 +1429,13 @@
    "target": true,
    "fx": [
     {
-     "t": "varDmg",
-     "opts": [
-      3,
-      6,
-      9
-     ]
+     "t": "cond",
+     "when": "enemyAtk",
+     "mult": 2
+    },
+    {
+     "t": "dmg",
+     "v": 5
     }
    ],
    "si": 3
@@ -1399,11 +1508,15 @@
    "rank": 4,
    "type": "수비",
    "cost": 1,
-   "target": false,
+   "target": true,
    "fx": [
     {
+     "t": "blockSteal",
+     "v": 3
+    },
+    {
      "t": "block",
-     "v": 5
+     "v": 4
     }
    ],
    "si": 3
@@ -1419,7 +1532,8 @@
    "fx": [
     {
      "t": "block",
-     "v": 2
+     "v": 2,
+     "reso": 3
     }
    ],
    "si": 5,
@@ -1536,6 +1650,12 @@
    "target": false,
    "fx": [
     {
+     "t": "cond",
+     "when": "playedN",
+     "per": 2,
+     "to": "aoe"
+    },
+    {
      "t": "aoe",
      "v": 7,
      "pierce": true
@@ -1553,13 +1673,16 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 3,
-     "pierce": true
+     "t": "cond",
+     "when": "enemyNoBlock",
+     "add": {
+      "vuln": 2
+     }
     },
     {
-     "t": "block",
-     "v": 3
+     "t": "dmg",
+     "v": 5,
+     "pierce": true
     }
    ],
    "si": 3
@@ -1574,13 +1697,13 @@
    "target": true,
    "fx": [
     {
+     "t": "retain",
+     "v": 3
+    },
+    {
      "t": "dmg",
      "v": 4,
      "pierce": true
-    },
-    {
-     "t": "buffAtk",
-     "v": 2
     }
    ],
    "si": 0
@@ -1595,13 +1718,12 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 2,
-     "pierce": true
+     "t": "returnKill"
     },
     {
-     "t": "buffAtk",
-     "v": 1
+     "t": "dmg",
+     "v": 4,
+     "pierce": true
     }
    ],
    "si": 2
@@ -1657,11 +1779,15 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 4
+     "t": "cond",
+     "when": "conDone",
+     "add": {
+      "mana": 1
+     }
     },
     {
-     "t": "crown"
+     "t": "dmg",
+     "v": 5
     }
    ],
    "si": 2
@@ -1732,15 +1858,14 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 5
+     "t": "recall",
+     "con": "corvus"
     },
     {
-     "t": "sacDmg",
-     "v": 4
+     "t": "dmg",
+     "v": 5
     }
    ],
-   "extraTxt": "버리기 1(선택): 피해 +4",
    "si": 0
   },
   "algorab": {
@@ -1753,15 +1878,14 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 2
+     "t": "deckTop"
     },
     {
      "t": "sacDmg",
-     "v": 3
+     "v": 4
     }
    ],
-   "extraTxt": "버리기 1(선택): 피해 +3",
+   "extraTxt": "버리기 1(선택): 피해 +4",
    "si": 2
   },
   "acubens": {
@@ -1802,12 +1926,15 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 4
+     "t": "cond",
+     "when": "enemyNoBlock",
+     "add": {
+      "vuln": 2
+     }
     },
     {
-     "t": "weak",
-     "n": 1
+     "t": "dmg",
+     "v": 6
     }
    ],
    "si": 0
@@ -1862,8 +1989,8 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 1
+     "t": "blockSteal",
+     "v": 4
     },
     {
      "t": "weak",
@@ -1900,13 +2027,13 @@
    "name": "멘칼리난",
    "con": "auriga",
    "rank": 2,
-   "type": "수비",
+   "type": "공격",
    "cost": 2,
    "target": true,
    "fx": [
     {
-     "t": "block",
-     "v": 5
+     "t": "blockSteal",
+     "v": 6
     },
     {
      "t": "halfBlockDmg"
@@ -1920,15 +2047,20 @@
    "con": "auriga",
    "rank": 3,
    "type": "공격",
-   "cost": 0,
+   "cost": 1,
    "target": true,
    "fx": [
     {
-     "t": "blockBurst",
-     "mult": 1
+     "t": "cond",
+     "when": "selfLowHp",
+     "add": {
+      "block": 6
+     }
+    },
+    {
+     "t": "halfBlockDmg"
     }
    ],
-   "extraTxt": "지금 성막을 전부 태워 그만큼 피해",
    "si": 4
   },
   "haedus": {
@@ -1971,7 +2103,6 @@
      "t": "vanish"
     }
    ],
-   "extraTxt": "HP가 절반 이하인 적에게는 피해 +10 · 쓰면 소멸",
    "si": 0
   },
   "algol": {
@@ -1984,16 +2115,17 @@
    "target": true,
    "fx": [
     {
+     "t": "growth",
+     "on": "kill",
+     "v": 3,
+     "scope": "battle"
+    },
+    {
      "t": "dmgExec",
      "v": 4,
      "plus": 3
-    },
-    {
-     "t": "weak",
-     "n": 1
     }
    ],
-   "extraTxt": "HP가 절반 이하인 적에게는 피해 +3",
    "si": 1
   },
   "atik": {
@@ -2025,12 +2157,14 @@
    "target": true,
    "fx": [
     {
+     "t": "returnKill"
+    },
+    {
      "t": "dmgExec",
      "v": 3,
      "plus": 4
     }
    ],
-   "extraTxt": "HP가 절반 이하인 적에게는 피해 +4",
    "si": 7
   },
   "alderamin": {
@@ -2043,8 +2177,16 @@
    "target": false,
    "fx": [
     {
-     "t": "power",
-     "v": 3
+     "t": "aura",
+     "on": "turn",
+     "do": {
+      "block": 4,
+      "heal": 1
+     },
+     "txt": "매 턴 성막 4 · HP 1 회복"
+    },
+    {
+     "t": "vanish"
     }
    ],
    "si": 0
@@ -2076,12 +2218,20 @@
    "con": "cepheus",
    "rank": 3,
    "type": "성좌",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
-     "t": "power",
-     "v": 2
+     "t": "aura",
+     "on": "hurt",
+     "do": {
+      "block": 2,
+      "dmg": 1
+     },
+     "txt": "맞을 때마다 성막 2 · 반격 1"
+    },
+    {
+     "t": "vanish"
     }
    ],
    "si": 2
@@ -2095,12 +2245,15 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 2
+     "t": "cond",
+     "when": "handSmall",
+     "add": {
+      "block": 5
+     }
     },
     {
-     "t": "power",
-     "v": 1
+     "t": "block",
+     "v": 3
     }
    ],
    "si": 5
@@ -2185,8 +2338,13 @@
    "target": true,
    "fx": [
     {
+     "t": "cond",
+     "when": "enemyPoisoned",
+     "mult": 2
+    },
+    {
      "t": "dmg",
-     "v": 2
+     "v": 4
     },
     {
      "t": "burn",
@@ -2255,8 +2413,8 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 5
+     "t": "poisonBurst",
+     "mult": 1.5
     },
     {
      "t": "heal",
@@ -2275,8 +2433,13 @@
    "target": true,
    "fx": [
     {
+     "t": "cond",
+     "when": "handSmall",
+     "mult": 2
+    },
+    {
      "t": "dmg",
-     "v": 2
+     "v": 4
     },
     {
      "t": "heal",
@@ -2360,9 +2523,13 @@
    "target": true,
    "fx": [
     {
+     "t": "cond",
+     "when": "enemyNoBlock",
+     "mult": 2
+    },
+    {
      "t": "dmg",
-     "v": 5,
-     "reso": 3
+     "v": 4
     }
    ],
    "si": 3
@@ -2376,9 +2543,13 @@
    "target": true,
    "fx": [
     {
+     "t": "cond",
+     "when": "lastCard",
+     "mult": 2
+    },
+    {
      "t": "dmg",
-     "v": 2,
-     "reso": 4
+     "v": 4
     }
    ],
    "si": 4
@@ -2418,12 +2589,11 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 8
+     "t": "blockSteal"
     },
     {
-     "t": "block",
-     "v": 8
+     "t": "dmg",
+     "v": 6
     }
    ],
    "si": 1
@@ -2437,6 +2607,11 @@
    "cost": 1,
    "target": true,
    "fx": [
+    {
+     "t": "cond",
+     "when": "conDone",
+     "mult": 2
+    },
     {
      "t": "dmg",
      "v": 4
@@ -2478,6 +2653,11 @@
    "cost": 1,
    "target": true,
    "fx": [
+    {
+     "t": "cond",
+     "when": "selfLowHp",
+     "mult": 2
+    },
     {
      "t": "dmg",
      "v": 3
@@ -2523,12 +2703,15 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 6
+     "t": "aura",
+     "on": "turn",
+     "do": {
+      "block": 3
+     },
+     "txt": "매 턴 성막 3"
     },
     {
-     "t": "heal",
-     "v": 2
+     "t": "vanish"
     }
    ],
    "si": 1
@@ -2543,12 +2726,12 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 5
+     "t": "hpCost",
+     "v": 2
     },
     {
-     "t": "heal",
-     "v": 2
+     "t": "block",
+     "v": 12
     }
    ],
    "si": 2
@@ -2563,19 +2746,14 @@
    "target": false,
    "fx": [
     {
-     "t": "hpCost",
+     "t": "retain",
      "v": 2
     },
     {
      "t": "block",
-     "v": 8
-    },
-    {
-     "t": "heal",
-     "v": 3
+     "v": 6
     }
    ],
-   "extraTxt": "끈기의 대가 — HP 2를 바친다",
    "si": 3
   },
   "captheta": {
@@ -2587,12 +2765,12 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 2
+     "t": "recall",
+     "con": "capricornus"
     },
     {
      "t": "heal",
-     "v": 1
+     "v": 2
     }
    ],
    "si": 4
@@ -2635,12 +2813,15 @@
    "target": false,
    "fx": [
     {
-     "t": "mana",
-     "v": 1
+     "t": "aura",
+     "on": "conDone",
+     "do": {
+      "mana": 1
+     },
+     "txt": "성좌를 완성할 때마다 성간 물질 1"
     },
     {
-     "t": "block",
-     "v": 2
+     "t": "vanish"
     }
    ],
    "si": 1
@@ -2754,8 +2935,7 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 2
+     "t": "deckTop"
     },
     {
      "t": "scry"
@@ -2792,8 +2972,8 @@
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 3
+     "t": "recall",
+     "con": "pisces"
     },
     {
      "t": "scry"
