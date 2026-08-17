@@ -6,23 +6,26 @@
    "con": "orion",
    "rank": 1,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
-     "t": "dmgPerCon",
-     "v": 5
+     "t": "hpCost",
+     "v": 3
     },
     {
-     "t": "block",
-     "v": 2
+     "t": "dmgPerCon",
+     "v": 12
+    },
+    {
+     "t": "vanish"
     }
    ],
    "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 피해 +1",
    "comp": {
-    "blockPlus": 3
+    "dmgPlus": 4
    },
-   "compTxt": "이 카드: 성막 +3",
+   "compTxt": "완성한 턴: 피해 +4",
    "si": 0
   },
   "rigel": {
@@ -122,7 +125,7 @@
    "con": "canis",
    "rank": 2,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -167,11 +170,12 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
+     "t": "ifAtk",
      "v": 5,
      "pierce": true
     }
    ],
+   "extraTxt": "적이 공격을 예고 중이면 피해 2배",
    "si": 4
   },
   "procyon": {
@@ -243,7 +247,7 @@
    "con": "gemini",
    "rank": 2,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
@@ -285,11 +289,11 @@
    "target": true,
    "fx": [
     {
-     "t": "dmgMulti",
-     "v": 3,
-     "n": 2
+     "t": "ifLast",
+     "v": 5
     }
    ],
+   "extraTxt": "손패의 마지막 카드라면 피해 2배",
    "si": 7
   },
   "mebsuta": {
@@ -302,11 +306,11 @@
    "target": true,
    "fx": [
     {
-     "t": "dmgMulti",
-     "v": 2,
-     "n": 2
+     "t": "ifLast",
+     "v": 3
     }
    ],
+   "extraTxt": "손패의 마지막 카드라면 피해 2배",
    "si": 3
   },
   "aldebaran": {
@@ -320,7 +324,10 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 24
+     "v": 30
+    },
+    {
+     "t": "vanish"
     }
    ],
    "comp": {
@@ -339,10 +346,11 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 13
+     "t": "ifAtk",
+     "v": 9
     }
    ],
+   "extraTxt": "적이 공격을 예고 중이면 피해 2배",
    "si": 5
   },
   "hyadum": {
@@ -371,10 +379,11 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 7
+     "t": "ifAtk",
+     "v": 5
     }
    ],
+   "extraTxt": "적이 공격을 예고 중이면 피해 2배",
    "si": 4
   },
   "tianguan": {
@@ -404,17 +413,21 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 11
+     "v": 14
     },
     {
      "t": "weakAllFx",
-     "n": 1
+     "n": 2
+    },
+    {
+     "t": "vanish"
     }
    ],
    "comp": {
     "dmgPlus": 5
    },
    "compTxt": "이 카드: 피해 +5",
+   "extraTxt": "사자의 포효는 한 전투에 한 번 — 쓰면 소멸",
    "si": 0
   },
   "denebola": {
@@ -423,7 +436,7 @@
    "con": "leo",
    "rank": 2,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
@@ -527,7 +540,7 @@
    "con": "virgo",
    "rank": 2,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -631,7 +644,7 @@
    "con": "bootes",
    "rank": 2,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -692,18 +705,23 @@
    "con": "lyra",
    "rank": 1,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
      "t": "draw",
      "n": 2
+    },
+    {
+     "t": "ifConDone",
+     "mana": 1
     }
    ],
    "comp": {
     "drawPlus": 1
    },
    "compTxt": "완성한 턴: 뽑기 +1",
+   "extraTxt": "이번 턴 성좌를 완성했다면 물질 +1",
    "si": 0
   },
   "sheliak": {
@@ -712,7 +730,7 @@
    "con": "lyra",
    "rank": 2,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -733,13 +751,14 @@
    "rank": 3,
    "type": "스킬",
    "cost": 0,
-   "target": true,
+   "target": false,
    "fx": [
     {
-     "t": "weak",
-     "n": 1
+     "t": "ifConDone",
+     "draw": 2
     }
    ],
+   "extraTxt": "이번 턴 성좌를 완성했다면 2장 뽑기",
    "si": 3
   },
   "lyrdelta": {
@@ -792,13 +811,14 @@
    "fx": [
     {
      "t": "block",
-     "v": 7
+     "v": 6
     },
     {
-     "t": "draw",
-     "n": 1
+     "t": "ifConDone",
+     "draw": 1
     }
    ],
+   "extraTxt": "이번 턴 성좌를 완성했다면 1장 뽑기",
    "si": 3
   },
   "sadr": {
@@ -915,22 +935,22 @@
    "con": "scorpius",
    "rank": 1,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
-     "t": "dmg",
+     "t": "poison",
      "v": 5
     },
     {
-     "t": "poison",
-     "v": 4
+     "t": "poisonDouble"
     }
    ],
    "comp": {
     "poisonPlus": 3
    },
    "compTxt": "완성한 턴: 중독 +3",
+   "extraTxt": "독을 심은 뒤, 그 적의 중독을 2배로",
    "si": 4
   },
   "acrab": {
@@ -963,10 +983,10 @@
    "target": true,
    "fx": [
     {
-     "t": "poison",
-     "v": 4
+     "t": "poisonDouble"
     }
    ],
+   "extraTxt": "그 적에게 퍼진 중독을 2배로 끓인다",
    "si": 1
   },
   "larawag": {
@@ -995,7 +1015,7 @@
    "con": "scorpius",
    "rank": 5,
    "type": "공격",
-   "cost": 0,
+   "cost": 1,
    "target": true,
    "fx": [
     {
@@ -1039,7 +1059,7 @@
    "con": "pegasus",
    "rank": 2,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
@@ -1119,7 +1139,7 @@
    "con": "andromeda",
    "rank": 2,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "alsoCon": "pegasus",
    "fx": [
@@ -1208,7 +1228,7 @@
    "con": "piscis",
    "rank": 2,
    "type": "수비",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -1337,7 +1357,7 @@
    "con": "ursa",
    "rank": 2,
    "type": "수비",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -1411,12 +1431,16 @@
    "con": "ursaminor",
    "rank": 1,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
-     "t": "needDown",
+     "t": "mana",
      "v": 1
+    },
+    {
+     "t": "draw",
+     "n": 1
     }
    ],
    "si": 0
@@ -1427,7 +1451,7 @@
    "con": "ursaminor",
    "rank": 2,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -1464,7 +1488,7 @@
    "con": "ursaminor",
    "rank": 4,
    "type": "공격",
-   "cost": 0,
+   "cost": 1,
    "target": false,
    "fx": [
     {
@@ -1488,18 +1512,18 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 12,
+     "v": 16,
      "pierce": true
     },
     {
-     "t": "buffAtk",
-     "v": 2
+     "t": "vanish"
     }
    ],
    "comp": {
     "dmgPlus": 6
    },
    "compTxt": "완성한 턴: 피해 +6",
+   "extraTxt": "화살은 한 발 — 쓰면 이번 전투에서 소멸",
    "si": 12
   },
   "alnasl": {
@@ -1567,7 +1591,7 @@
    "con": "sagittarius",
    "rank": 5,
    "type": "공격",
-   "cost": 0,
+   "cost": 1,
    "target": true,
    "fx": [
     {
@@ -1588,7 +1612,7 @@
    "con": "corona",
    "rank": 1,
    "type": "수비",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -1611,7 +1635,7 @@
    "con": "corona",
    "rank": 2,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -1662,7 +1686,7 @@
    "con": "corvus",
    "rank": 1,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -1683,7 +1707,7 @@
    "con": "corvus",
    "rank": 2,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
@@ -1725,7 +1749,7 @@
    "con": "corvus",
    "rank": 4,
    "type": "공격",
-   "cost": 0,
+   "cost": 1,
    "target": true,
    "fx": [
     {
@@ -1774,7 +1798,7 @@
    "con": "cancer",
    "rank": 2,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
@@ -1834,7 +1858,7 @@
    "con": "cancer",
    "rank": 5,
    "type": "공격",
-   "cost": 0,
+   "cost": 1,
    "target": true,
    "fx": [
     {
@@ -1877,16 +1901,15 @@
    "con": "auriga",
    "rank": 2,
    "type": "수비",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
      "t": "block",
-     "v": 3
+     "v": 5
     },
     {
-     "t": "dmg",
-     "v": 3
+     "t": "halfBlockDmg"
     }
    ],
    "si": 1
@@ -1901,9 +1924,11 @@
    "target": true,
    "fx": [
     {
-     "t": "halfBlockDmg"
+     "t": "blockBurst",
+     "mult": 1
     }
    ],
+   "extraTxt": "지금 성막을 전부 태워 그만큼 피해",
    "si": 4
   },
   "haedus": {
@@ -1912,17 +1937,20 @@
    "con": "auriga",
    "rank": 4,
    "type": "수비",
-   "cost": 0,
+   "cost": 1,
    "target": false,
    "fx": [
     {
      "t": "block",
-     "v": 2
+     "v": 3
     },
     {
-     "t": "halfBlockDmg"
+     "t": "addCard",
+     "id": "starlet",
+     "n": 1
     }
    ],
+   "extraTxt": "새끼 별(0비용 토큰)이 손에 들어온다",
    "si": 6
   },
   "mirfak": {
@@ -1936,11 +1964,14 @@
    "fx": [
     {
      "t": "dmgExec",
-     "v": 10,
-     "plus": 8
+     "v": 12,
+     "plus": 10
+    },
+    {
+     "t": "vanish"
     }
    ],
-   "extraTxt": "HP가 절반 이하인 적에게는 피해 +8",
+   "extraTxt": "HP가 절반 이하인 적에게는 피해 +10 · 쓰면 소멸",
    "si": 0
   },
   "algol": {
@@ -1949,7 +1980,7 @@
    "con": "perseus",
    "rank": 2,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
@@ -2060,7 +2091,7 @@
    "con": "cepheus",
    "rank": 4,
    "type": "수비",
-   "cost": 0,
+   "cost": 1,
    "target": false,
    "fx": [
     {
@@ -2084,18 +2115,23 @@
    "target": false,
    "fx": [
     {
+     "t": "hpCost",
+     "v": 2
+    },
+    {
      "t": "aoe",
-     "v": 7
+     "v": 9
     },
     {
      "t": "aoeBurn",
-     "v": 3
+     "v": 4
     }
    ],
    "comp": {
     "aoePlus": 3
    },
    "compTxt": "완성한 턴: 전체 피해 +3",
+   "extraTxt": "용의 숨결 — HP 2를 바친다",
    "si": 9
   },
   "rastaban": {
@@ -2104,18 +2140,23 @@
    "con": "draco",
    "rank": 2,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
+     "t": "hpCost",
+     "v": 2
+    },
+    {
      "t": "dmg",
-     "v": 3
+     "v": 8
     },
     {
      "t": "burn",
-     "v": 2
+     "v": 4
     }
    ],
+   "extraTxt": "화염의 대가 — HP 2를 바친다",
    "si": 1
   },
   "eltanin": {
@@ -2140,7 +2181,7 @@
    "con": "draco",
    "rank": 4,
    "type": "공격",
-   "cost": 0,
+   "cost": 1,
    "target": true,
    "fx": [
     {
@@ -2164,22 +2205,23 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 7
+     "t": "hpCost",
+     "v": 3
     },
     {
-     "t": "block",
-     "v": 3
+     "t": "dmg",
+     "v": 13
     },
     {
      "t": "heal",
-     "v": 3
+     "v": 6
     }
    ],
    "comp": {
     "healPlus": 3
    },
    "compTxt": "완성한 턴: 회복 +3",
+   "extraTxt": "깊은 잠수 — HP 3을 바친다",
    "si": 0
   },
   "diphda": {
@@ -2188,7 +2230,7 @@
    "con": "cetus",
    "rank": 2,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
@@ -2229,7 +2271,7 @@
    "con": "cetus",
    "rank": 4,
    "type": "공격",
-   "cost": 0,
+   "cost": 1,
    "target": true,
    "fx": [
     {
@@ -2254,17 +2296,21 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 13
+     "v": 17
     },
     {
      "t": "vuln",
      "n": 2
+    },
+    {
+     "t": "vanish"
     }
    ],
    "comp": {
     "dmgPlus": 6
    },
    "compTxt": "완성한 턴: 피해 +6",
+   "extraTxt": "양의 돌진은 한 번 — 쓰면 소멸",
    "si": 0
   },
   "sheratan": {
@@ -2473,7 +2519,7 @@
    "con": "capricornus",
    "rank": 2,
    "type": "수비",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -2517,14 +2563,19 @@
    "target": false,
    "fx": [
     {
+     "t": "hpCost",
+     "v": 2
+    },
+    {
      "t": "block",
-     "v": 5
+     "v": 8
     },
     {
      "t": "heal",
-     "v": 2
+     "v": 3
     }
    ],
+   "extraTxt": "끈기의 대가 — HP 2를 바친다",
    "si": 3
   },
   "captheta": {
@@ -2532,7 +2583,7 @@
    "con": "capricornus",
    "rank": 5,
    "type": "수비",
-   "cost": 0,
+   "cost": 1,
    "target": false,
    "fx": [
     {
@@ -2580,7 +2631,7 @@
    "con": "aquarius",
    "rank": 2,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -2654,7 +2705,7 @@
    "con": "pisces",
    "rank": 1,
    "type": "스킬",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -2681,7 +2732,7 @@
    "con": "pisces",
    "rank": 2,
    "type": "수비",
-   "cost": 1,
+   "cost": 2,
    "target": false,
    "fx": [
     {
@@ -2699,7 +2750,7 @@
    "con": "pisces",
    "rank": 3,
    "type": "수비",
-   "cost": 0,
+   "cost": 1,
    "target": false,
    "fx": [
     {
@@ -2759,10 +2810,10 @@
    "need": 3,
    "bonus": {
     "t": "aoeDmgBurn",
-    "v": 13,
-    "burn": 3
+    "v": 16,
+    "burn": 4
    },
-   "bonusTxt": "모든 적에게 피해 13 + 화상 3"
+   "bonusTxt": "모든 적에게 피해 16 + 화상 4"
   },
   "canis": {
    "name": "큰개자리",
@@ -2771,9 +2822,9 @@
    "need": 2,
    "bonus": {
     "t": "dmgLowestDraw",
-    "v": 10
+    "v": 13
    },
-   "bonusTxt": "HP 최저 적에게 피해 10, 처치 시 1장 뽑기"
+   "bonusTxt": "HP 최저 적에게 피해 13, 처치 시 1장 뽑기"
   },
   "canisminor": {
    "name": "작은개자리",
@@ -2782,9 +2833,9 @@
    "need": 1,
    "bonus": {
     "t": "dmgRandom",
-    "v": 5
+    "v": 7
    },
-   "bonusTxt": "무작위 적에게 피해 5"
+   "bonusTxt": "무작위 적에게 피해 7"
   },
   "gemini": {
    "name": "쌍둥이자리",
@@ -2794,9 +2845,9 @@
    "bonus": {
     "t": "copyRandom",
     "n": 2,
-    "mana": 1
+    "mana": 2
    },
-   "bonusTxt": "손패 무작위 2장 복제 + 성간 물질 1"
+   "bonusTxt": "손패 무작위 2장 복제 + 성간 물질 2"
   },
   "taurus": {
    "name": "황소자리",
@@ -2805,10 +2856,10 @@
    "need": 3,
    "bonus": {
     "t": "dmgHighestVuln",
-    "v": 18,
+    "v": 22,
     "vuln": 2
    },
-   "bonusTxt": "HP 최고 적에게 피해 18 + 취약 2턴"
+   "bonusTxt": "HP 최고 적에게 피해 22 + 취약 2턴"
   },
   "leo": {
    "name": "사자자리",
@@ -2817,10 +2868,10 @@
    "need": 3,
    "bonus": {
     "t": "aoeDmgWeak",
-    "v": 11,
+    "v": 14,
     "weak": 2
    },
-   "bonusTxt": "모든 적에게 피해 11 + 약화 2턴"
+   "bonusTxt": "모든 적에게 피해 14 + 약화 2턴"
   },
   "virgo": {
    "name": "처녀자리",
@@ -2830,10 +2881,10 @@
    "bonus": {
     "t": "manaHeal",
     "mana": 2,
-    "heal": 9,
+    "heal": 11,
     "draw": 1
    },
-   "bonusTxt": "성간 물질 2 + HP 9 회복 + 1장 뽑기"
+   "bonusTxt": "성간 물질 2 + HP 11 회복 + 1장 뽑기"
   },
   "bootes": {
    "name": "목동자리",
@@ -2842,9 +2893,9 @@
    "need": 2,
    "bonus": {
     "t": "buffAtkB",
-    "v": 10
+    "v": 13
    },
-   "bonusTxt": "이번 턴 다음 공격 카드 피해 +10"
+   "bonusTxt": "이번 턴 다음 공격 카드 피해 +13"
   },
   "lyra": {
    "name": "거문고자리",
@@ -2853,10 +2904,10 @@
    "need": 2,
    "bonus": {
     "t": "drawWeakAll",
-    "draw": 2,
+    "draw": 3,
     "weak": 1
    },
-   "bonusTxt": "2장 뽑기 + 적 전체 약화 1턴"
+   "bonusTxt": "3장 뽑기 + 적 전체 약화 1턴"
   },
   "cygnus": {
    "name": "백조자리",
@@ -2865,10 +2916,10 @@
    "need": 2,
    "bonus": {
     "t": "blockDraw",
-    "block": 9,
+    "block": 12,
     "draw": 2
    },
-   "bonusTxt": "성막 9 + 2장 뽑기"
+   "bonusTxt": "성막 12 + 2장 뽑기"
   },
   "aquila": {
    "name": "독수리자리",
@@ -2877,10 +2928,10 @@
    "need": 2,
    "bonus": {
     "t": "dmgRandom",
-    "v": 9,
+    "v": 12,
     "pierce": true
    },
-   "bonusTxt": "무작위 적에게 관통 피해 9"
+   "bonusTxt": "무작위 적에게 관통 피해 12"
   },
   "scorpius": {
    "name": "전갈자리",
@@ -2889,9 +2940,9 @@
    "need": 3,
    "bonus": {
     "t": "aoePoison",
-    "v": 5
+    "v": 7
    },
-   "bonusTxt": "적 전체에 중독 5"
+   "bonusTxt": "적 전체에 중독 7"
   },
   "pegasus": {
    "name": "페가수스자리",
@@ -2901,9 +2952,9 @@
    "bonus": {
     "t": "manaDraw",
     "mana": 2,
-    "draw": 1
+    "draw": 2
    },
-   "bonusTxt": "성간 물질 2 회복 + 1장 뽑기"
+   "bonusTxt": "성간 물질 2 회복 + 2장 뽑기"
   },
   "andromeda": {
    "name": "안드로메다자리",
@@ -2912,9 +2963,9 @@
    "need": 2,
    "bonus": {
     "t": "blockSeal",
-    "v": 5
+    "v": 7
    },
-   "bonusTxt": "성막 5 + 무작위 적의 의도 봉인"
+   "bonusTxt": "성막 7 + 무작위 적의 의도 봉인"
   },
   "piscis": {
    "name": "남쪽물고기자리",
@@ -2923,9 +2974,9 @@
    "need": 1,
    "bonus": {
     "t": "block",
-    "v": 3
+    "v": 5
    },
-   "bonusTxt": "성막 3"
+   "bonusTxt": "성막 5"
   },
   "cassiopeia": {
    "name": "카시오페이아자리",
@@ -2934,9 +2985,9 @@
    "need": 2,
    "bonus": {
     "t": "dmgRandom",
-    "v": 11
+    "v": 14
    },
-   "bonusTxt": "무작위 적에게 피해 11"
+   "bonusTxt": "무작위 적에게 피해 14"
   },
   "ursa": {
    "name": "큰곰자리",
@@ -2945,10 +2996,10 @@
    "need": 3,
    "bonus": {
     "t": "blockThorns",
-    "v": 13,
-    "thorns": 5
+    "v": 16,
+    "thorns": 6
    },
-   "bonusTxt": "성막 13 + 가시 5"
+   "bonusTxt": "성막 16 + 가시 6"
   },
   "ursaminor": {
    "name": "작은곰자리",
@@ -2957,9 +3008,9 @@
    "need": 2,
    "bonus": {
     "t": "drawCostDown",
-    "draw": 2
+    "draw": 3
    },
-   "bonusTxt": "카드 2장 뽑기 + 다음 카드 비용 −1"
+   "bonusTxt": "카드 3장 뽑기 + 다음 카드 비용 −1"
   },
   "sagittarius": {
    "name": "궁수자리",
@@ -2968,10 +3019,10 @@
    "need": 3,
    "bonus": {
     "t": "aoeDmg",
-    "v": 12,
+    "v": 15,
     "pierce": true
    },
-   "bonusTxt": "모든 적에게 관통 피해 12"
+   "bonusTxt": "모든 적에게 관통 피해 15"
   },
   "corona": {
    "name": "왕관자리",
@@ -2981,9 +3032,9 @@
    "bonus": {
     "t": "needDownB",
     "v": 1,
-    "draw": 1
+    "draw": 2
    },
-   "bonusTxt": "이번 턴 모든 성좌의 완성 필요 수 −1 + 1장 뽑기"
+   "bonusTxt": "이번 턴 모든 성좌의 완성 필요 수 −1 + 2장 뽑기"
   },
   "corvus": {
    "name": "까마귀자리",
@@ -2993,9 +3044,9 @@
    "bonus": {
     "t": "drawMana",
     "draw": 2,
-    "mana": 1
+    "mana": 2
    },
-   "bonusTxt": "카드 2장 뽑기 + 성간 물질 1"
+   "bonusTxt": "카드 2장 뽑기 + 성간 물질 2"
   },
   "cancer": {
    "name": "게자리",
@@ -3006,9 +3057,9 @@
     "t": "vulnWeakAll",
     "vuln": 2,
     "weak": 2,
-    "v": 6
+    "v": 8
    },
-   "bonusTxt": "모든 적에게 피해 6 + 취약 2턴 + 약화 2턴"
+   "bonusTxt": "모든 적에게 피해 8 + 취약 2턴 + 약화 2턴"
   },
   "auriga": {
    "name": "마차부자리",
@@ -3027,11 +3078,11 @@
    "need": 2,
    "bonus": {
     "t": "execLowest",
-    "v": 12,
+    "v": 15,
     "mana": 1,
     "draw": 1
    },
-   "bonusTxt": "HP 최저 적에게 피해 12 — 처치 시 물질 1 + 1장 뽑기"
+   "bonusTxt": "HP 최저 적에게 피해 15 — 처치 시 물질 1 + 1장 뽑기"
   },
   "cepheus": {
    "name": "케페우스자리",
@@ -3040,9 +3091,9 @@
    "need": 2,
    "bonus": {
     "t": "squareBlock",
-    "v": 6
+    "v": 8
    },
-   "bonusTxt": "성막 6 + 다음 턴 시작 시 성막 유지"
+   "bonusTxt": "성막 8 + 다음 턴 시작 시 성막 유지"
   },
   "draco": {
    "name": "용자리",
@@ -3051,10 +3102,10 @@
    "need": 2,
    "bonus": {
     "t": "aoeDmgBurn",
-    "v": 7,
-    "burn": 3
+    "v": 9,
+    "burn": 4
    },
-   "bonusTxt": "모든 적에게 피해 7 + 화상 3"
+   "bonusTxt": "모든 적에게 피해 9 + 화상 4"
   },
   "cetus": {
    "name": "고래자리",
@@ -3063,10 +3114,10 @@
    "need": 2,
    "bonus": {
     "t": "dmgHeal",
-    "v": 9,
-    "heal": 5
+    "v": 12,
+    "heal": 7
    },
-   "bonusTxt": "적 하나에게 피해 9 + HP 5 회복"
+   "bonusTxt": "적 하나에게 피해 12 + HP 7 회복"
   },
   "aries": {
    "name": "양자리",
@@ -3075,9 +3126,9 @@
    "need": 3,
    "bonus": {
     "t": "dmgHighest",
-    "v": 20
+    "v": 25
    },
-   "bonusTxt": "HP 최고 적에게 피해 20"
+   "bonusTxt": "HP 최고 적에게 피해 25"
   },
   "libra": {
    "name": "천칭자리",
@@ -3086,10 +3137,10 @@
    "need": 3,
    "bonus": {
     "t": "dmgRandBlock2",
-    "v": 10,
-    "block": 10
+    "v": 13,
+    "block": 13
    },
-   "bonusTxt": "무작위 적에게 피해 10 + 성막 10"
+   "bonusTxt": "무작위 적에게 피해 13 + 성막 13"
   },
   "capricornus": {
    "name": "염소자리",
@@ -3098,10 +3149,10 @@
    "need": 3,
    "bonus": {
     "t": "blockHeal",
-    "v": 12,
-    "heal": 6
+    "v": 15,
+    "heal": 8
    },
-   "bonusTxt": "성막 12 + HP 6 회복"
+   "bonusTxt": "성막 15 + HP 8 회복"
   },
   "aquarius": {
    "name": "물병자리",
@@ -3110,10 +3161,10 @@
    "need": 3,
    "bonus": {
     "t": "manaDraw",
-    "mana": 2,
+    "mana": 3,
     "draw": 2
    },
-   "bonusTxt": "성간 물질 2 + 2장 뽑기"
+   "bonusTxt": "성간 물질 3 + 2장 뽑기"
   },
   "pisces": {
    "name": "물고기자리",
@@ -3122,9 +3173,9 @@
    "need": 3,
    "bonus": {
     "t": "drawCostDown",
-    "draw": 3
+    "draw": 4
    },
-   "bonusTxt": "3장 뽑기 + 다음 카드 비용 −1"
+   "bonusTxt": "4장 뽑기 + 다음 카드 비용 −1"
   }
  },
  "ENEMIES": {
@@ -4037,7 +4088,9 @@
   "aoeBurn",
   "dmgExec",
   "dmgKill",
-  "aoePoisonFx"
+  "aoePoisonFx",
+  "ifAtk",
+  "ifLast"
  ],
  "SEASONS": [
   "봄",

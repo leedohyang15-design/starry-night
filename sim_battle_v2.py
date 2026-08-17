@@ -6,7 +6,7 @@ v1(52종·전투 누적 규칙) 폐기 후 재작성. 현행 규칙을 재현한
   · 별 150종 / 별자리 26개 · 성좌 완성 = **한 턴** 기준 · 발동 = **턴당 성좌마다 1회**
   · 계절: 1막 = 보정 없음 / 2막 = 턴마다 봄→여름→가을→겨울 (제철 +25% 올림 / 역철 −25% 내림, 주극 무보정)
   · 적 아머(성막)와 관통·중독·화상의 아머 무시, 블랙홀의 중력(다음 턴 물질 −1)
-  · 마나 3 / 드로우 5 / HP 70, 북극성 필요 수 −1(하한 1), 미자르-알코르 2성 계산, 알페라츠 겸용
+  · 마나 3 / 드로우 5 / HP 70, 물질 이월 최대 2(v0.46), 미자르-알코르 2성 계산, 알페라츠 겸용
 
 데이터는 빌드 HTML에서 그대로 떠낸 sim_data_v019.json 사용 (node dump_sim_data.js).
 
@@ -95,8 +95,16 @@ def norm(card):
     return {'id': card[0], 'up': card[1]}
 
 
+SIM_TOKENS = {   # v0.46: addCard 토큰 — 성좌 계산 제외·소멸
+    'starlet': {'id': 'starlet', 'by': '', 'name': '새끼 별', 'con': 'auriga', 'rank': 5,
+                'type': '공격', 'cost': 0, 'target': True,
+                'fx': [{'t': 'noCount'}, {'t': 'vanish'}, {'t': 'dmg', 'v': 4}]}}
+
+
 def cdata(card):
     c = norm(card)
+    if c.get('tok'):
+        return SIM_TOKENS[c['id']]
     if c.get('id2'):
         return fused_data(c)
     if not c.get('up'):
@@ -259,7 +267,7 @@ class Sim:
         if self.power_atk > 0:
             t = self.rng.choice(self.alive()) if self.alive() else None
             self.hit(t, self.power_atk)
-        self.energy = 3
+        self.energy = 3 + (min(2, self.energy) if self.turn > 1 else 0)   # v0.46 물질 이월
         self.con_seal = self.con_seal_next
         self.con_seal_next = None
         if self.gravity_always:
@@ -443,11 +451,13 @@ class Sim:
         self.disc.append(card)
         self.played_turn += 1
         con, n = d['con'], d.get('countAs', 1)
-        self.turn_counts[con] += n
-        self.battle_counts[con] += n
-        if d.get('alsoCon'):
-            self.turn_counts[d['alsoCon']] += 1
-            self.battle_counts[d['alsoCon']] += 1
+        _noc = any(f['t'] == 'noCount' for f in d['fx'])       # v0.46 대가 — 성좌 계산 제외
+        if not _noc:
+            self.turn_counts[con] += n
+            self.battle_counts[con] += n
+            if d.get('alsoCon'):
+                self.turn_counts[d['alsoCon']] += 1
+                self.battle_counts[d['alsoCon']] += 1
         self.check_cons()
         ss = CONS[con]['season']
         sA = lambda v: self.sadj(v, ss)
@@ -623,7 +633,46 @@ class Sim:
                     self.block += sA(5)
                 else:
                     self.hit(self.rng.choice(self.alive()) if self.alive() else None, sA(6))
-            # scry 등은 시뮬 영향 없음
+            elif t == 'hpCost':                                # v0.46 대가 — 하한 1
+                self.hp = max(1, self.hp - f['v'])
+            elif t == 'blockBurst':                            # v0.46 대가 — 성막 전부 소모
+                b = self.block; self.block = 0
+                v = int(b * f['mult'])
+                if d['type'] == '공격' and self.atk_buff:
+                    v += self.atk_buff; self.atk_buff = 0
+                if v > 0:
+                    self.hit(target, v)
+            elif t == 'ifAtk':                                 # v0.46 요격 — 공격 예고 시 2배 (근사: 이번 턴 피해가 들어오면)
+                v = sA(self.fv(f, d)) * (2 if self.incoming() > 0 else 1)
+                if d['type'] == '공격' and self.atk_buff:
+                    v += self.atk_buff; self.atk_buff = 0
+                self.hit(target, v, f.get('pierce'))
+            elif t == 'ifLast':                                # v0.46 막별 — 손패 마지막 장이면 2배
+                v = sA(self.fv(f, d)) * (2 if not self.hand else 1)
+                if d['type'] == '공격' and self.atk_buff:
+                    v += self.atk_buff; self.atk_buff = 0
+                self.hit(target, v, f.get('pierce'))
+            elif t == 'ifConDone':                             # v0.46 개선 — 완성한 턴이면
+                if self.completed:
+                    if f.get('draw'): self.draw(f['draw'])
+                    if f.get('mana'): self.energy += f['mana']
+                    if f.get('block'): self.block += f['block']
+                    if f.get('heal'): self.hp = min(self.maxhp, self.hp + f['heal'])
+            elif t == 'poisonDouble':                          # v0.46 맹독
+                if f.get('all'):
+                    for e in self.alive():
+                        e.poison *= 2
+                elif target and target.hp > 0:
+                    target.poison *= 2
+            elif t == 'addCard':                               # v0.46 강생 — 토큰 생성
+                for _ in range(f.get('n', 1)):
+                    self.hand.append({'id': f['id'], 'tok': True})
+            # scry·noCount·vanish 등은 여기서 처리 없음
+        if any(f['t'] == 'vanish' for f in d['fx']):           # v0.46 소멸 — 이번 전투에서 제거
+            for _vi in range(len(self.disc) - 1, -1, -1):
+                if self.disc[_vi] is card:
+                    del self.disc[_vi]
+                    break
         self.check_cons()
         return True
 
@@ -801,9 +850,30 @@ class Sim:
                 s += 0.5
             elif t.startswith('sac'):
                 s += 0.4
+            elif t == 'hpCost':                                # v0.46 대가
+                s -= f['v'] * 0.15
+            elif t == 'blockBurst':
+                s += self.block * f['mult'] / 6.0 - min(self.block, need_block) / 5.0
+            elif t == 'ifAtk':
+                s += self.sadj(f['v'], ss) * (2 if self.incoming() > 0 else 1) / 6.0
+            elif t == 'ifLast':
+                s += self.sadj(f['v'], ss) * (2 if len(self.hand) == 1 else 1) / 6.0
+            elif t == 'ifConDone':
+                if self.completed:
+                    s += 0.45 * f.get('draw', 0) + f.get('mana', 0) + f.get('block', 0) / 5.0 + f.get('heal', 0) * 0.2
+            elif t == 'poisonDouble':
+                mx = max((e.poison for e in self.alive()), default=0)
+                s += mx * 0.3
+            elif t == 'addCard':
+                s += 0.5 * f.get('n', 1)
+            elif t == 'vanish':
+                s -= 0.3
         # 성좌 완성 기여
         con = d['con']
-        if con not in self.completed:
+        _noc = any(f['t'] == 'noCount' for f in d['fx'])
+        if _noc:
+            con = None
+        if con and con not in self.completed:
             after = self.turn_counts[con] + d.get('countAs', 1)
             nd = self.need(con)
             if after >= nd:
@@ -1099,11 +1169,17 @@ def validate(rng):
     print(f'  카시오페이아 2성 완성(턴당 1회): completed={sorted(s.completed)} (기대 [cassiopeia])')
     s.play(0); s.play(0)
     print(f'  4장 냈을 때 완성 로그={dict(s.completed_log)} (기대 1회)')
-    s2 = Sim([('mizar', False), ('polaris', False)], ['jupiter'], act=1, rng=rng)
-    s2.start_turn(); s2.hand = [('mizar', False), ('polaris', False)]; s2.energy = 9
-    s2.play(1)   # 북극성 — 필요 수 −1
-    s2.play(0)   # 미자르 2성 계산 → 큰곰 3−1=2 완성
-    print(f'  북극성+미자르 → 큰곰 완성={"ursa" in s2.completed} (기대 True)')
+    s2 = Sim([('mizar', False), ('merak', False), ('polaris', False)], ['jupiter'], act=1, rng=rng)
+    s2.start_turn(); s2.hand = [('mizar', False), ('merak', False), ('polaris', False)]; s2.energy = 9
+    s2.play(0); s2.play(0)   # 미자르(2성)+메라크 → 큰곰 3성 완성
+    print(f'  미자르 2성+메라크 → 큰곰 완성={"ursa" in s2.completed} (기대 True)')
+    e0 = s2.energy
+    s2.play(0)   # v0.46 북극성 — 비용 2 · 물질 +1 · 1장 뽑기 (needDown 폐지)
+    print(f'  북극성(v0.46 개편): 물질 {e0}→{s2.energy} (기대 −1) · 손패 {len(s2.hand)}장 (기대 2 — 메라크 뽑기 포함)')
+    s2b = Sim([('caph', False)], ['jupiter'], act=1, rng=rng)   # v0.46 물질 이월
+    s2b.start_turn(); s2b.energy = 2; s2b.hand = []
+    s2b.start_turn()
+    print(f'  물질 이월: 잔여 2 → 다음 턴 {s2b.energy} (기대 5)')
     s3 = Sim([('wezen', False)], ['m42'], act=1, rng=rng)   # v0.25 축소로 nunki가 빠져 웨젠(관통 5)으로 교체
     s3.start_turn(); s3.hand = [('wezen', False)]; s3.energy = 9
     s3.enemies[0].block = 50
