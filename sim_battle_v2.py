@@ -101,6 +101,11 @@ SIM_TOKENS = {   # v0.46: addCard 토큰 — 성좌 계산 제외·소멸
                 'fx': [{'t': 'noCount'}, {'t': 'vanish'}, {'t': 'dmg', 'v': 4}]}}
 
 
+def card_id(card):
+    c = norm(card)
+    return c.get('id')
+
+
 def cdata(card):
     c = norm(card)
     if c.get('tok'):
@@ -164,6 +169,12 @@ class Sim:
         # v0.37: 블랙홀 '계절 왜곡' — seasonWarp 턴마다 계절이 한 칸 밀린다 (구 역행 폐지)
         self.season_warp = next((ENEMIES[e].get('seasonWarp') for e in enemies
                                  if ENEMIES[e].get('seasonWarp')), None)
+        # v0.47 천문 메커니즘 상태
+        self.auras = []          # 항성풍
+        self.grown = {}          # 강착 (전투 scope)
+        self.expose = {}         # 노출 누적
+        self._grow_kill = None
+        self._return_kill = None
         # 통계
         self.completed_log = defaultdict(int)     # 실제 완성 횟수
         self.had_cards = defaultdict(int)         # 그 별자리 카드를 손에 쥔 턴 수
@@ -199,14 +210,20 @@ class Sim:
         return max(1, CONS[k]['need'] - self.need_reduce)
 
     def draw(self, n):
+        got = 0
         for _ in range(n):
             if not self.deck:
                 if not self.disc:
-                    return
+                    break
                 self.deck = self.disc
                 self.disc = []
                 self.rng.shuffle(self.deck)
             self.hand.append(self.deck.pop())
+            got += 1
+        if got and not getattr(self, '_in_aura_draw', False):     # v0.47 항성풍(재귀 방지)
+            self._in_aura_draw = True
+            self.aura_fire('draw')
+            self._in_aura_draw = False
 
     def hit(self, e, dmg, pierce=False):
         if e is None or e.hp <= 0:
@@ -221,6 +238,16 @@ class Sim:
             dmg -= b
         was_alive = e.hp > 0
         e.hp = max(0, e.hp - dmg)
+        if was_alive and e.hp == 0:                               # v0.47 강착·공전·항성풍
+            if self._grow_kill:
+                cid, gv = self._grow_kill
+                self.grown[cid] = self.grown.get(cid, 0) + gv
+            if self._return_kill is not None:
+                rc = self._return_kill
+                if rc in self.disc:
+                    self.disc.remove(rc); self.hand.append(rc)
+                self._return_kill = None
+            self.aura_fire('kill', e)
         if was_alive and e.hp == 0 and e.sp.get('deathBurst'):   # v0.43 임종 폭발
             _bd = max(0, e.sp['deathBurst'] - 0)
             _b = min(self.block, _bd); self.block -= _b
@@ -264,6 +291,8 @@ class Sim:
         else:
             self.block = 0
         self.block += self.power_block
+        if self.turn > 1:
+            self.aura_fire('turn')                                # v0.47 항성풍 — 매 턴
         if self.power_atk > 0:
             t = self.rng.choice(self.alive()) if self.alive() else None
             self.hit(t, self.power_atk)
@@ -282,7 +311,13 @@ class Sim:
         self.thorns = 0
         self.atk_buff = self.def_buff = self.cost_down = 0
         self.crown = 0
-        n = 5
+        for _c in list(self.hand):        # v0.47 노출(retain) — 손에 남긴 채 턴을 넘기면 밝아진다
+            _d = cdata(_c)
+            _rf = next((f for f in _d['fx'] if f['t'] == 'retain'), None)
+            if _rf:
+                k = id(_c)
+                self.expose[k] = self.expose.get(k, 0) + _rf.get('v', 0)
+        n = max(2, 5 - len(self.hand))
         if 'compass' in self.relics and self.turn == 1:
             self.block += 5
         if 'ember' in self.relics:
@@ -413,6 +448,7 @@ class Sim:
             else:
                 if e.weak > 0:
                     v = int(v * 0.75)
+                self.aura_fire('hurt')                            # v0.47 항성풍 — 맞을 때마다
                 blocked = 0 if (e.sp.get('pierce') or kind == 'jet') else min(self.block, v)
                 self.block -= blocked
                 thru = v - blocked
@@ -428,6 +464,74 @@ class Sim:
     # ── 카드 사용 ──
     def eff_cost(self, d):
         return max(0, d['cost'] - 1) if self.cost_down > 0 else d['cost']
+
+    # ═══ v0.47: 조건 리더(cond) — 하나의 프리미티브가 수십 카드 문장을 만든다 ═══
+    def cond_met(self, when, target):
+        if when == 'enemyAtk':
+            return bool(target and target.intent and target.intent[0] in ('atk', 'jet', 'charging'))   # sim의 intent는 (kind, v) 튜플
+        if when == 'lastCard':
+            return len(self.hand) == 0
+        if when == 'conDone':
+            return bool(self.completed)
+        if when == 'enemyPoisoned':
+            return bool(target and (target.poison > 0 or target.burn > 0))
+        if when == 'enemyNoBlock':
+            return bool(target and not (target.block or 0) > 0)
+        if when == 'selfLowHp':
+            return self.hp * 2 <= self.maxhp
+        if when == 'handSmall':
+            return len(self.hand) <= 2
+        return False
+
+    def cond_scan(self, d, target):
+        r = {'mult': 1, 'add': None, 'per': 0, 'perTo': 'dmg'}
+        for f in d['fx']:
+            if f['t'] != 'cond':
+                continue
+            if f.get('when') == 'playedN':
+                r['per'] = f.get('per', 1) * max(0, self.played_turn - 1)
+                r['perTo'] = f.get('to', 'dmg')
+                continue
+            if self.cond_met(f['when'], target):
+                if f.get('mult'):
+                    r['mult'] *= f['mult']
+                if f.get('add'):
+                    r['add'] = dict(r['add'] or {}, **f['add'])
+        return r
+
+    def _match(self, x, f):
+        dd = cdata(x)
+        if not dd:
+            return False
+        if f.get('con') and dd['con'] != f['con']:
+            return False
+        if f.get('type') and dd['type'] != f['type']:
+            return False
+        return True
+
+    def aura_fire(self, on, enemy=None):                        # v0.47 항성풍
+        for a in self.auras:
+            if a['on'] != on:
+                continue
+            q = a['do']
+            if q.get('dmg'):
+                t = enemy if (enemy and enemy.hp > 0) else (self.rng.choice(self.alive()) if self.alive() else None)
+                self.hit(t, q['dmg'])
+            if q.get('aoe'):
+                for e in self.alive():
+                    self.hit(e, q['aoe'])
+            if q.get('block'):
+                self.block += q['block']
+            if q.get('draw'):
+                self.draw(q['draw'])
+            if q.get('mana'):
+                self.energy += q['mana']
+            if q.get('heal'):
+                self.hp = min(self.maxhp, self.hp + q['heal'])
+            if q.get('poison'):
+                t = enemy if (enemy and enemy.hp > 0) else (self.rng.choice(self.alive()) if self.alive() else None)
+                if t:
+                    t.poison += q['poison']
 
     def fv(self, f, d):
         """v0.36 공명(reso — 이번 턴 같은 별자리를 먼저 냈다면 +) · 잔광(glow — 이번 턴 완성했다면 +)"""
@@ -460,7 +564,9 @@ class Sim:
                 self.battle_counts[d['alsoCon']] += 1
         self.check_cons()
         ss = CONS[con]['season']
-        sA = lambda v: self.sadj(v, ss)
+        cd = self.cond_scan(d, target)                                  # v0.47 조건 리더
+        grow = self.grown.get(d.get('_id') or card_id(card), 0) + self.expose.get(id(card), 0)
+        sA = lambda v: max(0, round(self.sadj(v, ss) * cd['mult']) + grow)
         comp = con in self.completed
         if target is None or target.hp <= 0:
             target = self.alive()[0] if self.alive() else None
@@ -667,7 +773,69 @@ class Sim:
             elif t == 'addCard':                               # v0.46 강생 — 토큰 생성
                 for _ in range(f.get('n', 1)):
                     self.hand.append({'id': f['id'], 'tok': True})
+            # ═══ v0.47 천문 메커니즘 ═══
+            elif t == 'aura':                                  # 항성풍
+                self.auras.append({'on': f['on'], 'do': f.get('do', {})})
+            elif t == 'growth':                                # 강착
+                cid = card_id(card)
+                if f['on'] == 'play':
+                    self.grown[cid] = self.grown.get(cid, 0) + f['v']
+                else:
+                    self._grow_kill = (cid, f['v'])
+            elif t == 'returnKill':                            # 공전
+                self._return_kill = card
+            elif t == 'recall':                                # 회귀
+                pool = [x for x in self.disc if x is not card and self._match(x, f)]
+                if pool:
+                    pk = self.rng.choice(pool)
+                    self.disc.remove(pk); self.hand.append(pk)
+            elif t == 'deckTop':                               # 남중
+                pool = [x for x in self.disc if x is not card and (not f.get('con') or cdata(x)['con'] == f['con'])]
+                if pool:
+                    pk = self.rng.choice(pool)
+                    self.disc.remove(pk); self.deck.append(pk)
+            elif t == 'poisonBurst':                           # 붕괴
+                if target and target.hp > 0 and target.poison > 0:
+                    pz = target.poison
+                    if not f.get('keep'):
+                        target.poison = 0
+                    self.hit(target, round(pz * f.get('mult', 1)), True)
+            elif t == 'spreadDot':                             # 플레어
+                src = next((e for e in self.alive() if e.poison > 0 or e.burn > 0), None)
+                if src:
+                    for e in self.alive():
+                        if e is src:
+                            continue
+                        e.poison += src.poison
+                        if src.burn > 0:
+                            e.burn += src.burn; e.burn_t = max(getattr(e, 'burn_t', 0), 2)
+            elif t == 'blockSteal':                            # 조석
+                if target and target.hp > 0 and (target.block or 0) > 0:
+                    bb = min(target.block, f.get('v', 99))
+                    target.block -= bb; self.block += bb
             # scry·noCount·vanish 등은 여기서 처리 없음
+        a = cd.get('add')                                      # v0.47 조건 추가효과
+        if a:
+            if a.get('dmg') and target and target.hp > 0:
+                self.hit(target, sA(a['dmg']), a.get('pierce'))
+            if a.get('aoe'):
+                for e in self.alive():
+                    self.hit(e, sA(a['aoe']))
+            if a.get('block'):
+                self.block += sA(a['block'])
+            if a.get('draw'):
+                self.draw(a['draw'])
+            if a.get('mana'):
+                self.energy += a['mana']
+            if a.get('heal'):
+                self.hp = min(self.maxhp, self.hp + sA(a['heal']))
+            if a.get('poison') and target and target.hp > 0:
+                target.poison += sA(a['poison'])
+            if a.get('vuln') and target and target.hp > 0:
+                target.vuln = max(target.vuln or 0, a['vuln'])
+            if a.get('weak') and target and target.hp > 0:
+                target.weak = max(target.weak, a['weak'])
+        self._grow_kill = None; self._return_kill = None
         if any(f['t'] == 'vanish' for f in d['fx']):           # v0.46 소멸 — 이번 전투에서 제거
             for _vi in range(len(self.disc) - 1, -1, -1):
                 if self.disc[_vi] is card:
@@ -686,6 +854,7 @@ class Sim:
                 self.completed.add(k)
                 self.ever.add(k)
                 self.completed_log[k] += 1
+                self.aura_fire('conDone')                         # v0.47 항성풍
                 self.bonus(CONS[k]['bonus'])
                 if self.crown:
                     self.draw(self.crown)
@@ -868,6 +1037,38 @@ class Sim:
                 s += 0.5 * f.get('n', 1)
             elif t == 'vanish':
                 s -= 0.3
+            # ═══ v0.47 천문 메커니즘 채점 ═══
+            elif t == 'cond':
+                if f.get('when') == 'playedN':
+                    s += f.get('per', 1) * max(0, self.played_turn) / 6.0
+                elif self.cond_met(f['when'], self.enemies[0] if self.enemies else None):
+                    a = f.get('add') or {}
+                    if f.get('mult'):
+                        s += 1.2                       # 뒤 효과가 배로 — 대략적 가산
+                    s += (a.get('dmg', 0) + a.get('aoe', 0)) / 6.0 + a.get('block', 0) / 5.0 \
+                        + 0.45 * a.get('draw', 0) + a.get('mana', 0) + a.get('heal', 0) * 0.2 \
+                        + 0.6 * a.get('vuln', 0) + 0.45 * a.get('weak', 0) + a.get('poison', 0) * 0.4
+            elif t == 'aura':
+                q = f.get('do', {})
+                s += (q.get('dmg', 0) + q.get('aoe', 0)) / 6.0 * 2.5 + q.get('block', 0) / 5.0 * 2.5 \
+                    + 0.9 * q.get('draw', 0) + 2.0 * q.get('mana', 0) + q.get('heal', 0) * 0.4 + q.get('poison', 0) * 0.5
+            elif t == 'growth':
+                s += f['v'] * 0.35
+            elif t == 'retain':
+                s += 0.2                               # 지금 내면 누적을 포기하는 셈
+            elif t == 'recall' or t == 'deckTop':
+                s += 0.5
+            elif t == 'returnKill':
+                s += 0.4
+            elif t == 'poisonBurst':
+                mx = max((e.poison for e in self.alive()), default=0)
+                s += mx * f.get('mult', 1) / 6.0
+            elif t == 'spreadDot':
+                mx = max((e.poison + e.burn for e in self.alive()), default=0)
+                s += mx * max(0, len(self.alive()) - 1) / 8.0
+            elif t == 'blockSteal':
+                mx = max((e.block or 0 for e in self.alive()), default=0)
+                s += min(mx, f.get('v', 99)) / 5.0
         # 성좌 완성 기여
         con = d['con']
         _noc = any(f['t'] == 'noCount' for f in d['fx'])
