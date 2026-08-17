@@ -15,7 +15,7 @@
     },
     {
      "t": "dmgPerCon",
-     "v": 12
+     "v": 14
     },
     {
      "t": "vanish"
@@ -33,21 +33,20 @@
    "name": "리겔",
    "con": "orion",
    "rank": 2,
-   "type": "공격",
+   "type": "수비",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "cond",
      "when": "playedN",
-     "per": 2
+     "per": 1
     },
     {
-     "t": "dmgPerCon",
-     "v": 6
+     "t": "blockPerCon",
+     "v": 2
     }
    ],
-   "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 피해 +1",
    "si": 6
   },
   "bellatrix": {
@@ -66,8 +65,8 @@
      "scope": "battle"
     },
     {
-     "t": "dmg",
-     "v": 5
+     "t": "vuln",
+     "n": 1
     }
    ],
    "si": 1
@@ -101,17 +100,17 @@
    "name": "알니람",
    "con": "orion",
    "rank": 5,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "deckTop",
      "con": "orion"
     },
     {
-     "t": "dmg",
-     "v": 5
+     "t": "draw",
+     "n": 1
     }
    ],
    "everCon": "orion",
@@ -129,7 +128,7 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 9,
+     "v": 11,
      "pierce": true
     }
    ],
@@ -154,7 +153,7 @@
      "do": {
       "draw": 1
      },
-     "txt": "적을 쓰러뜨릴 때마다 1장 뽑기"
+     "txt": "처치마다 1장 뽑기"
     },
     {
      "t": "vanish"
@@ -177,9 +176,8 @@
      "mult": 2
     },
     {
-     "t": "dmg",
-     "v": 4,
-     "pierce": true
+     "t": "poison",
+     "v": 2
     }
    ],
    "comp": {
@@ -200,7 +198,9 @@
     {
      "t": "cond",
      "when": "enemyAtk",
-     "mult": 2
+     "add": {
+      "block": 3
+     }
     },
     {
      "t": "dmg",
@@ -240,17 +240,17 @@
    "name": "고메이사",
    "con": "canisminor",
    "rank": 2,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "recall",
      "type": "공격"
     },
     {
-     "t": "dmg",
-     "v": 4
+     "t": "buffAtk",
+     "v": 2
     }
    ],
    "si": 1
@@ -266,7 +266,7 @@
    "fx": [
     {
      "t": "dmgMulti",
-     "v": 7,
+     "v": 8,
      "n": 2
     }
    ],
@@ -281,21 +281,19 @@
    "name": "폴룩스",
    "con": "gemini",
    "rank": 2,
-   "type": "공격",
+   "type": "스킬",
    "cost": 2,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "cond",
      "when": "conDone",
      "add": {
-      "dmg": 6
+      "draw": 2
      }
     },
     {
-     "t": "dmgMulti",
-     "v": 3,
-     "n": 2
+     "t": "copyRand"
     }
    ],
    "si": 1
@@ -315,9 +313,8 @@
      "mult": 2
     },
     {
-     "t": "dmgMulti",
-     "v": 4,
-     "n": 2
+     "t": "weak",
+     "n": 1
     }
    ],
    "si": 9
@@ -345,18 +342,20 @@
    "name": "메브수타",
    "con": "gemini",
    "rank": 5,
-   "type": "공격",
+   "type": "스킬",
    "cost": 0,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "cond",
      "when": "handSmall",
-     "mult": 2
+     "add": {
+      "draw": 1
+     }
     },
     {
-     "t": "dmg",
-     "v": 3
+     "t": "buffDef",
+     "v": 2
     }
    ],
    "si": 3
@@ -372,7 +371,7 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 30
+     "v": 32
     },
     {
      "t": "vanish"
@@ -401,7 +400,7 @@
     },
     {
      "t": "dmg",
-     "v": 12
+     "v": 14
     }
    ],
    "si": 5
@@ -411,13 +410,13 @@
    "name": "프리마 히아둠",
    "con": "taurus",
    "rank": 3,
-   "type": "공격",
+   "type": "수비",
    "cost": 2,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "blockBurst",
-     "mult": 1.5
+     "mult": 1.8
     }
    ],
    "si": 2
@@ -427,18 +426,20 @@
    "name": "아인",
    "con": "taurus",
    "rank": 4,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "cond",
      "when": "selfLowHp",
-     "mult": 2
+     "add": {
+      "mana": 1
+     }
     },
     {
-     "t": "dmg",
-     "v": 6
+     "t": "buffAtk",
+     "v": 3
     }
    ],
    "si": 4
@@ -448,17 +449,17 @@
    "name": "톈관",
    "con": "taurus",
    "rank": 5,
-   "type": "공격",
+   "type": "수비",
    "cost": 0,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "retain",
-     "v": 2
+     "v": 1
     },
     {
-     "t": "dmg",
-     "v": 4
+     "t": "buffDef",
+     "v": 2
     }
    ],
    "si": 6
@@ -474,7 +475,7 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 14
+     "v": 16
     },
     {
      "t": "weakAllFx",
@@ -506,7 +507,7 @@
      "do": {
       "aoe": 4
      },
-     "txt": "성좌를 완성할 때마다 모든 적에게 피해 4"
+     "txt": "완성마다 전체 피해 4"
     },
     {
      "t": "vanish"
@@ -539,19 +540,19 @@
    "name": "조스마",
    "con": "leo",
    "rank": 4,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
    "target": false,
    "fx": [
     {
      "t": "cond",
      "when": "playedN",
-     "per": 2,
+     "per": 1,
      "to": "aoe"
     },
     {
-     "t": "aoe",
-     "v": 4
+     "t": "weakAllFx",
+     "n": 1
     }
    ],
    "si": 6
@@ -569,8 +570,8 @@
      "t": "spreadDot"
     },
     {
-     "t": "aoe",
-     "v": 3
+     "t": "aoePoisonFx",
+     "v": 2
     }
    ],
    "si": 5
@@ -586,7 +587,7 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 8
+     "v": 10
     },
     {
      "t": "mana",
@@ -618,7 +619,7 @@
      "do": {
       "heal": 3
      },
-     "txt": "성좌를 완성할 때마다 HP 3 회복"
+     "txt": "완성마다 HP 3 회복"
     },
     {
      "t": "vanish"
@@ -862,7 +863,7 @@
      "do": {
       "mana": 1
      },
-     "txt": "적을 쓰러뜨릴 때마다 성간 물질 1"
+     "txt": "처치마다 물질 1"
     },
     {
      "t": "vanish"
@@ -966,7 +967,7 @@
    "fx": [
     {
      "t": "dmgMulti",
-     "v": 3,
+     "v": 4,
      "n": 3
     }
    ],
@@ -987,7 +988,7 @@
    "fx": [
     {
      "t": "dmgMulti",
-     "v": 2,
+     "v": 3,
      "n": 3,
      "pierce": true
     }
@@ -999,17 +1000,16 @@
    "name": "타라제드",
    "con": "aquila",
    "rank": 3,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "returnKill"
     },
     {
-     "t": "dmgMulti",
-     "v": 2,
-     "n": 3
+     "t": "buffAtk",
+     "v": 3
     }
    ],
    "si": 1
@@ -1019,19 +1019,20 @@
    "name": "데네브 오카브",
    "con": "aquila",
    "rank": 4,
-   "type": "공격",
+   "type": "스킬",
    "cost": 0,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "cond",
      "when": "lastCard",
-     "mult": 2
+     "add": {
+      "draw": 1
+     }
     },
     {
-     "t": "dmgMulti",
-     "v": 1,
-     "n": 3
+     "t": "buffAtk",
+     "v": 2
     }
    ],
    "si": 4
@@ -1111,8 +1112,12 @@
      "mult": 2
     },
     {
-     "t": "dmg",
-     "v": 5
+     "t": "poison",
+     "v": 4
+    },
+    {
+     "t": "weak",
+     "n": 1
     }
    ],
    "si": 6
@@ -1210,8 +1215,15 @@
    "target": false,
    "fx": [
     {
-     "t": "dmgRand",
-     "v": 7
+     "t": "costDown",
+     "v": 1
+    },
+    {
+     "t": "draw",
+     "n": 1
+    },
+    {
+     "t": "scry"
     }
    ],
    "si": 6
@@ -1345,7 +1357,7 @@
      "do": {
       "block": 2
      },
-     "txt": "맞을 때마다 성막 2"
+     "txt": "피격마다 성막 2"
     },
     {
      "t": "vanish"
@@ -1364,7 +1376,7 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 9
+     "v": 11
     },
     {
      "t": "draw",
@@ -1389,9 +1401,9 @@
     {
      "t": "varDmg",
      "opts": [
-      8,
-      12,
-      16
+      10,
+      14,
+      18
      ]
     }
    ],
@@ -1410,11 +1422,11 @@
     {
      "t": "cond",
      "when": "playedN",
-     "per": 3
+     "per": 2
     },
     {
      "t": "dmg",
-     "v": 5
+     "v": 4
     }
    ],
    "si": 2
@@ -1431,7 +1443,9 @@
     {
      "t": "cond",
      "when": "enemyAtk",
-     "mult": 2
+     "add": {
+      "block": 4
+     }
     },
     {
      "t": "dmg",
@@ -1607,7 +1621,7 @@
    "fx": [
     {
      "t": "dmgRand",
-     "v": 2
+     "v": 3
     },
     {
      "t": "scry"
@@ -1626,7 +1640,7 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 16,
+     "v": 18,
      "pierce": true
     },
     {
@@ -1657,7 +1671,7 @@
     },
     {
      "t": "aoe",
-     "v": 7,
+     "v": 9,
      "pierce": true
     }
    ],
@@ -1681,7 +1695,7 @@
     },
     {
      "t": "dmg",
-     "v": 5,
+     "v": 7,
      "pierce": true
     }
    ],
@@ -1692,18 +1706,17 @@
    "name": "카우스 아우스트랄리스",
    "con": "sagittarius",
    "rank": 4,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "retain",
-     "v": 3
+     "v": 2
     },
     {
-     "t": "dmg",
-     "v": 4,
-     "pierce": true
+     "t": "buffAtk",
+     "v": 3
     }
    ],
    "si": 0
@@ -1722,7 +1735,7 @@
     },
     {
      "t": "dmg",
-     "v": 4,
+     "v": 6,
      "pierce": true
     }
    ],
@@ -1774,9 +1787,9 @@
    "by": "γ",
    "con": "corona",
    "rank": 3,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "cond",
@@ -1786,8 +1799,11 @@
      }
     },
     {
-     "t": "dmg",
-     "v": 5
+     "t": "crown"
+    },
+    {
+     "t": "draw",
+     "n": 1
     }
    ],
    "si": 2
@@ -1853,19 +1869,20 @@
    "name": "기에나 코르비",
    "con": "corvus",
    "rank": 3,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "recall",
      "con": "corvus"
     },
     {
-     "t": "dmg",
-     "v": 5
+     "t": "sacMana",
+     "v": 2
     }
    ],
+   "extraTxt": "버리기 1(선택): 성간 물질 2",
    "si": 0
   },
   "algorab": {
@@ -1921,7 +1938,7 @@
    "name": "알타르프",
    "con": "cancer",
    "rank": 2,
-   "type": "공격",
+   "type": "스킬",
    "cost": 2,
    "target": true,
    "fx": [
@@ -1929,12 +1946,16 @@
      "t": "cond",
      "when": "enemyNoBlock",
      "add": {
-      "vuln": 2
+      "vuln": 1
      }
     },
     {
-     "t": "dmg",
-     "v": 6
+     "t": "weak",
+     "n": 1
+    },
+    {
+     "t": "draw",
+     "n": 1
     }
    ],
    "si": 0
@@ -2046,15 +2067,15 @@
    "name": "알마즈",
    "con": "auriga",
    "rank": 3,
-   "type": "공격",
+   "type": "수비",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
      "t": "cond",
      "when": "selfLowHp",
      "add": {
-      "block": 6
+      "block": 4
      }
     },
     {
@@ -2096,7 +2117,7 @@
    "fx": [
     {
      "t": "dmgExec",
-     "v": 12,
+     "v": 14,
      "plus": 10
     },
     {
@@ -2122,8 +2143,8 @@
     },
     {
      "t": "dmgExec",
-     "v": 4,
-     "plus": 3
+     "v": 6,
+     "plus": 4
     }
    ],
    "si": 1
@@ -2152,7 +2173,7 @@
    "name": "고르고네아",
    "con": "perseus",
    "rank": 4,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
    "target": true,
    "fx": [
@@ -2160,9 +2181,8 @@
      "t": "returnKill"
     },
     {
-     "t": "dmgExec",
-     "v": 3,
-     "plus": 4
+     "t": "vuln",
+     "n": 1
     }
    ],
    "si": 7
@@ -2183,7 +2203,7 @@
       "block": 4,
       "heal": 1
      },
-     "txt": "매 턴 성막 4 · HP 1 회복"
+     "txt": "매 턴 성막 4 · HP 1"
     },
     {
      "t": "vanish"
@@ -2228,7 +2248,7 @@
       "block": 2,
       "dmg": 1
      },
-     "txt": "맞을 때마다 성막 2 · 반격 1"
+     "txt": "피격마다 성막 2 · 반격 1"
     },
     {
      "t": "vanish"
@@ -2368,7 +2388,7 @@
     },
     {
      "t": "dmg",
-     "v": 13
+     "v": 15
     },
     {
      "t": "heal",
@@ -2459,7 +2479,7 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 17
+     "v": 19
     },
     {
      "t": "vuln",
@@ -2489,6 +2509,10 @@
      "t": "dmg",
      "v": 5,
      "reso": 6
+    },
+    {
+     "t": "vuln",
+     "n": 1
     }
    ],
    "si": 1
@@ -2518,7 +2542,7 @@
    "name": "보테인",
    "con": "aries",
    "rank": 4,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
    "target": true,
    "fx": [
@@ -2528,8 +2552,8 @@
      "mult": 2
     },
     {
-     "t": "dmg",
-     "v": 4
+     "t": "vuln",
+     "n": 1
     }
    ],
    "si": 3
@@ -2538,18 +2562,20 @@
    "by": "ε",
    "con": "aries",
    "rank": 5,
-   "type": "공격",
+   "type": "스킬",
    "cost": 0,
    "target": true,
    "fx": [
     {
      "t": "cond",
      "when": "lastCard",
-     "mult": 2
+     "add": {
+      "vuln": 1
+     }
     },
     {
-     "t": "dmg",
-     "v": 4
+     "t": "weak",
+     "n": 1
     }
    ],
    "si": 4
@@ -2584,7 +2610,7 @@
    "name": "주벤에샤마리",
    "con": "libra",
    "rank": 2,
-   "type": "공격",
+   "type": "수비",
    "cost": 2,
    "target": true,
    "fx": [
@@ -2592,8 +2618,8 @@
      "t": "blockSteal"
     },
     {
-     "t": "dmg",
-     "v": 6
+     "t": "heal",
+     "v": 4
     }
    ],
    "si": 1
@@ -2818,7 +2844,7 @@
      "do": {
       "mana": 1
      },
-     "txt": "성좌를 완성할 때마다 성간 물질 1"
+     "txt": "완성마다 물질 1"
     },
     {
      "t": "vanish"
