@@ -21,7 +21,6 @@
      "t": "vanish"
     }
    ],
-   "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 피해 +1",
    "comp": {
     "dmgPlus": 4
    },
@@ -42,7 +41,6 @@
      "v": 3
     }
    ],
-   "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 성막 +1",
    "si": 6
   },
   "bellatrix": {
@@ -57,12 +55,12 @@
     {
      "t": "growth",
      "on": "play",
-     "v": 2,
+     "v": 3,
      "scope": "battle"
     },
     {
      "t": "dmg",
-     "v": 2
+     "v": 5
     }
    ],
    "si": 1
@@ -81,7 +79,6 @@
      "v": 3
     }
    ],
-   "extraTxt": "이번 전투에 먼저 낸 오리온 별 1장당 피해 +1",
    "si": 4
   },
   "alnilam": {
@@ -146,7 +143,7 @@
      "do": {
       "draw": 1
      },
-     "txt": "처치마다 1장 뽑기"
+     "txt": "적을 처치할 때마다 카드를 1장 뽑습니다"
     },
     {
      "t": "vanish"
@@ -159,13 +156,20 @@
    "name": "물리페인",
    "con": "canis",
    "rank": 3,
-   "type": "스킬",
+   "type": "공격",
    "cost": 1,
    "target": true,
    "fx": [
     {
-     "t": "vuln",
-     "n": 2
+     "t": "cond",
+     "when": "enemyAtk",
+     "add": {
+      "weak": 2
+     }
+    },
+    {
+     "t": "dmg",
+     "v": 4
     }
    ],
    "comp": {
@@ -320,11 +324,13 @@
    "target": true,
    "fx": [
     {
-     "t": "ifLast",
-     "v": 3
+     "t": "addCopy"
+    },
+    {
+     "t": "dmg",
+     "v": 5
     }
    ],
-   "extraTxt": "손패의 마지막 카드라면 피해 2배",
    "si": 3
   },
   "aldebaran": {
@@ -360,14 +366,15 @@
    "target": true,
    "fx": [
     {
-     "t": "growth",
-     "on": "play",
-     "v": 1,
-     "scope": "run"
+     "t": "maxHpKill",
+     "v": 3
     },
     {
      "t": "dmg",
-     "v": 14
+     "v": 12
+    },
+    {
+     "t": "vanish"
     }
    ],
    "si": 5
@@ -445,7 +452,6 @@
     "dmgPlus": 5
    },
    "compTxt": "이 카드: 피해 +5",
-   "extraTxt": "사자의 포효는 한 전투에 한 번 — 쓰면 소멸",
    "si": 0
   },
   "denebola": {
@@ -463,7 +469,7 @@
      "do": {
       "aoe": 4
      },
-     "txt": "완성마다 전체 피해 4"
+     "txt": "성좌가 떠오를 때마다 모든 적에게 피해를 4 줍니다"
     },
     {
      "t": "vanish"
@@ -566,7 +572,7 @@
      "do": {
       "heal": 3
      },
-     "txt": "완성마다 HP 3 회복"
+     "txt": "성좌가 떠오를 때마다 HP를 3 회복합니다"
     },
     {
      "t": "vanish"
@@ -651,7 +657,7 @@
      "do": {
       "atk": 3
      },
-     "txt": "매 턴 다음 공격 +3"
+     "txt": "매 턴 다음 공격이 3 강해집니다"
     },
     {
      "t": "vanish"
@@ -677,7 +683,6 @@
      "n": 1
     }
    ],
-   "extraTxt": "버리기 1(선택): 1장 더 뽑기",
    "si": 3
   },
   "seginus": {
@@ -800,7 +805,7 @@
      "do": {
       "mana": 1
      },
-     "txt": "처치마다 물질 1"
+     "txt": "적을 처치할 때마다 성간 물질을 1 얻습니다"
     },
     {
      "t": "vanish"
@@ -979,7 +984,6 @@
     "poisonPlus": 3
    },
    "compTxt": "떠 있는 동안: 중독 +3",
-   "extraTxt": "독을 심은 뒤, 그 적의 중독을 2배로",
    "si": 4
   },
   "acrab": {
@@ -997,7 +1001,7 @@
      "do": {
       "poison": 2
      },
-     "txt": "매 턴 무작위 적 중독 2"
+     "txt": "매 턴 무작위 적에게 중독을 2 부여합니다"
     },
     {
      "t": "vanish"
@@ -1184,7 +1188,7 @@
      "n": 1
     }
    ],
-   "extraTxt": "페가수스자리 성좌 판정에도 계산",
+   "extraTxt": "페가수스 판정에도 계산",
    "si": 2
   },
   "almach": {
@@ -1236,7 +1240,7 @@
      "do": {
       "heal": 2
      },
-     "txt": "매 턴 HP 2 회복"
+     "txt": "매 턴 HP를 2 회복합니다"
     },
     {
      "t": "vanish"
@@ -1258,7 +1262,7 @@
      "do": {
       "block": 2
      },
-     "txt": "피격마다 성막 2"
+     "txt": "맞을 때마다 성막을 2 얻습니다"
     },
     {
      "t": "vanish"
@@ -1308,7 +1312,6 @@
      ]
     }
    ],
-   "extraTxt": "변광 — 셋 중 무작위",
    "si": 0
   },
   "tsih": {
@@ -1547,7 +1550,6 @@
     "dmgPlus": 6
    },
    "compTxt": "떠 있는 동안: 피해 +6",
-   "extraTxt": "화살은 한 발 — 쓰면 이번 전투에서 소멸",
    "si": 12
   },
   "alnasl": {
@@ -1729,7 +1731,6 @@
      "v": 1
     }
    ],
-   "extraTxt": "버리기 1(선택): 성간 물질 1 회복",
    "si": 4
   },
   "kraz": {
@@ -1750,7 +1751,6 @@
      "v": 7
     }
    ],
-   "extraTxt": "버리기 1(선택): 피해 +7",
    "si": 1
   },
   "gienahcorvi": {
@@ -1767,11 +1767,10 @@
      "v": 5
     },
     {
-     "t": "sacDraw",
-     "n": 1
+     "t": "onDiscard",
+     "draw": 1
     }
    ],
-   "extraTxt": "버리기 1(선택): 1장 뽑기",
    "si": 0
   },
   "algorab": {
@@ -1780,18 +1779,18 @@
    "con": "corvus",
    "rank": 4,
    "type": "공격",
-   "cost": 1,
+   "cost": 0,
    "target": true,
    "fx": [
     {
-     "t": "deckTop"
+     "t": "onDiscard",
+     "dmg": 6
     },
     {
-     "t": "sacDmg",
-     "v": 4
+     "t": "dmg",
+     "v": 2
     }
    ],
-   "extraTxt": "버리기 1(선택): 피해 +4",
    "si": 2
   },
   "acubens": {
@@ -1848,12 +1847,16 @@
    "target": true,
    "fx": [
     {
-     "t": "block",
-     "v": 3
+     "t": "cond",
+     "when": "enemyVuln",
+     "add": {
+      "mana": 1,
+      "draw": 1
+     }
     },
     {
-     "t": "vuln",
-     "n": 1
+     "t": "block",
+     "v": 4
     }
    ],
    "si": 2
@@ -1868,12 +1871,16 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 3
+     "t": "cond",
+     "when": "enemyWeak",
+     "add": {
+      "mana": 1,
+      "draw": 1
+     }
     },
     {
-     "t": "weak",
-     "n": 1
+     "t": "dmg",
+     "v": 5
     }
    ],
    "si": 1
@@ -1974,7 +1981,6 @@
      "n": 1
     }
    ],
-   "extraTxt": "새끼 별(0비용 토큰)이 손에 들어온다",
    "si": 6
   },
   "mirfak": {
@@ -2054,7 +2060,6 @@
      "plus": 5
     }
    ],
-   "extraTxt": "HP가 절반 이하인 적에게는 피해 +5",
    "si": 7
   },
   "alderamin": {
@@ -2073,7 +2078,7 @@
       "block": 4,
       "heal": 1
      },
-     "txt": "매 턴 성막 4 · HP 1"
+     "txt": "매 턴 성막을 4 얻고 HP를 1 회복합니다"
     },
     {
      "t": "vanish"
@@ -2099,7 +2104,6 @@
      ]
     }
    ],
-   "extraTxt": "세페이드 변광 — 셋 중 무작위",
    "si": 1
   },
   "errai": {
@@ -2118,7 +2122,7 @@
       "block": 2,
       "dmg": 1
      },
-     "txt": "피격마다 성막 2 · 반격 1"
+     "txt": "맞을 때마다 성막을 2 얻고 반격으로 피해를 1 줍니다"
     },
     {
      "t": "vanish"
@@ -2330,7 +2334,6 @@
     "dmgPlus": 6
    },
    "compTxt": "떠 있는 동안: 피해 +6",
-   "extraTxt": "양의 돌진은 한 번 — 쓰면 소멸",
    "si": 0
   },
   "sheratan": {
@@ -2559,7 +2562,7 @@
      "do": {
       "block": 3
      },
-     "txt": "매 턴 성막 3"
+     "txt": "매 턴 성막을 3 얻습니다"
     },
     {
      "t": "vanish"
@@ -2665,7 +2668,7 @@
      "do": {
       "mana": 1
      },
-     "txt": "완성마다 물질 1"
+     "txt": "성좌가 떠오를 때마다 성간 물질을 1 얻습니다"
     },
     {
      "t": "vanish"
@@ -2836,7 +2839,7 @@
      "dmgPlus": 2
     }
    },
-   "bonusTxt": "내 공격 카드 피해 +2"
+   "bonusTxt": "내 공격 카드의 피해가 2 강해집니다"
   },
   "canis": {
    "name": "큰개자리",
@@ -2849,7 +2852,7 @@
      "dmgLow": 3
     }
    },
-   "bonusTxt": "매 턴 HP 최저 적에게 피해 3"
+   "bonusTxt": "매 턴 HP가 가장 낮은 적에게 피해를 3 줍니다"
   },
   "canisminor": {
    "name": "작은개자리",
@@ -2862,7 +2865,7 @@
      "dmg": 2
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 피해 2"
+   "bonusTxt": "매 턴 무작위 적에게 피해를 2 줍니다"
   },
   "gemini": {
    "name": "쌍둥이자리",
@@ -2875,7 +2878,7 @@
      "copy": 1
     }
    },
-   "bonusTxt": "매 턴 손패 1장 복제"
+   "bonusTxt": "매 턴 손패의 무작위 카드 1장을 복사합니다"
   },
   "taurus": {
    "name": "황소자리",
@@ -2888,7 +2891,7 @@
      "atk": 3
     }
    },
-   "bonusTxt": "매 턴 다음 공격 +3"
+   "bonusTxt": "매 턴 다음 공격이 3 강해집니다"
   },
   "leo": {
    "name": "사자자리",
@@ -2901,7 +2904,7 @@
      "weakAll": 1
     }
    },
-   "bonusTxt": "적 전체 약화 유지"
+   "bonusTxt": "모든 적이 계속 약화 상태가 됩니다"
   },
   "virgo": {
    "name": "처녀자리",
@@ -2914,7 +2917,7 @@
      "heal": 3
     }
    },
-   "bonusTxt": "매 턴 HP 3 회복"
+   "bonusTxt": "매 턴 HP를 3 회복합니다"
   },
   "bootes": {
    "name": "목동자리",
@@ -2927,7 +2930,7 @@
      "atk": 2
     }
    },
-   "bonusTxt": "매 턴 다음 공격 +2"
+   "bonusTxt": "매 턴 다음 공격이 2 강해집니다"
   },
   "lyra": {
    "name": "거문고자리",
@@ -2940,7 +2943,7 @@
      "draw": 1
     }
    },
-   "bonusTxt": "처치할 때마다 1장 뽑기"
+   "bonusTxt": "적을 처치할 때마다 카드를 1장 뽑습니다"
   },
   "cygnus": {
    "name": "백조자리",
@@ -2953,7 +2956,7 @@
      "block": 4
     }
    },
-   "bonusTxt": "매 턴 성막 4"
+   "bonusTxt": "매 턴 성막을 4 얻습니다"
   },
   "aquila": {
    "name": "독수리자리",
@@ -2966,7 +2969,7 @@
      "dmg": 4
     }
    },
-   "bonusTxt": "처치하면 이어서 무작위 적에게 피해 4"
+   "bonusTxt": "적을 처치하면 이어서 무작위 적에게 피해를 4 줍니다"
   },
   "scorpius": {
    "name": "전갈자리",
@@ -2979,7 +2982,7 @@
      "poison": 2
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 중독 2"
+   "bonusTxt": "매 턴 무작위 적에게 중독을 2 부여합니다"
   },
   "pegasus": {
    "name": "페가수스자리",
@@ -2992,7 +2995,7 @@
      "costDown": 1
     }
    },
-   "bonusTxt": "매 턴 첫 카드 비용 −1"
+   "bonusTxt": "매 턴 첫 카드의 비용이 1 줄어듭니다"
   },
   "andromeda": {
    "name": "안드로메다자리",
@@ -3005,7 +3008,7 @@
      "block": 3
     }
    },
-   "bonusTxt": "맞을 때마다 성막 3"
+   "bonusTxt": "맞을 때마다 성막을 3 얻습니다"
   },
   "piscis": {
    "name": "남쪽물고기자리",
@@ -3018,7 +3021,7 @@
      "heal": 2
     }
    },
-   "bonusTxt": "매 턴 HP 2 회복"
+   "bonusTxt": "매 턴 HP를 2 회복합니다"
   },
   "cassiopeia": {
    "name": "카시오페이아자리",
@@ -3031,7 +3034,7 @@
      "dmg": 3
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 피해 3"
+   "bonusTxt": "매 턴 무작위 적에게 피해를 3 줍니다"
   },
   "ursa": {
    "name": "큰곰자리",
@@ -3044,7 +3047,7 @@
      "block": 5
     }
    },
-   "bonusTxt": "매 턴 성막 5"
+   "bonusTxt": "매 턴 성막을 5 얻습니다"
   },
   "ursaminor": {
    "name": "작은곰자리",
@@ -3056,7 +3059,7 @@
      "carryPlus": 2
     }
    },
-   "bonusTxt": "남긴 물질 이월 상한 +2"
+   "bonusTxt": "남긴 성간 물질을 4까지 이월할 수 있습니다"
   },
   "sagittarius": {
    "name": "궁수자리",
@@ -3068,7 +3071,7 @@
      "pierce": true
     }
    },
-   "bonusTxt": "내 모든 피해가 성막을 관통"
+   "bonusTxt": "내 모든 피해가 적의 성막을 관통합니다"
   },
   "corona": {
    "name": "왕관자리",
@@ -3080,7 +3083,7 @@
      "riseDraw": 2
     }
    },
-   "bonusTxt": "이후 성좌가 떠오를 때마다 2장 뽑기"
+   "bonusTxt": "이후 성좌가 떠오를 때마다 카드를 2장 뽑습니다"
   },
   "corvus": {
    "name": "까마귀자리",
@@ -3093,7 +3096,7 @@
      "mana": 1
     }
    },
-   "bonusTxt": "처치할 때마다 성간 물질 1"
+   "bonusTxt": "적을 처치할 때마다 성간 물질을 1 얻습니다"
   },
   "cancer": {
    "name": "게자리",
@@ -3106,7 +3109,7 @@
      "vulnAll": 1
     }
    },
-   "bonusTxt": "적 전체 취약 유지"
+   "bonusTxt": "모든 적이 계속 취약 상태가 됩니다"
   },
   "auriga": {
    "name": "마차부자리",
@@ -3119,7 +3122,7 @@
      "dmg": 3
     }
    },
-   "bonusTxt": "맞을 때마다 무작위 적에게 반격 3"
+   "bonusTxt": "맞을 때마다 무작위 적에게 반격으로 피해를 3 줍니다"
   },
   "perseus": {
    "name": "페르세우스자리",
@@ -3131,7 +3134,7 @@
      "execBonus": 4
     }
    },
-   "bonusTxt": "HP 절반 이하인 적에게 내 피해 +4"
+   "bonusTxt": "HP가 절반 이하인 적에게 내 피해가 4 강해집니다"
   },
   "cepheus": {
    "name": "케페우스자리",
@@ -3143,7 +3146,7 @@
      "keepBlock": true
     }
    },
-   "bonusTxt": "성막이 사라지지 않는다"
+   "bonusTxt": "성막이 턴이 지나도 사라지지 않습니다"
   },
   "draco": {
    "name": "용자리",
@@ -3156,7 +3159,7 @@
      "burnRand": 2
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 화상 2"
+   "bonusTxt": "매 턴 무작위 적에게 화상을 2 부여합니다"
   },
   "cetus": {
    "name": "고래자리",
@@ -3169,7 +3172,7 @@
      "heal": 4
     }
    },
-   "bonusTxt": "처치할 때마다 HP 4 회복"
+   "bonusTxt": "적을 처치할 때마다 HP를 4 회복합니다"
   },
   "aries": {
    "name": "양자리",
@@ -3182,7 +3185,7 @@
      "vulnHigh": 1
     }
    },
-   "bonusTxt": "HP 최고 적에게 취약 유지"
+   "bonusTxt": "HP가 가장 높은 적이 계속 취약 상태가 됩니다"
   },
   "libra": {
    "name": "천칭자리",
@@ -3196,7 +3199,7 @@
      "dmg": 3
     }
    },
-   "bonusTxt": "매 턴 성막 3 · 무작위 적에게 피해 3"
+   "bonusTxt": "매 턴 성막을 3 얻고 무작위 적에게 피해를 3 줍니다"
   },
   "capricornus": {
    "name": "염소자리",
@@ -3210,7 +3213,7 @@
      "heal": 2
     }
    },
-   "bonusTxt": "매 턴 성막 3 · HP 2 회복"
+   "bonusTxt": "매 턴 성막을 3 얻고 HP를 2 회복합니다"
   },
   "aquarius": {
    "name": "물병자리",
@@ -3223,7 +3226,7 @@
      "mana": 1
     }
    },
-   "bonusTxt": "매 턴 성간 물질 +1"
+   "bonusTxt": "매 턴 성간 물질을 1 얻습니다"
   },
   "pisces": {
    "name": "물고기자리",
@@ -3236,14 +3239,14 @@
      "draw": 1
     }
    },
-   "bonusTxt": "맞을 때마다 1장 뽑기"
+   "bonusTxt": "맞을 때마다 카드를 1장 뽑습니다"
   }
  },
  "ENEMIES": {
   "m42": {
    "name": "오리온 대성운 M42",
-   "hp": 225,
-   "atk": 17,
+   "hp": 280,
+   "atk": 19,
    "boss": true,
    "season": "겨울",
    "minionMax": 2,
@@ -3263,13 +3266,13 @@
     "txt": "성운이 크게 부푼다 — 아기별이 더 많이 태어나고 장막이 두꺼워진다!"
    },
    "act1": {
-    "hp": 140,
-    "atk": 12
+    "hp": 155,
+    "atk": 13
    }
   },
   "pleiades": {
    "name": "플레이아데스 성단",
-   "hp": 95,
+   "hp": 105,
    "atk": 10,
    "season": "겨울",
    "minionMax": 2,
@@ -3289,13 +3292,13 @@
   },
   "hyades": {
    "name": "히아데스 성단",
-   "hp": 180,
-   "atk": 14,
+   "hp": 240,
+   "atk": 20,
    "season": "겨울",
    "pattern": [
-    14,
-    14,
-    20
+    20,
+    20,
+    28
    ],
    "elite": true,
    "defend": {
@@ -3309,165 +3312,165 @@
   },
   "babystar": {
    "name": "아기별",
-   "hp": 10,
+   "hp": 11,
    "atk": 5
   },
   "asteroid": {
    "name": "떠도는 소행성",
-   "hp": 30,
-   "atk": 5
+   "hp": 38,
+   "atk": 6
   },
   "mercury": {
    "name": "수성",
-   "hp": 26,
-   "atk": 6,
+   "hp": 33,
+   "atk": 8,
    "pattern": [
-    6,
-    8
+    8,
+    10
    ]
   },
   "venus": {
    "name": "금성",
-   "hp": 41,
-   "atk": 7
+   "hp": 51,
+   "atk": 9
   },
   "mars": {
    "name": "화성",
-   "hp": 48,
-   "atk": 10,
+   "hp": 60,
+   "atk": 12,
    "charge": {
     "every": 4,
     "mul": 2.2
    },
    "pattern": [
-    10,
-    10,
-    13
+    12,
+    12,
+    16
    ]
   },
   "jupiter": {
    "name": "목성",
-   "hp": 72,
-   "atk": 8,
+   "hp": 90,
+   "atk": 10,
    "pattern": [
-    8,
-    8,
-    13
+    10,
+    10,
+    16
    ]
   },
   "saturn": {
    "name": "토성",
-   "hp": 58,
-   "atk": 7,
+   "hp": 73,
+   "atk": 9,
    "pattern": [
-    7,
-    7,
-    11
+    9,
+    9,
+    14
    ]
   },
   "moonlet": {
    "name": "미아 위성",
-   "hp": 46,
-   "atk": 7,
+   "hp": 58,
+   "atk": 9,
    "blockSteal": 5,
    "pattern": [
-    7,
-    11
+    9,
+    14
    ]
   },
   "comet": {
    "name": "얼음 혜성",
-   "hp": 66,
-   "atk": 10,
+   "hp": 83,
+   "atk": 12,
    "deathBurst": 8,
    "pattern": [
-    10,
-    10,
-    14
+    12,
+    12,
+    17
    ]
   },
   "shard": {
    "name": "성운 파편",
-   "hp": 29,
-   "atk": 6,
+   "hp": 36,
+   "atk": 8,
    "deathBurst": 6
   },
   "uranus": {
    "name": "천왕성",
-   "hp": 79,
-   "atk": 10,
+   "hp": 95,
+   "atk": 12,
    "pattern": [
-    10,
-    10,
-    13
+    12,
+    12,
+    16
    ]
   },
   "neptune": {
    "name": "해왕성",
-   "hp": 90,
-   "atk": 11
+   "hp": 108,
+   "atk": 13
   },
   "pluto": {
    "name": "명왕성",
-   "hp": 67,
-   "atk": 10,
+   "hp": 80,
+   "atk": 12,
    "pattern": [
-    10,
-    12
+    12,
+    14
    ]
   },
   "titan": {
    "name": "타이탄",
-   "hp": 73,
-   "atk": 10,
+   "hp": 91,
+   "atk": 12,
    "blockSteal": 6,
    "pattern": [
-    10,
-    10,
-    12
+    12,
+    12,
+    15
    ]
   },
   "io": {
    "name": "이오",
-   "hp": 61,
-   "atk": 11,
+   "hp": 76,
+   "atk": 13,
    "charge": {
     "every": 4,
     "mul": 2.2
    },
    "pattern": [
-    11,
-    8
+    13,
+    10
    ]
   },
   "rogue": {
    "name": "떠돌이 행성",
-   "hp": 97,
-   "atk": 11,
+   "hp": 116,
+   "atk": 13,
    "sealOne": {
     "every": 3
    },
    "pattern": [
-    11,
-    11,
-    15
+    13,
+    13,
+    17
    ]
   },
   "oort": {
    "name": "오르트 구름 파편",
-   "hp": 44,
-   "atk": 8,
+   "hp": 53,
+   "atk": 10,
    "deathBurst": 7
   },
   "m1": {
    "name": "게 성운 M1",
-   "hp": 205,
-   "atk": 16,
+   "hp": 280,
+   "atk": 20,
    "season": "겨울",
    "pattern": [
-    16,
-    16,
-    22
+    20,
+    20,
+    28
    ],
    "elite": true,
    "defend": {
@@ -3480,8 +3483,8 @@
   },
   "m13": {
    "name": "헤르쿨레스 구상성단 M13",
-   "hp": 155,
-   "atk": 12,
+   "hp": 235,
+   "atk": 18,
    "season": "여름",
    "minionMax": 2,
    "summonN": 2,
@@ -3499,14 +3502,14 @@
   },
   "blackhole": {
    "name": "은하핵의 블랙홀",
-   "hp": 330,
-   "atk": 23,
+   "hp": 420,
+   "atk": 26,
    "boss": true,
    "season": "여름",
    "pattern": [
-    21,
-    21,
-    28
+    24,
+    24,
+    32
    ],
    "defend": {
     "every": 3,
@@ -3530,8 +3533,8 @@
   },
   "whitedwarf": {
    "name": "백색왜성",
-   "hp": 88,
-   "atk": 11,
+   "hp": 97,
+   "atk": 12,
    "season": "겨울",
    "pattern": [
     11,
@@ -3541,8 +3544,8 @@
   },
   "neutron": {
    "name": "중성자별",
-   "hp": 78,
-   "atk": 12,
+   "hp": 86,
+   "atk": 13,
    "charge": {
     "every": 4,
     "mul": 2.5
@@ -3555,8 +3558,8 @@
   },
   "magnetar": {
    "name": "마그네타",
-   "hp": 84,
-   "atk": 11,
+   "hp": 92,
+   "atk": 12,
    "sealOne": {
     "every": 3
    },
@@ -3569,8 +3572,8 @@
   },
   "darkneb": {
    "name": "암흑 성운",
-   "hp": 110,
-   "atk": 10,
+   "hp": 120,
+   "atk": 11,
    "regen": 5,
    "season": "가을",
    "pattern": [
@@ -3581,8 +3584,8 @@
   },
   "snr": {
    "name": "초신성 잔해",
-   "hp": 98,
-   "atk": 11,
+   "hp": 108,
+   "atk": 12,
    "deathBurst": 9,
    "season": "겨울",
    "pattern": [
@@ -3593,27 +3596,27 @@
   },
   "ghost": {
    "name": "유령 은하",
-   "hp": 74,
-   "atk": 13,
+   "hp": 81,
+   "atk": 14,
    "regen": 5,
    "season": "가을"
   },
   "lmc": {
    "name": "마젤란 조각",
-   "hp": 58,
-   "atk": 10,
+   "hp": 64,
+   "atk": 11,
    "blockSteal": 6,
    "season": "봄"
   },
   "satgal": {
    "name": "위성 은하",
-   "hp": 24,
-   "atk": 6
+   "hp": 28,
+   "atk": 7
   },
   "m31": {
    "name": "안드로메다 은하 M31",
-   "hp": 165,
-   "atk": 12,
+   "hp": 195,
+   "atk": 13,
    "season": "가을",
    "elite": true,
    "defend": {
@@ -3631,13 +3634,13 @@
   },
   "quasar": {
    "name": "퀘이사 3C 273",
-   "hp": 170,
-   "atk": 13,
+   "hp": 215,
+   "atk": 15,
    "season": "봄",
    "pattern": [
-    13,
-    13,
-    18
+    15,
+    15,
+    20
    ],
    "elite": true,
    "defend": {
