@@ -171,6 +171,11 @@ class Sim:
                                  if ENEMIES[e].get('seasonWarp')), None)
         # v0.47 천문 메커니즘 상태
         self.auras = []          # 항성풍
+        # v0.50 떠오름 상태
+        self.completed = set()   # 전투 내내 유지 (구: 턴 리셋)
+        self.rose_this_turn = []
+        self.rise = {}           # 정적 패시브 (dmgPlus·pierce·keepBlock·execBonus·riseDraw·carryPlus)
+        self.crown = 0           # 대관 — 전투 지속
         self.grown = {}          # 강착 (전투 scope)
         self.expose = {}         # 노출 누적
         self._grow_kill = None
@@ -228,6 +233,10 @@ class Sim:
     def hit(self, e, dmg, pierce=False):
         if e is None or e.hp <= 0:
             return
+        if self.rise.get('pierce'):                               # v0.50 궁수 패시브
+            pierce = True
+        if self.rise.get('execBonus') and e.hp * 2 <= e.maxhp:    # v0.50 페르세우스 패시브
+            dmg += self.rise['execBonus']
         if e.sp.get('huddle') and any(x.id == 'babystar' and x.hp > 0 for x in self.enemies):
             dmg = math.ceil(dmg * (1 - e.sp['huddle']))
         if e.vuln > 0:
@@ -288,6 +297,8 @@ class Sim:
                 _e.hp = min(_e.maxhp, _e.hp + _rg)
         if self.keep_block:
             self.keep_block = False
+        elif self.rise.get('keepBlock'):
+            pass                                                  # v0.50 케페우스 — 성막 유지
         else:
             self.block = 0
         self.block += self.power_block
@@ -296,7 +307,7 @@ class Sim:
         if self.power_atk > 0:
             t = self.rng.choice(self.alive()) if self.alive() else None
             self.hit(t, self.power_atk)
-        self.energy = 3 + (min(2, self.energy) if self.turn > 1 else 0)   # v0.46 물질 이월
+        self.energy = 3 + (min(2 + self.rise.get('carryPlus', 0), self.energy) if self.turn > 1 else 0)   # v0.46 이월 + v0.50 작은곰
         self.con_seal = self.con_seal_next
         self.con_seal_next = None
         if self.gravity_always:
@@ -305,12 +316,11 @@ class Sim:
             self.energy = max(0, self.energy - self.energy_drain)
             self.energy_drain = 0
         self.turn_counts = defaultdict(int)
-        self.completed = set()
+        self.rose_this_turn = []                                  # v0.50: completed는 전투 유지
         self.need_reduce = 0
         self.played_turn = 0
         self.thorns = 0
         self.atk_buff = self.def_buff = self.cost_down = 0
-        self.crown = 0
         for _c in list(self.hand):        # v0.47 노출(retain) — 손에 남긴 채 턴을 넘기면 밝아진다
             _d = cdata(_c)
             _rf = next((f for f in _d['fx'] if f['t'] == 'retain'), None)
@@ -472,7 +482,7 @@ class Sim:
         if when == 'lastCard':
             return len(self.hand) == 0
         if when == 'conDone':
-            return bool(self.completed)
+            return bool(self.rose_this_turn)                      # v0.50: 이번 턴에 떠올랐다면
         if when == 'enemyPoisoned':
             return bool(target and (target.poison > 0 or target.burn > 0))
         if when == 'enemyNoBlock':
@@ -534,6 +544,29 @@ class Sim:
                 t = enemy if (enemy and enemy.hp > 0) else (self.rng.choice(self.alive()) if self.alive() else None)
                 if t:
                     t.poison += q['poison']
+            # v0.50 성좌 패시브 어휘
+            if q.get('weakAll'):
+                for e in self.alive():
+                    e.weak = max(e.weak, q['weakAll'])
+            if q.get('vulnAll'):
+                for e in self.alive():
+                    e.vuln = max(e.vuln or 0, q['vulnAll'])
+            if q.get('burnRand'):
+                t = self.rng.choice(self.alive()) if self.alive() else None
+                if t:
+                    t.burn += q['burnRand']; t.burn_t = 2
+            if q.get('dmgLow'):
+                al = sorted(self.alive(), key=lambda e: e.hp)
+                if al:
+                    self.hit(al[0], q['dmgLow'])
+            if q.get('vulnHigh'):
+                al = sorted(self.alive(), key=lambda e: -e.hp)
+                if al:
+                    al[0].vuln = max(al[0].vuln or 0, q['vulnHigh'])
+            if q.get('costDown'):
+                self.cost_down += q['costDown']
+            if q.get('copy') and self.hand:
+                self.hand.append(dict(norm(self.rng.choice(self.hand))))
 
     def fv(self, f, d):
         """v0.36 공명(reso — 이번 턴 같은 별자리를 먼저 냈다면 +) · 잔광(glow — 이번 턴 완성했다면 +)"""
@@ -567,7 +600,8 @@ class Sim:
         self.check_cons()
         ss = CONS[con]['season']
         cd = self.cond_scan(d, target)                                  # v0.47 조건 리더
-        grow = self.grown.get(d.get('_id') or card_id(card), 0) + self.expose.get(id(card), 0)
+        grow = self.grown.get(d.get('_id') or card_id(card), 0) + self.expose.get(id(card), 0) \
+            + (self.rise.get('dmgPlus', 0) if d['type'] == '공격' else 0)   # v0.50 오리온 패시브
         sA = lambda v: max(0, round(self.sadj(v, ss) * cd['mult']) + grow)
         comp = con in self.completed
         if target is None or target.hp <= 0:
@@ -760,8 +794,8 @@ class Sim:
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
                 self.hit(target, v, f.get('pierce'))
-            elif t == 'ifConDone':                             # v0.46 개선 — 완성한 턴이면
-                if self.completed:
+            elif t == 'ifConDone':                             # v0.50 정렬 — 떠오른 턴이면
+                if self.rose_this_turn:
                     if f.get('draw'): self.draw(f['draw'])
                     if f.get('mana'): self.energy += f['mana']
                     if f.get('block'): self.block += f['block']
@@ -848,18 +882,37 @@ class Sim:
         self.check_cons()
         return True
 
+    def rise_apply(self, k, r):
+        """v0.50 떠오름 — 전투 상시 패시브 등록"""
+        if not r:
+            return
+        if r.get('on'):
+            self.auras.append({'on': r['on'], 'do': r.get('do', {}), 'rise': k})
+        for key, v in (r.get('static') or {}).items():
+            if isinstance(v, (int, float)):
+                self.rise[key] = self.rise.get(key, 0) + v
+            else:
+                self.rise[key] = v
+
     def check_cons(self):
         if self.con_seal_all:
             return
         for k in CONS:
             if k in self.completed or k == self.con_seal:
                 continue
-            if self.turn_counts[k] >= self.need(k):
+            if self.battle_counts[k] >= self.need(k):             # v0.50: 전투 누적 판정
                 self.completed.add(k)
                 self.ever.add(k)
+                self.rose_this_turn.append(k)
                 self.completed_log[k] += 1
-                self.aura_fire('conDone')                         # v0.47 항성풍
-                self.bonus(CONS[k]['bonus'])
+                self.aura_fire('conDone')
+                self.rise_apply(k, CONS[k].get('rise'))
+                if self.rise.get('riseDraw') and len(self.completed) > 1:   # 왕관 패시브
+                    self.draw(self.rise['riseDraw'])
+                if len(self.completed) in (2, 3):                 # v0.50 연쇄 — 2·3번째 떠오름까지만
+                    self.energy += 1
+                    if len(self.completed) == 3:
+                        self.draw(1)
                 if self.crown:
                     self.draw(self.crown)
 
@@ -1032,7 +1085,7 @@ class Sim:
             elif t == 'ifLast':
                 s += self.sadj(f['v'], ss) * (2 if len(self.hand) == 1 else 1) / 6.0
             elif t == 'ifConDone':
-                if self.completed:
+                if self.rose_this_turn:
                     s += 0.45 * f.get('draw', 0) + f.get('mana', 0) + f.get('block', 0) / 5.0 + f.get('heal', 0) * 0.2
             elif t == 'poisonDouble':
                 mx = max((e.poison for e in self.alive()), default=0)
@@ -1075,18 +1128,18 @@ class Sim:
                 s += min(mx, f.get('v', 99)) / 5.0
             elif t == 'blockDouble':
                 s += min(self.block, max(0, need_block)) / 5.0 + self.block / 12.0
-        # 성좌 완성 기여
+        # v0.50 성좌 기여 — 전투 누적: 이 카드로 떠오르면 크게, 다가가면 조금
         con = d['con']
         _noc = any(f['t'] == 'noCount' for f in d['fx'])
         if _noc:
             con = None
         if con and con not in self.completed:
-            after = self.turn_counts[con] + d.get('countAs', 1)
+            after = self.battle_counts[con] + d.get('countAs', 1)
             nd = self.need(con)
             if after >= nd:
-                s += 2.0 + nd * 0.6                    # 이번 카드로 완성
-            elif self.can_finish(con, exclude=idx):
-                s += 0.9                               # 손패로 마저 완성 가능
+                s += 2.2 + nd * 0.7                    # 이번 카드로 떠오른다 (전투 내내 패시브)
+            else:
+                s += 0.35                              # 점등 전진
         return s - cost * 0.92
 
     def can_finish(self, con, exclude=-1):
@@ -1372,10 +1425,14 @@ def validate(rng):
     s.start_turn()
     s.hand = [('caph', False)] * 4
     s.energy = 9
+    s.play(0)
+    print(f'  1장(1/2) — 떠오름={sorted(s.completed)} (기대 [])')
+    s.enemy_turn(); s.start_turn()                                # v0.50: 턴을 넘겨도 점등 유지
+    s.energy = 9; s.hand = [('caph', False)] * 3
+    s.play(0)
+    print(f'  다음 턴 2장째(2/2) — 떠오름={sorted(s.completed)} (기대 [cassiopeia] — 누적 점등)')
     s.play(0); s.play(0)
-    print(f'  카시오페이아 2성 완성(턴당 1회): completed={sorted(s.completed)} (기대 [cassiopeia])')
-    s.play(0); s.play(0)
-    print(f'  4장 냈을 때 완성 로그={dict(s.completed_log)} (기대 1회)')
+    print(f'  4장 냈을 때 떠오름 로그={dict(s.completed_log)} (기대 1회 — 전투당 1회)')
     s2 = Sim([('mizar', False), ('merak', False), ('polaris', False)], ['jupiter'], act=1, rng=rng)
     s2.start_turn(); s2.hand = [('mizar', False), ('merak', False), ('polaris', False)]; s2.energy = 9
     s2.play(0); s2.play(0)   # 미자르(2성)+메라크 → 큰곰 3성 완성
