@@ -517,6 +517,8 @@ class Sim:
             if q.get('dmg'):
                 t = enemy if (enemy and enemy.hp > 0) else (self.rng.choice(self.alive()) if self.alive() else None)
                 self.hit(t, q['dmg'])
+            if q.get('atk'):
+                self.atk_buff += q['atk']                       # v0.49 매 턴 공격 증폭
             if q.get('aoe'):
                 for e in self.alive():
                     self.hit(e, q['aoe'])
@@ -813,6 +815,8 @@ class Sim:
                 if target and target.hp > 0 and (target.block or 0) > 0:
                     bb = min(target.block, f.get('v', 99))
                     target.block -= bb; self.block += bb
+            elif t == 'blockDouble':                           # v0.49 참호
+                self.block += self.block
             # scry·noCount·vanish 등은 여기서 처리 없음
         a = cd.get('add')                                      # v0.47 조건 추가효과
         if a:
@@ -1050,7 +1054,7 @@ class Sim:
                         + 0.6 * a.get('vuln', 0) + 0.45 * a.get('weak', 0) + a.get('poison', 0) * 0.4
             elif t == 'aura':
                 q = f.get('do', {})
-                s += (q.get('dmg', 0) + q.get('aoe', 0)) / 6.0 * 2.5 + q.get('block', 0) / 5.0 * 2.5 \
+                s += (q.get('dmg', 0) + q.get('aoe', 0) + q.get('atk', 0)) / 6.0 * 2.5 + q.get('block', 0) / 5.0 * 2.5 \
                     + 0.9 * q.get('draw', 0) + 2.0 * q.get('mana', 0) + q.get('heal', 0) * 0.4 + q.get('poison', 0) * 0.5
             elif t == 'growth':
                 s += f['v'] * 0.35
@@ -1069,6 +1073,8 @@ class Sim:
             elif t == 'blockSteal':
                 mx = max((e.block or 0 for e in self.alive()), default=0)
                 s += min(mx, f.get('v', 99)) / 5.0
+            elif t == 'blockDouble':
+                s += min(self.block, max(0, need_block)) / 5.0 + self.block / 12.0
         # 성좌 완성 기여
         con = d['con']
         _noc = any(f['t'] == 'noCount' for f in d['fx'])
