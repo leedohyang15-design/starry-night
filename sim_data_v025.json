@@ -53,14 +53,14 @@
    "target": true,
    "fx": [
     {
+     "t": "dmg",
+     "v": 5
+    },
+    {
      "t": "growth",
      "on": "play",
      "v": 3,
      "scope": "battle"
-    },
-    {
-     "t": "dmg",
-     "v": 5
     }
    ],
    "si": 1
@@ -99,8 +99,6 @@
      "n": 1
     }
    ],
-   "everCon": "orion",
-   "everPlus": 4,
    "si": 3
   },
   "sirius": {
@@ -188,12 +186,7 @@
    "target": true,
    "fx": [
     {
-     "t": "cond",
-     "when": "enemyAtk",
-     "mult": 2
-    },
-    {
-     "t": "dmg",
+     "t": "ifAtk",
      "v": 5,
      "pierce": true
     }
@@ -211,12 +204,11 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 10,
-     "glow": 3
+     "v": 10
     },
     {
-     "t": "draw",
-     "n": 1
+     "t": "delayDraw",
+     "n": 2
     }
    ],
    "comp": {
@@ -272,7 +264,7 @@
    "target": false,
    "fx": [
     {
-     "t": "copyRand"
+     "t": "doubleNextAtk"
     },
     {
      "t": "draw",
@@ -469,7 +461,7 @@
      "do": {
       "aoe": 4
      },
-     "txt": "성좌가 떠오를 때마다 모든 적에게 피해를 4 줍니다"
+     "txt": "성좌가 떠오를 때마다 적 전체에게 4의 피해를 줍니다"
     },
     {
      "t": "vanish"
@@ -585,18 +577,16 @@
    "name": "포리마",
    "con": "virgo",
    "rank": 3,
-   "type": "수비",
-   "cost": 1,
+   "type": "공격",
+   "cost": 2,
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 3,
-     "glow": 2
+     "t": "aoeReap",
+     "v": 5
     },
     {
-     "t": "heal",
-     "v": 2
+     "t": "vanish"
     }
    ],
    "si": 1
@@ -671,16 +661,16 @@
    "con": "bootes",
    "rank": 2,
    "type": "스킬",
-   "cost": 2,
+   "cost": 1,
    "target": false,
    "fx": [
     {
      "t": "draw",
-     "n": 1
+     "n": 2
     },
     {
-     "t": "sacDraw",
-     "n": 1
+     "t": "buffAtk",
+     "v": 2
     }
    ],
    "si": 3
@@ -758,16 +748,12 @@
    "con": "lyra",
    "rank": 2,
    "type": "스킬",
-   "cost": 2,
+   "cost": 1,
    "target": false,
    "fx": [
     {
-     "t": "draw",
-     "n": 1
-    },
-    {
-     "t": "dmgRand",
-     "v": 3
+     "t": "drawCap",
+     "n": 3
     }
    ],
    "si": 4
@@ -862,13 +848,17 @@
    "name": "사드르",
    "con": "cygnus",
    "rank": 3,
-   "type": "스킬",
+   "type": "수비",
    "cost": 1,
    "target": false,
    "fx": [
     {
-     "t": "delayDraw",
-     "n": 2
+     "t": "block",
+     "v": 4
+    },
+    {
+     "t": "blockNextTurn",
+     "v": 4
     }
    ],
    "si": 1
@@ -1001,7 +991,7 @@
      "do": {
       "poison": 2
      },
-     "txt": "매 턴 무작위 적에게 중독을 2 부여합니다"
+     "txt": "매 턴 무작위 적에게 중독 2를 부여합니다"
     },
     {
      "t": "vanish"
@@ -1090,16 +1080,14 @@
    "con": "pegasus",
    "rank": 2,
    "type": "스킬",
-   "cost": 2,
+   "cost": 1,
    "target": false,
    "fx": [
     {
-     "t": "deckTop",
-     "con": "pegasus"
+     "t": "costZeroRand"
     },
     {
-     "t": "costDown",
-     "v": 1
+     "t": "vanish"
     }
    ],
    "si": 1
@@ -1129,16 +1117,16 @@
    "name": "에니프",
    "con": "pegasus",
    "rank": 4,
-   "type": "스킬",
+   "type": "공격",
    "cost": 1,
-   "target": false,
+   "target": true,
    "fx": [
     {
-     "t": "draw",
-     "n": 1
+     "t": "dmg",
+     "v": 8
     },
     {
-     "t": "costDown",
+     "t": "delayMana",
      "v": 1
     }
    ],
@@ -1173,22 +1161,23 @@
    "name": "미라크",
    "con": "andromeda",
    "rank": 2,
-   "type": "스킬",
+   "type": "수비",
    "cost": 2,
    "target": false,
    "alsoCon": "pegasus",
    "fx": [
     {
      "t": "block",
-     "v": 2,
-     "glow": 2
+     "v": 5
     },
     {
-     "t": "draw",
-     "n": 1
+     "t": "cond",
+     "when": "enemyAtk",
+     "add": {
+      "draw": 1
+     }
     }
    ],
-   "extraTxt": "페가수스 판정에도 계산",
    "si": 2
   },
   "almach": {
@@ -1389,12 +1378,14 @@
    "fx": [
     {
      "t": "block",
-     "v": 3,
-     "reso": 2
+     "v": 4
     },
     {
-     "t": "draw",
-     "n": 1
+     "t": "cond",
+     "when": "enemyAtk",
+     "add": {
+      "block": 3
+     }
     }
    ],
    "si": 1
@@ -1445,8 +1436,14 @@
    "fx": [
     {
      "t": "block",
-     "v": 2,
-     "reso": 3
+     "v": 2
+    },
+    {
+     "t": "cond",
+     "when": "handSmall",
+     "add": {
+      "block": 3
+     }
     }
    ],
    "si": 5,
@@ -1503,8 +1500,14 @@
    "fx": [
     {
      "t": "draw",
-     "n": 1,
-     "reso": 1
+     "n": 1
+    },
+    {
+     "t": "cond",
+     "when": "conDone",
+     "add": {
+      "draw": 1
+     }
     }
    ],
    "si": 5
@@ -1667,16 +1670,20 @@
    "name": "누사칸",
    "con": "corona",
    "rank": 2,
-   "type": "스킬",
+   "type": "성좌",
    "cost": 2,
    "target": false,
    "fx": [
     {
-     "t": "draw",
-     "n": 1
+     "t": "aura",
+     "on": "conDone",
+     "do": {
+      "block": 4
+     },
+     "txt": "성좌가 떠오를 때마다 성막을 4 얻습니다"
     },
     {
-     "t": "crown"
+     "t": "vanish"
     }
    ],
    "si": 1
@@ -1685,16 +1692,20 @@
    "by": "γ",
    "con": "corona",
    "rank": 3,
-   "type": "스킬",
+   "type": "성좌",
    "cost": 1,
    "target": false,
    "fx": [
     {
-     "t": "crown"
+     "t": "aura",
+     "on": "conDone",
+     "do": {
+      "dmg": 5
+     },
+     "txt": "성좌가 떠오를 때마다 무작위 적에게 5의 피해를 줍니다"
     },
     {
-     "t": "mana",
-     "v": 1
+     "t": "vanish"
     }
    ],
    "si": 2
@@ -1703,12 +1714,16 @@
    "by": "δ",
    "con": "corona",
    "rank": 4,
-   "type": "성좌",
+   "type": "스킬",
    "cost": 0,
    "target": false,
    "fx": [
     {
-     "t": "crown"
+     "t": "cond",
+     "when": "conDone",
+     "add": {
+      "block": 5
+     }
     }
    ],
    "si": 3
@@ -1822,16 +1837,20 @@
    "name": "알타르프",
    "con": "cancer",
    "rank": 2,
-   "type": "스킬",
+   "type": "공격",
    "cost": 2,
    "target": true,
    "fx": [
     {
-     "t": "vuln",
-     "n": 2
+     "t": "dmg",
+     "v": 11
     },
     {
      "t": "weak",
+     "n": 1
+    },
+    {
+     "t": "vuln",
      "n": 1
     }
    ],
@@ -2013,15 +2032,15 @@
    "target": true,
    "fx": [
     {
+     "t": "dmgExec",
+     "v": 6,
+     "plus": 4
+    },
+    {
      "t": "growth",
      "on": "kill",
      "v": 3,
      "scope": "battle"
-    },
-    {
-     "t": "dmgExec",
-     "v": 6,
-     "plus": 4
     }
    ],
    "si": 1
@@ -2299,12 +2318,15 @@
    "con": "cetus",
    "rank": 4,
    "type": "스킬",
-   "cost": 1,
+   "cost": 0,
    "target": false,
    "fx": [
     {
      "t": "heal",
-     "v": 5
+     "v": 4
+    },
+    {
+     "t": "vanish"
     }
    ],
    "si": 7
@@ -2347,12 +2369,14 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 5,
-     "reso": 6
+     "v": 7
     },
     {
-     "t": "vuln",
-     "n": 1
+     "t": "cond",
+     "when": "enemyVuln",
+     "add": {
+      "dmg": 4
+     }
     }
    ],
    "si": 1
@@ -2387,9 +2411,13 @@
    "target": true,
    "fx": [
     {
+     "t": "cond",
+     "when": "enemyVuln",
+     "mult": 2
+    },
+    {
      "t": "dmg",
-     "v": 4,
-     "reso": 4
+     "v": 5
     }
    ],
    "si": 3
@@ -2485,19 +2513,17 @@
    "by": "δ",
    "con": "libra",
    "rank": 4,
-   "type": "공격",
+   "type": "수비",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
-     "t": "dmg",
-     "v": 3,
-     "glow": 2
+     "t": "block",
+     "v": 4
     },
     {
-     "t": "block",
-     "v": 3,
-     "glow": 2
+     "t": "buffAtk",
+     "v": 4
     }
    ],
    "si": 3
@@ -2509,12 +2535,11 @@
    "rank": 5,
    "type": "공격",
    "cost": 1,
-   "target": true,
+   "target": false,
    "fx": [
     {
-     "t": "dmg",
-     "v": 3,
-     "glow": 3
+     "t": "aoe",
+     "v": 3
     },
     {
      "t": "block",
@@ -2668,7 +2693,7 @@
      "do": {
       "mana": 1
      },
-     "txt": "성좌가 떠오를 때마다 성간 물질을 1 얻습니다"
+     "txt": "성좌가 떠오를 때마다 성간 물질 1을 얻습니다"
     },
     {
      "t": "vanish"
@@ -2702,13 +2727,19 @@
    "con": "aquarius",
    "rank": 4,
    "type": "스킬",
-   "cost": 1,
+   "cost": 0,
    "target": false,
    "fx": [
     {
+     "t": "mana",
+     "v": 1
+    },
+    {
      "t": "draw",
-     "n": 1,
-     "glow": 1
+     "n": 1
+    },
+    {
+     "t": "vanish"
     }
    ],
    "si": 3
@@ -2718,14 +2749,13 @@
    "name": "알발리",
    "con": "aquarius",
    "rank": 5,
-   "type": "수비",
+   "type": "스킬",
    "cost": 1,
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 4,
-     "glow": 2
+     "t": "delayMana",
+     "v": 2
     }
    ],
    "si": 4
@@ -2758,16 +2788,16 @@
    "name": "푸말사마카",
    "con": "pisces",
    "rank": 2,
-   "type": "수비",
-   "cost": 2,
+   "type": "스킬",
+   "cost": 1,
    "target": false,
    "fx": [
     {
-     "t": "block",
-     "v": 4
+     "t": "reshuffle"
     },
     {
-     "t": "scry"
+     "t": "draw",
+     "n": 1
     }
    ],
    "si": 1
@@ -2799,11 +2829,11 @@
    "target": false,
    "fx": [
     {
-     "t": "scry"
+     "t": "draw",
+     "n": 2
     },
     {
-     "t": "costDown",
-     "v": 1
+     "t": "discard1"
     }
    ],
    "si": 3
@@ -2852,7 +2882,7 @@
      "dmgLow": 3
     }
    },
-   "bonusTxt": "매 턴 HP가 가장 낮은 적에게 피해를 3 줍니다"
+   "bonusTxt": "매 턴 HP가 가장 낮은 적에게 3의 피해를 줍니다"
   },
   "canisminor": {
    "name": "작은개자리",
@@ -2865,7 +2895,7 @@
      "dmg": 2
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 피해를 2 줍니다"
+   "bonusTxt": "매 턴 무작위 적에게 2의 피해를 줍니다"
   },
   "gemini": {
    "name": "쌍둥이자리",
@@ -2904,7 +2934,7 @@
      "weakAll": 1
     }
    },
-   "bonusTxt": "모든 적이 계속 약화 상태가 됩니다"
+   "bonusTxt": "적 전체가 계속 약화 상태가 됩니다"
   },
   "virgo": {
    "name": "처녀자리",
@@ -2969,7 +2999,7 @@
      "dmg": 4
     }
    },
-   "bonusTxt": "적을 처치하면 이어서 무작위 적에게 피해를 4 줍니다"
+   "bonusTxt": "적을 처치하면 이어서 무작위 적에게 4의 피해를 줍니다"
   },
   "scorpius": {
    "name": "전갈자리",
@@ -2982,7 +3012,7 @@
      "poison": 2
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 중독을 2 부여합니다"
+   "bonusTxt": "매 턴 무작위 적에게 중독 2를 부여합니다"
   },
   "pegasus": {
    "name": "페가수스자리",
@@ -3034,7 +3064,7 @@
      "dmg": 3
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 피해를 3 줍니다"
+   "bonusTxt": "매 턴 무작위 적에게 3의 피해를 줍니다"
   },
   "ursa": {
    "name": "큰곰자리",
@@ -3109,7 +3139,7 @@
      "vulnAll": 1
     }
    },
-   "bonusTxt": "모든 적이 계속 취약 상태가 됩니다"
+   "bonusTxt": "적 전체가 계속 취약 상태가 됩니다"
   },
   "auriga": {
    "name": "마차부자리",
@@ -3122,7 +3152,7 @@
      "dmg": 3
     }
    },
-   "bonusTxt": "맞을 때마다 무작위 적에게 반격으로 피해를 3 줍니다"
+   "bonusTxt": "맞을 때마다 무작위 적에게 반격으로 3의 피해를 줍니다"
   },
   "perseus": {
    "name": "페르세우스자리",
@@ -3159,7 +3189,7 @@
      "burnRand": 2
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 화상을 2 부여합니다"
+   "bonusTxt": "매 턴 무작위 적에게 화상 2를 부여합니다"
   },
   "cetus": {
    "name": "고래자리",
@@ -3199,7 +3229,7 @@
      "dmg": 3
     }
    },
-   "bonusTxt": "매 턴 성막을 3 얻고 무작위 적에게 피해를 3 줍니다"
+   "bonusTxt": "매 턴 성막을 3 얻고 무작위 적에게 3의 피해를 줍니다"
   },
   "capricornus": {
    "name": "염소자리",
@@ -3226,7 +3256,7 @@
      "mana": 1
     }
    },
-   "bonusTxt": "매 턴 성간 물질을 1 얻습니다"
+   "bonusTxt": "매 턴 성간 물질 1을 얻습니다"
   },
   "pisces": {
    "name": "물고기자리",
@@ -3266,8 +3296,8 @@
     "txt": "성운이 크게 부푼다 — 아기별이 더 많이 태어나고 장막이 두꺼워진다!"
    },
    "act1": {
-    "hp": 155,
-    "atk": 13
+    "hp": 170,
+    "atk": 14
    }
   },
   "pleiades": {
@@ -3502,14 +3532,14 @@
   },
   "blackhole": {
    "name": "은하핵의 블랙홀",
-   "hp": 420,
-   "atk": 26,
+   "hp": 440,
+   "atk": 27,
    "boss": true,
    "season": "여름",
    "pattern": [
-    24,
-    24,
-    32
+    25,
+    25,
+    33
    ],
    "defend": {
     "every": 3,
@@ -3655,13 +3685,13 @@
   },
   "darkmatter": {
    "name": "암흑 물질",
-   "hp": 640,
-   "atk": 19,
+   "hp": 670,
+   "atk": 20,
    "boss": true,
    "pattern": [
-    17,
-    17,
-    25
+    18,
+    18,
+    26
    ],
    "defend": {
     "every": 3,
@@ -4129,7 +4159,6 @@
  "UP_COST_ONLY": [
   "polaris",
   "pollux",
-  "sheliak",
   "albireo",
   "scheat",
   "kochab"
@@ -4154,7 +4183,9 @@
   "dmgKill",
   "aoePoisonFx",
   "ifAtk",
-  "ifLast"
+  "ifLast",
+  "blockNextTurn",
+  "aoeReap"
  ],
  "SEASONS": [
   "봄",

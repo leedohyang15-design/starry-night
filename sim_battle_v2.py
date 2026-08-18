@@ -216,6 +216,8 @@ class Sim:
         return max(1, CONS[k]['need'] - self.need_reduce)
 
     def draw(self, n):
+        if getattr(self, 'no_draw', False):                       # v0.53 Battle Trance
+            return
         got = 0
         for _ in range(n):
             if not self.deck:
@@ -326,6 +328,7 @@ class Sim:
         self.played_turn = 0
         self.thorns = 0
         self.atk_buff = self.def_buff = self.cost_down = 0
+        self.no_draw = False; self.next_atk_x2 = 0                # v0.53
         for _c in list(self.hand):        # v0.47 노출(retain) — 손에 남긴 채 턴을 넘기면 밝아진다
             _d = cdata(_c)
             _rf = next((f for f in _d['fx'] if f['t'] == 'retain'), None)
@@ -364,6 +367,10 @@ class Sim:
         if self.delay_draw:
             self.draw(self.delay_draw)
             self.delay_draw = 0
+        if getattr(self, 'delay_mana', 0):                        # v0.53
+            self.energy += self.delay_mana; self.delay_mana = 0
+        if getattr(self, 'delay_block', 0):                       # v0.53
+            self.block += self.delay_block; self.delay_block = 0
         for e in self.enemies:
             self.set_intent(e)
         for k in {cdata(c)['con'] for c in self.hand}:
@@ -477,7 +484,9 @@ class Sim:
         self.enemies = [e for e in self.enemies if e.hp > 0 or e.boss]
 
     # ── 카드 사용 ──
-    def eff_cost(self, d):
+    def eff_cost(self, d, card=None):
+        if isinstance(card, dict) and card.get('czero'):
+            return 0                                              # v0.53 Madness — 전투 내내 0코
         return max(0, d['cost'] - 1) if self.cost_down > 0 else d['cost']
 
     # ═══ v0.47: 조건 리더(cond) — 하나의 프리미티브가 수십 카드 문장을 만든다 ═══
@@ -603,10 +612,10 @@ class Sim:
     def play(self, idx, target=None):
         card = self.hand[idx]
         d = cdata(card)
-        cost = self.eff_cost(d)
+        cost = self.eff_cost(d, card)
         if cost > self.energy:
             return False
-        if cost < d['cost']:
+        if not (isinstance(card, dict) and card.get('czero')) and cost < d['cost']:
             self.cost_down -= 1
         self.energy -= cost
         self.hand.pop(idx)
@@ -626,6 +635,10 @@ class Sim:
         grow = self.grown.get(d.get('_id') or card_id(card), 0) + self.expose.get(id(card), 0) \
             + (self.rise.get('dmgPlus', 0) if d['type'] == '공격' else 0)   # v0.50 오리온 패시브
         sA = lambda v: max(0, round(self.sadj(v, ss) * cd['mult']) + grow)
+        x2 = 1                                                    # v0.53 겹상(Double Tap)
+        if d['type'] == '공격' and getattr(self, 'next_atk_x2', 0) > 0:
+            self.next_atk_x2 -= 1; x2 = 2
+        HIT = lambda e, v, p=False: self.hit(e, round(v * x2), p)
         comp = con in self.completed
         if target is None or target.hp <= 0:
             target = self.alive()[0] if self.alive() else None
@@ -643,12 +656,12 @@ class Sim:
                     v += f['if3']
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
-                self.hit(target, v, f.get('pierce'))
+                HIT(target, v, f.get('pierce'))
             elif t == 'dmgPerCon':
                 v = sA(f['v']) + max(0, self.battle_counts[con] - n)
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
-                self.hit(target, v)
+                HIT(target, v)
             elif t == 'blockPerCon':
                 v = sA(f['v']) + max(0, self.battle_counts[con] - n)
                 self.block += v
@@ -661,7 +674,7 @@ class Sim:
                 per, rem = total // f['n'], total - (total // f['n']) * f['n']
                 for i in range(f['n']):
                     tt = target if (target and target.hp > 0) else (self.alive()[0] if self.alive() else None)
-                    self.hit(tt, per + (1 if i < rem else 0), f.get('pierce'))
+                    HIT(tt, per + (1 if i < rem else 0), f.get('pierce'))
             elif t == 'aoe':
                 v = sA(f['v'])
                 if comp and d.get('comp', {}).get('aoePlus'):       # v0.44 각성
@@ -669,7 +682,7 @@ class Sim:
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
                 for e in self.alive():
-                    self.hit(e, v)
+                    HIT(e, v)
             elif t == 'aoeBurn':
                 v = sA(f['v'])
                 for e in self.alive():
@@ -687,31 +700,31 @@ class Sim:
                 v = sA(self.rng.choice(f['opts']))
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
-                self.hit(target, v)
+                HIT(target, v)
             elif t == 'halfBlockDmg':
                 v = self.block // 2 + f.get('bonus', 0)
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
                 if v > 0:
-                    self.hit(target, v)
+                    HIT(target, v)
             elif t == 'dmgExec':
                 v = sA(f['v'])
                 if target and target.hp * 2 <= target.maxhp:
                     v += sA(f['plus'])
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
-                self.hit(target, v)
+                HIT(target, v)
             elif t == 'dmgKill':
                 v = sA(f['v'])
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
                 alv = target and target.hp > 0
-                self.hit(target, v)
+                HIT(target, v)
                 if alv and target.hp <= 0:
                     self.energy += f['mana']
             elif t == 'dmgRand':
                 t2 = self.rng.choice(self.alive()) if self.alive() else None
-                self.hit(t2, sA(f['v']))
+                HIT(t2, sA(f['v']))
             elif t == 'poison':
                 if target:
                     target.poison += sA(f['v'])
@@ -774,7 +787,7 @@ class Sim:
                     self.disc.append(_dc)
                     self.fire_on_discard(_dc)
                     if t == 'sacDmg':
-                        self.hit(target, f['v'])
+                        HIT(target, f['v'])
                     elif t == 'sacBlock':
                         self.block += f['v']
                     elif t == 'sacMana':
@@ -793,7 +806,7 @@ class Sim:
                     self.hand.append(src)
             elif t == 'toggle':
                 if self.sheliak_atk:
-                    self.hit(self.rng.choice(self.alive()) if self.alive() else None, sA(6))
+                    HIT(self.rng.choice(self.alive()) if self.alive() else None, sA(6))
                 else:
                     self.block += sA(5)
                 self.sheliak_atk = not self.sheliak_atk
@@ -801,7 +814,7 @@ class Sim:
                 if self.incoming() > self.block:
                     self.block += sA(5)
                 else:
-                    self.hit(self.rng.choice(self.alive()) if self.alive() else None, sA(6))
+                    HIT(self.rng.choice(self.alive()) if self.alive() else None, sA(6))
             elif t == 'hpCost':                                # v0.46 대가 — 하한 1
                 self.hp = max(1, self.hp - f['v'])
             elif t == 'blockBurst':                            # v0.46 대가 — 성막 전부 소모
@@ -810,17 +823,17 @@ class Sim:
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
                 if v > 0:
-                    self.hit(target, v)
+                    HIT(target, v)
             elif t == 'ifAtk':                                 # v0.46 요격 — 공격 예고 시 2배 (근사: 이번 턴 피해가 들어오면)
                 v = sA(self.fv(f, d)) * (2 if self.incoming() > 0 else 1)
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
-                self.hit(target, v, f.get('pierce'))
+                HIT(target, v, f.get('pierce'))
             elif t == 'ifLast':                                # v0.46 막별 — 손패 마지막 장이면 2배
                 v = sA(self.fv(f, d)) * (2 if not self.hand else 1)
                 if d['type'] == '공격' and self.atk_buff:
                     v += self.atk_buff; self.atk_buff = 0
-                self.hit(target, v, f.get('pierce'))
+                HIT(target, v, f.get('pierce'))
             elif t == 'ifConDone':                             # v0.50 정렬 — 떠오른 턴이면
                 if self.rose_this_turn:
                     if f.get('draw'): self.draw(f['draw'])
@@ -867,7 +880,7 @@ class Sim:
                     pz = target.poison
                     if not f.get('keep'):
                         target.poison = 0
-                    self.hit(target, round(pz * f.get('mult', 1)), True)
+                    HIT(target, round(pz * f.get('mult', 1)), True)
             elif t == 'spreadDot':                             # 플레어
                 src = next((e for e in self.alive() if e.poison > 0 or e.burn > 0), None)
                 if src:
@@ -883,14 +896,45 @@ class Sim:
                     target.block -= bb; self.block += bb
             elif t == 'blockDouble':                           # v0.49 참호
                 self.block += self.block
+            # ═══ v0.53: StS 표 이식 2차 ═══
+            elif t == 'delayMana':                             # 다음 턴 물질 (Outmaneuver/Flying Knee)
+                self.delay_mana = getattr(self, 'delay_mana', 0) + f['v']
+            elif t == 'blockNextTurn':                         # 다음 턴 성막 (Dodge and Roll)
+                self.delay_block = getattr(self, 'delay_block', 0) + f['v']
+            elif t == 'drawCap':                               # Battle Trance
+                self.draw(f['n']); self.no_draw = True
+            elif t == 'doubleNextAtk':                         # Double Tap
+                self.next_atk_x2 = getattr(self, 'next_atk_x2', 0) + 1
+            elif t == 'aoeReap':                               # Reaper
+                v = sA(f['v'])
+                if d['type'] == '공격' and self.atk_buff:
+                    v += self.atk_buff; self.atk_buff = 0
+                hb = sum(max(0, e.hp) for e in self.enemies)
+                for e in self.alive():
+                    HIT(e, v)
+                healed = max(0, hb - sum(max(0, e.hp) for e in self.enemies))
+                self.hp = min(self.maxhp, self.hp + healed)
+            elif t == 'reshuffle':                             # Deep Breath
+                pool = [x for x in self.disc if x is not card]
+                if pool:
+                    self.disc = [x for x in self.disc if x is card]
+                    self.deck.extend(pool); self.rng.shuffle(self.deck)
+            elif t == 'costZeroRand':                          # Madness
+                if self.hand:
+                    j = self.rng.randrange(len(self.hand))
+                    ncd = dict(norm(self.hand[j])); ncd['czero'] = 1
+                    self.hand[j] = ncd
+            elif t == 'exhaustRand':                           # True Grit — 무작위 1장 소멸
+                if self.hand:
+                    self.hand.remove(self.rng.choice(self.hand))
             # scry·noCount·vanish 등은 여기서 처리 없음
         a = cd.get('add')                                      # v0.47 조건 추가효과
         if a:
             if a.get('dmg') and target and target.hp > 0:
-                self.hit(target, sA(a['dmg']), a.get('pierce'))
+                HIT(target, sA(a['dmg']), a.get('pierce'))
             if a.get('aoe'):
                 for e in self.alive():
-                    self.hit(e, sA(a['aoe']))
+                    HIT(e, sA(a['aoe']))
             if a.get('block'):
                 self.block += sA(a['block'])
             if a.get('draw'):
@@ -1054,7 +1098,7 @@ class Sim:
         """카드 1장의 즉시 가치 (물질 환산). 성좌를 완성시키면 보너스 가치를 더한다."""
         card = self.hand[idx]
         d = cdata(card)
-        cost = self.eff_cost(d)
+        cost = self.eff_cost(d, card)
         if cost > self.energy:
             return None
         ss = CONS[d['con']]['season']
@@ -1167,6 +1211,24 @@ class Sim:
             elif t == 'maxHpKill':
                 mx = min((e.hp for e in self.alive()), default=99)
                 s += 1.2 if mx <= 12 else 0.3
+            # ═══ v0.53 신규 채점 ═══
+            elif t == 'delayMana':
+                s += f['v'] * 0.8
+            elif t == 'blockNextTurn':
+                s += f['v'] / 8.0
+            elif t == 'drawCap':
+                s += 0.45 * f['n']
+            elif t == 'doubleNextAtk':
+                s += 1.2
+            elif t == 'aoeReap':
+                s += self.sadj(f['v'], ss) * max(1, len(self.alive())) / 6.0 \
+                    + (0.5 if self.hp < self.maxhp - 6 else 0)
+            elif t == 'reshuffle':
+                s += 0.3
+            elif t == 'costZeroRand':
+                s += 1.0
+            elif t == 'exhaustRand':
+                s -= 0.2
         # v0.50 성좌 기여 — 전투 누적: 이 카드로 떠오르면 크게, 다가가면 조금
         con = d['con']
         _noc = any(f['t'] == 'noCount' for f in d['fx'])
@@ -1472,13 +1534,13 @@ def validate(rng):
     print(f'  다음 턴 2장째(2/2) — 떠오름={sorted(s.completed)} (기대 [cassiopeia] — 누적 점등)')
     s.play(0); s.play(0)
     print(f'  4장 냈을 때 떠오름 로그={dict(s.completed_log)} (기대 1회 — 전투당 1회)')
-    s2 = Sim([('mizar', False), ('merak', False), ('polaris', False)], ['jupiter'], act=1, rng=rng)
-    s2.start_turn(); s2.hand = [('mizar', False), ('merak', False), ('polaris', False)]; s2.energy = 9
-    s2.play(0); s2.play(0)   # 미자르(2성)+메라크 → 큰곰 3성 완성
-    print(f'  미자르 2성+메라크 → 큰곰 완성={"ursa" in s2.completed} (기대 True)')
+    s2 = Sim([('mizar', False), ('phecda', False), ('polaris', False)], ['jupiter'], act=1, rng=rng)
+    s2.start_turn(); s2.hand = [('mizar', False), ('phecda', False), ('polaris', False)]; s2.energy = 9
+    s2.play(0); s2.play(0)   # 미자르(2성)+페크다 → 큰곰 3성 완성 (v0.53: 메라크는 소멸 딸림이라 페크다로)
+    print(f'  미자르 2성+페크다 → 큰곰 완성={"ursa" in s2.completed} (기대 True)')
     e0 = s2.energy
     s2.play(0)   # v0.46 북극성 — 비용 2 · 물질 +1 · 1장 뽑기 (needDown 폐지)
-    print(f'  북극성(v0.46 개편): 물질 {e0}→{s2.energy} (기대 −1) · 손패 {len(s2.hand)}장 (기대 2 — 메라크 뽑기 포함)')
+    print(f'  북극성(v0.46 개편): 물질 {e0}→{s2.energy} (기대 −1) · 손패 {len(s2.hand)}장 (기대 0~1 — 덱이 비면 못 뽑는다)')
     s2b = Sim([('caph', False)], ['jupiter'], act=1, rng=rng)   # v0.46 물질 이월
     s2b.start_turn(); s2b.energy = 2; s2b.hand = []
     s2b.start_turn()
