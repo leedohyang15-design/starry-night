@@ -25,7 +25,7 @@
    "comp": {
     "dmgPlus": 4
    },
-   "compTxt": "완성한 턴: 피해 +4",
+   "compTxt": "떠 있는 동안: 피해 +4",
    "si": 0
   },
   "rigel": {
@@ -117,14 +117,18 @@
    "fx": [
     {
      "t": "dmg",
-     "v": 11,
+     "v": 9,
      "pierce": true
+    },
+    {
+     "t": "weak",
+     "n": 1
     }
    ],
    "comp": {
     "dmgPlus": 5
    },
-   "compTxt": "완성한 턴: 피해 +5",
+   "compTxt": "떠 있는 동안: 피해 +5",
    "si": 0
   },
   "mirzam": {
@@ -167,7 +171,7 @@
    "comp": {
     "dmgPlus": 2
    },
-   "compTxt": "완성 시 피해 +2",
+   "compTxt": "떠 있는 동안: 피해 +2",
    "si": 2
   },
   "wezen": {
@@ -214,7 +218,7 @@
    "comp": {
     "dmgPlus": 4
    },
-   "compTxt": "완성한 턴: 피해 +4",
+   "compTxt": "떠 있는 동안: 피해 +4",
    "si": 0
   },
   "gomeisa": {
@@ -251,7 +255,7 @@
    "comp": {
     "multiPlus": 3
    },
-   "compTxt": "완성한 턴: 연격 각 +3",
+   "compTxt": "떠 있는 동안: 연격 각 +3",
    "si": 0
   },
   "pollux": {
@@ -343,7 +347,7 @@
    "comp": {
     "dmgPlus": 8
    },
-   "compTxt": "완성한 턴: 피해 +8",
+   "compTxt": "떠 있는 동안: 피해 +8",
    "si": 0
   },
   "elnath": {
@@ -514,7 +518,11 @@
    "fx": [
     {
      "t": "aoe",
-     "v": 4
+     "v": 3
+    },
+    {
+     "t": "weakAllFx",
+     "n": 1
     }
    ],
    "si": 5
@@ -540,7 +548,7 @@
    "comp": {
     "dmgPlus": 4
    },
-   "compTxt": "완성한 턴: 피해 +4",
+   "compTxt": "떠 있는 동안: 피해 +4",
    "si": 0
   },
   "zavijava": {
@@ -736,7 +744,7 @@
    "comp": {
     "drawPlus": 1
    },
-   "compTxt": "완성한 턴: 뽑기 +1",
+   "compTxt": "떠 있는 동안: 뽑기 +1",
    "si": 0
   },
   "sheliak": {
@@ -821,7 +829,7 @@
    "comp": {
     "blockPlus": 5
    },
-   "compTxt": "완성한 턴: 성막 +5",
+   "compTxt": "떠 있는 동안: 성막 +5",
    "si": 0
   },
   "albireo": {
@@ -893,7 +901,7 @@
    "comp": {
     "multiPlus": 2
    },
-   "compTxt": "완성한 턴: 연격 각 +2",
+   "compTxt": "떠 있는 동안: 연격 각 +2",
    "si": 0
   },
   "alshain": {
@@ -970,7 +978,7 @@
    "comp": {
     "poisonPlus": 3
    },
-   "compTxt": "완성한 턴: 중독 +3",
+   "compTxt": "떠 있는 동안: 중독 +3",
    "extraTxt": "독을 심은 뒤, 그 적의 중독을 2배로",
    "si": 4
   },
@@ -1069,7 +1077,7 @@
    "comp": {
     "dmgPlus": 6
    },
-   "compTxt": "완성한 턴: 피해 +6",
+   "compTxt": "떠 있는 동안: 피해 +6",
    "si": 0
   },
   "scheat": {
@@ -1152,7 +1160,7 @@
    "comp": {
     "blockPlus": 5
    },
-   "compTxt": "완성한 턴: 성막 +5",
+   "compTxt": "떠 있는 동안: 성막 +5",
    "si": 0,
    "alsoCon": "pegasus"
   },
@@ -1279,7 +1287,7 @@
    "comp": {
     "dmgPlus": 5
    },
-   "compTxt": "완성한 턴: 피해 +5",
+   "compTxt": "떠 있는 동안: 피해 +5",
    "si": 1
   },
   "caph": {
@@ -1364,7 +1372,7 @@
    "comp": {
     "blockPlus": 6
    },
-   "compTxt": "완성한 턴: 성막 +6",
+   "compTxt": "떠 있는 동안: 성막 +6",
    "si": 0
   },
   "merak": {
@@ -1538,7 +1546,7 @@
    "comp": {
     "dmgPlus": 6
    },
-   "compTxt": "완성한 턴: 피해 +6",
+   "compTxt": "떠 있는 동안: 피해 +6",
    "extraTxt": "화살은 한 발 — 쓰면 이번 전투에서 소멸",
    "si": 12
   },
@@ -1649,7 +1657,7 @@
    "comp": {
     "blockPlus": 4
    },
-   "compTxt": "완성한 턴: 성막 +4",
+   "compTxt": "떠 있는 동안: 성막 +4",
    "si": 0
   },
   "nusakan": {
@@ -1807,7 +1815,7 @@
    "comp": {
     "aoePlus": 3
    },
-   "compTxt": "완성한 턴: 전체 피해 +3",
+   "compTxt": "떠 있는 동안: 전체 피해 +3",
    "si": 3
   },
   "altarf": {
@@ -1910,7 +1918,7 @@
    "comp": {
     "blockPlus": 4
    },
-   "compTxt": "완성한 턴: 성막 +4",
+   "compTxt": "떠 있는 동안: 성막 +4",
    "si": 0
   },
   "menkalinan": {
@@ -2159,7 +2167,7 @@
    "comp": {
     "aoePlus": 3
    },
-   "compTxt": "완성한 턴: 전체 피해 +3",
+   "compTxt": "떠 있는 동안: 전체 피해 +3",
    "si": 9
   },
   "rastaban": {
@@ -2235,7 +2243,7 @@
    "comp": {
     "healPlus": 3
    },
-   "compTxt": "완성한 턴: 회복 +3",
+   "compTxt": "떠 있는 동안: 회복 +3",
    "si": 0
   },
   "diphda": {
@@ -2321,7 +2329,7 @@
    "comp": {
     "dmgPlus": 6
    },
-   "compTxt": "완성한 턴: 피해 +6",
+   "compTxt": "떠 있는 동안: 피해 +6",
    "extraTxt": "양의 돌진은 한 번 — 쓰면 소멸",
    "si": 0
   },
@@ -2423,7 +2431,7 @@
     "dmgPlus": 3,
     "blockPlus": 3
    },
-   "compTxt": "완성한 턴: 피해·성막 +3",
+   "compTxt": "떠 있는 동안: 피해·성막 +3",
    "si": 0
   },
   "zubeneschamali": {
@@ -2533,7 +2541,7 @@
    "comp": {
     "healPlus": 4
    },
-   "compTxt": "완성한 턴: 회복 +4",
+   "compTxt": "떠 있는 동안: 회복 +4",
    "si": 0
   },
   "dabih": {
@@ -2639,7 +2647,7 @@
    "comp": {
     "blockPlus": 4
    },
-   "compTxt": "완성한 턴: 성막 +4",
+   "compTxt": "떠 있는 동안: 성막 +4",
    "si": 0
   },
   "sadalsuud": {
@@ -2739,7 +2747,7 @@
    "comp": {
     "drawPlus": 1
    },
-   "compTxt": "완성한 턴: 뽑기 +1",
+   "compTxt": "떠 있는 동안: 뽑기 +1",
    "si": 0
   },
   "fumalsamakah": {
@@ -2823,374 +2831,412 @@
    "short": "오리온",
    "season": "겨울",
    "need": 3,
-   "bonus": {
-    "t": "aoeDmgBurn",
-    "v": 16,
-    "burn": 4
+   "rise": {
+    "static": {
+     "dmgPlus": 2
+    }
    },
-   "bonusTxt": "모든 적에게 피해 16 + 화상 4"
+   "bonusTxt": "내 공격 카드 피해 +2"
   },
   "canis": {
    "name": "큰개자리",
    "short": "큰개",
    "season": "겨울",
    "need": 2,
-   "bonus": {
-    "t": "dmgLowestDraw",
-    "v": 13
+   "rise": {
+    "on": "turn",
+    "do": {
+     "dmgLow": 3
+    }
    },
-   "bonusTxt": "HP 최저 적에게 피해 13, 처치 시 1장 뽑기"
+   "bonusTxt": "매 턴 HP 최저 적에게 피해 3"
   },
   "canisminor": {
    "name": "작은개자리",
    "short": "작은개",
    "season": "겨울",
    "need": 1,
-   "bonus": {
-    "t": "dmgRandom",
-    "v": 7
+   "rise": {
+    "on": "turn",
+    "do": {
+     "dmg": 2
+    }
    },
-   "bonusTxt": "무작위 적에게 피해 7"
+   "bonusTxt": "매 턴 무작위 적에게 피해 2"
   },
   "gemini": {
    "name": "쌍둥이자리",
    "short": "쌍둥이",
    "season": "겨울",
    "need": 3,
-   "bonus": {
-    "t": "copyRandom",
-    "n": 2,
-    "mana": 2
+   "rise": {
+    "on": "turn",
+    "do": {
+     "copy": 1
+    }
    },
-   "bonusTxt": "손패 무작위 2장 복제 + 성간 물질 2"
+   "bonusTxt": "매 턴 손패 1장 복제"
   },
   "taurus": {
    "name": "황소자리",
    "short": "황소",
    "season": "겨울",
    "need": 3,
-   "bonus": {
-    "t": "dmgHighestVuln",
-    "v": 22,
-    "vuln": 2
+   "rise": {
+    "on": "turn",
+    "do": {
+     "atk": 3
+    }
    },
-   "bonusTxt": "HP 최고 적에게 피해 22 + 취약 2턴"
+   "bonusTxt": "매 턴 다음 공격 +3"
   },
   "leo": {
    "name": "사자자리",
    "short": "사자",
    "season": "봄",
    "need": 3,
-   "bonus": {
-    "t": "aoeDmgWeak",
-    "v": 14,
-    "weak": 2
+   "rise": {
+    "on": "turn",
+    "do": {
+     "weakAll": 1
+    }
    },
-   "bonusTxt": "모든 적에게 피해 14 + 약화 2턴"
+   "bonusTxt": "적 전체 약화 유지"
   },
   "virgo": {
    "name": "처녀자리",
    "short": "처녀",
    "season": "봄",
    "need": 3,
-   "bonus": {
-    "t": "manaHeal",
-    "mana": 2,
-    "heal": 11,
-    "draw": 1
+   "rise": {
+    "on": "turn",
+    "do": {
+     "heal": 3
+    }
    },
-   "bonusTxt": "성간 물질 2 + HP 11 회복 + 1장 뽑기"
+   "bonusTxt": "매 턴 HP 3 회복"
   },
   "bootes": {
    "name": "목동자리",
    "short": "목동",
    "season": "봄",
    "need": 2,
-   "bonus": {
-    "t": "buffAtkB",
-    "v": 13
+   "rise": {
+    "on": "turn",
+    "do": {
+     "atk": 2
+    }
    },
-   "bonusTxt": "이번 턴 다음 공격 카드 피해 +13"
+   "bonusTxt": "매 턴 다음 공격 +2"
   },
   "lyra": {
    "name": "거문고자리",
    "short": "거문고",
    "season": "여름",
    "need": 2,
-   "bonus": {
-    "t": "drawWeakAll",
-    "draw": 3,
-    "weak": 1
+   "rise": {
+    "on": "kill",
+    "do": {
+     "draw": 1
+    }
    },
-   "bonusTxt": "3장 뽑기 + 적 전체 약화 1턴"
+   "bonusTxt": "처치할 때마다 1장 뽑기"
   },
   "cygnus": {
    "name": "백조자리",
    "short": "백조",
    "season": "여름",
    "need": 2,
-   "bonus": {
-    "t": "blockDraw",
-    "block": 12,
-    "draw": 2
+   "rise": {
+    "on": "turn",
+    "do": {
+     "block": 4
+    }
    },
-   "bonusTxt": "성막 12 + 2장 뽑기"
+   "bonusTxt": "매 턴 성막 4"
   },
   "aquila": {
    "name": "독수리자리",
    "short": "독수리",
    "season": "여름",
    "need": 2,
-   "bonus": {
-    "t": "dmgRandom",
-    "v": 12,
-    "pierce": true
+   "rise": {
+    "on": "kill",
+    "do": {
+     "dmg": 4
+    }
    },
-   "bonusTxt": "무작위 적에게 관통 피해 12"
+   "bonusTxt": "처치하면 이어서 무작위 적에게 피해 4"
   },
   "scorpius": {
    "name": "전갈자리",
    "short": "전갈",
    "season": "여름",
    "need": 3,
-   "bonus": {
-    "t": "aoePoison",
-    "v": 7
+   "rise": {
+    "on": "turn",
+    "do": {
+     "poison": 2
+    }
    },
-   "bonusTxt": "적 전체에 중독 7"
+   "bonusTxt": "매 턴 무작위 적에게 중독 2"
   },
   "pegasus": {
    "name": "페가수스자리",
    "short": "페가수스",
    "season": "가을",
    "need": 2,
-   "bonus": {
-    "t": "manaDraw",
-    "mana": 2,
-    "draw": 2
+   "rise": {
+    "on": "turn",
+    "do": {
+     "costDown": 1
+    }
    },
-   "bonusTxt": "성간 물질 2 회복 + 2장 뽑기"
+   "bonusTxt": "매 턴 첫 카드 비용 −1"
   },
   "andromeda": {
    "name": "안드로메다자리",
    "short": "안드로메다",
    "season": "가을",
    "need": 2,
-   "bonus": {
-    "t": "blockSeal",
-    "v": 7
+   "rise": {
+    "on": "hurt",
+    "do": {
+     "block": 3
+    }
    },
-   "bonusTxt": "성막 7 + 무작위 적의 의도 봉인"
+   "bonusTxt": "맞을 때마다 성막 3"
   },
   "piscis": {
    "name": "남쪽물고기자리",
    "short": "남쪽물고기",
    "season": "가을",
    "need": 1,
-   "bonus": {
-    "t": "block",
-    "v": 5
+   "rise": {
+    "on": "turn",
+    "do": {
+     "heal": 2
+    }
    },
-   "bonusTxt": "성막 5"
+   "bonusTxt": "매 턴 HP 2 회복"
   },
   "cassiopeia": {
    "name": "카시오페이아자리",
    "short": "카시오페이아",
    "season": "주극",
    "need": 2,
-   "bonus": {
-    "t": "dmgRandom",
-    "v": 14
+   "rise": {
+    "on": "turn",
+    "do": {
+     "dmg": 3
+    }
    },
-   "bonusTxt": "무작위 적에게 피해 14"
+   "bonusTxt": "매 턴 무작위 적에게 피해 3"
   },
   "ursa": {
    "name": "큰곰자리",
    "short": "큰곰",
    "season": "주극",
    "need": 3,
-   "bonus": {
-    "t": "blockThorns",
-    "v": 16,
-    "thorns": 6
+   "rise": {
+    "on": "turn",
+    "do": {
+     "block": 5
+    }
    },
-   "bonusTxt": "성막 16 + 가시 6"
+   "bonusTxt": "매 턴 성막 5"
   },
   "ursaminor": {
    "name": "작은곰자리",
    "short": "작은곰",
    "season": "주극",
    "need": 2,
-   "bonus": {
-    "t": "drawCostDown",
-    "draw": 3
+   "rise": {
+    "static": {
+     "carryPlus": 2
+    }
    },
-   "bonusTxt": "카드 3장 뽑기 + 다음 카드 비용 −1"
+   "bonusTxt": "남긴 물질 이월 상한 +2"
   },
   "sagittarius": {
    "name": "궁수자리",
    "short": "궁수",
    "season": "여름",
    "need": 3,
-   "bonus": {
-    "t": "aoeDmg",
-    "v": 15,
-    "pierce": true
+   "rise": {
+    "static": {
+     "pierce": true
+    }
    },
-   "bonusTxt": "모든 적에게 관통 피해 15"
+   "bonusTxt": "내 모든 피해가 성막을 관통"
   },
   "corona": {
    "name": "왕관자리",
    "short": "왕관",
    "season": "여름",
    "need": 2,
-   "bonus": {
-    "t": "needDownB",
-    "v": 1,
-    "draw": 2
+   "rise": {
+    "static": {
+     "riseDraw": 2
+    }
    },
-   "bonusTxt": "이번 턴 모든 성좌의 완성 필요 수 −1 + 2장 뽑기"
+   "bonusTxt": "이후 성좌가 떠오를 때마다 2장 뽑기"
   },
   "corvus": {
    "name": "까마귀자리",
    "short": "까마귀",
    "season": "봄",
    "need": 2,
-   "bonus": {
-    "t": "drawMana",
-    "draw": 2,
-    "mana": 2
+   "rise": {
+    "on": "kill",
+    "do": {
+     "mana": 1
+    }
    },
-   "bonusTxt": "카드 2장 뽑기 + 성간 물질 2"
+   "bonusTxt": "처치할 때마다 성간 물질 1"
   },
   "cancer": {
    "name": "게자리",
    "short": "게",
    "season": "봄",
    "need": 3,
-   "bonus": {
-    "t": "vulnWeakAll",
-    "vuln": 2,
-    "weak": 2,
-    "v": 8
+   "rise": {
+    "on": "turn",
+    "do": {
+     "vulnAll": 1
+    }
    },
-   "bonusTxt": "모든 적에게 피해 8 + 취약 2턴 + 약화 2턴"
+   "bonusTxt": "적 전체 취약 유지"
   },
   "auriga": {
    "name": "마차부자리",
    "short": "마차부",
    "season": "겨울",
    "need": 2,
-   "bonus": {
-    "t": "dmgRandBlock"
+   "rise": {
+    "on": "hurt",
+    "do": {
+     "dmg": 3
+    }
    },
-   "bonusTxt": "무작위 적에게 지금 성막만큼 피해"
+   "bonusTxt": "맞을 때마다 무작위 적에게 반격 3"
   },
   "perseus": {
    "name": "페르세우스자리",
    "short": "페르세우스",
    "season": "가을",
    "need": 2,
-   "bonus": {
-    "t": "execLowest",
-    "v": 15,
-    "mana": 1,
-    "draw": 1
+   "rise": {
+    "static": {
+     "execBonus": 4
+    }
    },
-   "bonusTxt": "HP 최저 적에게 피해 15 — 처치 시 물질 1 + 1장 뽑기"
+   "bonusTxt": "HP 절반 이하인 적에게 내 피해 +4"
   },
   "cepheus": {
    "name": "케페우스자리",
    "short": "케페우스",
    "season": "주극",
    "need": 2,
-   "bonus": {
-    "t": "squareBlock",
-    "v": 8
+   "rise": {
+    "static": {
+     "keepBlock": true
+    }
    },
-   "bonusTxt": "성막 8 + 다음 턴 시작 시 성막 유지"
+   "bonusTxt": "성막이 사라지지 않는다"
   },
   "draco": {
    "name": "용자리",
    "short": "용",
    "season": "주극",
    "need": 2,
-   "bonus": {
-    "t": "aoeDmgBurn",
-    "v": 9,
-    "burn": 4
+   "rise": {
+    "on": "turn",
+    "do": {
+     "burnRand": 2
+    }
    },
-   "bonusTxt": "모든 적에게 피해 9 + 화상 4"
+   "bonusTxt": "매 턴 무작위 적에게 화상 2"
   },
   "cetus": {
    "name": "고래자리",
    "short": "고래",
    "season": "가을",
    "need": 2,
-   "bonus": {
-    "t": "dmgHeal",
-    "v": 12,
-    "heal": 7
+   "rise": {
+    "on": "kill",
+    "do": {
+     "heal": 4
+    }
    },
-   "bonusTxt": "적 하나에게 피해 12 + HP 7 회복"
+   "bonusTxt": "처치할 때마다 HP 4 회복"
   },
   "aries": {
    "name": "양자리",
    "short": "양",
    "season": "가을",
    "need": 3,
-   "bonus": {
-    "t": "dmgHighest",
-    "v": 25
+   "rise": {
+    "on": "turn",
+    "do": {
+     "vulnHigh": 1
+    }
    },
-   "bonusTxt": "HP 최고 적에게 피해 25"
+   "bonusTxt": "HP 최고 적에게 취약 유지"
   },
   "libra": {
    "name": "천칭자리",
    "short": "천칭",
    "season": "봄",
    "need": 3,
-   "bonus": {
-    "t": "dmgRandBlock2",
-    "v": 13,
-    "block": 13
+   "rise": {
+    "on": "turn",
+    "do": {
+     "block": 3,
+     "dmg": 3
+    }
    },
-   "bonusTxt": "무작위 적에게 피해 13 + 성막 13"
+   "bonusTxt": "매 턴 성막 3 · 무작위 적에게 피해 3"
   },
   "capricornus": {
    "name": "염소자리",
    "short": "염소",
    "season": "가을",
    "need": 3,
-   "bonus": {
-    "t": "blockHeal",
-    "v": 15,
-    "heal": 8
+   "rise": {
+    "on": "turn",
+    "do": {
+     "block": 3,
+     "heal": 2
+    }
    },
-   "bonusTxt": "성막 15 + HP 8 회복"
+   "bonusTxt": "매 턴 성막 3 · HP 2 회복"
   },
   "aquarius": {
    "name": "물병자리",
    "short": "물병",
    "season": "가을",
    "need": 3,
-   "bonus": {
-    "t": "manaDraw",
-    "mana": 3,
-    "draw": 2
+   "rise": {
+    "on": "turn",
+    "do": {
+     "mana": 1
+    }
    },
-   "bonusTxt": "성간 물질 3 + 2장 뽑기"
+   "bonusTxt": "매 턴 성간 물질 +1"
   },
   "pisces": {
    "name": "물고기자리",
    "short": "물고기",
    "season": "봄",
    "need": 3,
-   "bonus": {
-    "t": "drawCostDown",
-    "draw": 4
+   "rise": {
+    "on": "hurt",
+    "do": {
+     "draw": 1
+    }
    },
-   "bonusTxt": "4장 뽑기 + 다음 카드 비용 −1"
+   "bonusTxt": "맞을 때마다 1장 뽑기"
   }
  },
  "ENEMIES": {
@@ -3606,13 +3652,13 @@
   },
   "darkmatter": {
    "name": "암흑 물질",
-   "hp": 880,
-   "atk": 26,
+   "hp": 640,
+   "atk": 19,
    "boss": true,
    "pattern": [
-    24,
-    24,
-    33
+    17,
+    17,
+    25
    ],
    "defend": {
     "every": 3,
