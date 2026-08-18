@@ -180,6 +180,7 @@ class Sim:
         self.expose = {}         # 노출 누적
         self._grow_kill = None
         self._return_kill = None
+        self._maxhp_kill = None
         # 통계
         self.completed_log = defaultdict(int)     # 실제 완성 횟수
         self.had_cards = defaultdict(int)         # 그 별자리 카드를 손에 쥔 턴 수
@@ -256,6 +257,10 @@ class Sim:
                 if rc in self.disc:
                     self.disc.remove(rc); self.hand.append(rc)
                 self._return_kill = None
+            if getattr(self, '_maxhp_kill', None):             # v0.51 포식
+                self.maxhp += self._maxhp_kill
+                self.hp += self._maxhp_kill
+                self._maxhp_kill = None
             self.aura_fire('kill', e)
         if was_alive and e.hp == 0 and e.sp.get('deathBurst'):   # v0.43 임종 폭발
             _bd = max(0, e.sp['deathBurst'] - 0)
@@ -491,6 +496,10 @@ class Sim:
             return self.hp * 2 <= self.maxhp
         if when == 'handSmall':
             return len(self.hand) <= 2
+        if when == 'enemyVuln':
+            return bool(target and (target.vuln or 0) > 0)
+        if when == 'enemyWeak':
+            return bool(target and target.weak > 0)
         return False
 
     def cond_scan(self, d, target):
@@ -508,6 +517,20 @@ class Sim:
                 if f.get('add'):
                     r['add'] = dict(r['add'] or {}, **f['add'])
         return r
+
+    def fire_on_discard(self, c):
+        d = cdata(c)
+        f = next((x for x in d['fx'] if x['t'] == 'onDiscard'), None) if d else None
+        if not f:
+            return
+        if f.get('draw'):
+            self.draw(f['draw'])
+        if f.get('mana'):
+            self.energy += f['mana']
+        if f.get('block'):
+            self.block += f['block']
+        if f.get('dmg') and self.alive():
+            self.hit(self.rng.choice(self.alive()), f['dmg'])
 
     def _match(self, x, f):
         dd = cdata(x)
@@ -747,7 +770,9 @@ class Sim:
                 # AI 정책: 손패가 4장 이상이면 버린다 (가장 비싼 카드부터)
                 if len(self.hand) >= 4:
                     j = max(range(len(self.hand)), key=lambda i: cdata(self.hand[i])['cost'])
-                    self.disc.append(self.hand.pop(j))
+                    _dc = self.hand.pop(j)
+                    self.disc.append(_dc)
+                    self.fire_on_discard(_dc)
                     if t == 'sacDmg':
                         self.hit(target, f['v'])
                     elif t == 'sacBlock':
@@ -759,7 +784,9 @@ class Sim:
             elif t == 'discard1':
                 if self.hand:
                     j = max(range(len(self.hand)), key=lambda i: cdata(self.hand[i])['cost'])
-                    self.disc.append(self.hand.pop(j))
+                    _dc = self.hand.pop(j)
+                    self.disc.append(_dc)
+                    self.fire_on_discard(_dc)
             elif t == 'copySelect' or t == 'copyRandom':
                 if self.hand:
                     src = self.rng.choice(self.hand)
@@ -809,6 +836,11 @@ class Sim:
             elif t == 'addCard':                               # v0.46 강생 — 토큰 생성
                 for _ in range(f.get('n', 1)):
                     self.hand.append({'id': f['id'], 'tok': True})
+            elif t == 'addCopy':                               # v0.51 분신 (StS Anger)
+                self.disc.append(dict(norm(card)))
+            elif t == 'maxHpKill':                             # v0.51 포식 (StS Feed)
+                self._maxhp_kill = f.get('v', 3)
+            # onDiscard는 버려질 때 발동 — 여기서는 없음
             # ═══ v0.47 천문 메커니즘 ═══
             elif t == 'aura':                                  # 항성풍
                 self.auras.append({'on': f['on'], 'do': f.get('do', {})})
@@ -873,7 +905,7 @@ class Sim:
                 target.vuln = max(target.vuln or 0, a['vuln'])
             if a.get('weak') and target and target.hp > 0:
                 target.weak = max(target.weak, a['weak'])
-        self._grow_kill = None; self._return_kill = None
+        self._grow_kill = None; self._return_kill = None; self._maxhp_kill = None
         if any(f['t'] == 'vanish' for f in d['fx']):           # v0.46 소멸 — 이번 전투에서 제거
             for _vi in range(len(self.disc) - 1, -1, -1):
                 if self.disc[_vi] is card:
@@ -1128,6 +1160,13 @@ class Sim:
                 s += min(mx, f.get('v', 99)) / 5.0
             elif t == 'blockDouble':
                 s += min(self.block, max(0, need_block)) / 5.0 + self.block / 12.0
+            elif t == 'addCopy':
+                s += 0.4
+            elif t == 'onDiscard':
+                s += 0.2
+            elif t == 'maxHpKill':
+                mx = min((e.hp for e in self.alive()), default=99)
+                s += 1.2 if mx <= 12 else 0.3
         # v0.50 성좌 기여 — 전투 누적: 이 카드로 떠오르면 크게, 다가가면 조금
         con = d['con']
         _noc = any(f['t'] == 'noCount' for f in d['fx'])
