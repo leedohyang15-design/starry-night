@@ -209,6 +209,43 @@ class Sim:
         return math.ceil(v * 1.5) if m == 1 else math.floor(v * 0.75) if m == -1 else v   # v0.37: 제철 +50%
 
     # ── 유틸 ──
+    def add_block(self, v):                                   # v0.54 큰곰 — 성막마다 침
+        if v <= 0:
+            return
+        self.block += v
+        if self.rise.get('blockSting') and not getattr(self, '_sting', False):
+            self._sting = True
+            t = self.rng.choice(self.alive()) if self.alive() else None
+            if t:
+                self.hit(t, self.rise['blockSting'])
+            self._sting = False
+
+    def heal_hp(self, v):                                     # v0.54 남쪽물고기 — 초과 회복 → 성막
+        if v <= 0:
+            return 0
+        got = min(v, self.maxhp - self.hp)
+        self.hp += got
+        over = v - got
+        if over > 0 and self.rise.get('overhealBlock'):
+            self.add_block(over)
+        return got
+
+    def fetch_atk_top(self):                                  # v0.54 작은개
+        pool = [x for x in self.deck if (cdata(x) or {}).get('type') == '공격']
+        if not pool:
+            return
+        pk = self.rng.choice(pool)
+        self.deck.remove(pk); self.deck.append(pk)
+
+    def corpse_check(self, e):                                # v0.54 시체 폭발
+        if e is None or not getattr(e, 'corpse_ex', False) or e.hp > 0 or getattr(e, '_corpsed', False):
+            return
+        e._corpsed = True
+        px = (e.poison or 0) * 2
+        if px > 0:
+            for x in self.alive():
+                self.hit(x, px, True)
+
     def alive(self):
         return [e for e in self.enemies if e.hp > 0]
 
@@ -226,8 +263,16 @@ class Sim:
                 self.deck = self.disc
                 self.disc = []
                 self.rng.shuffle(self.deck)
+                if self.rise.get('reshufflePay'):                 # v0.54 물고기
+                    self.energy += 2
+                    self._reshuf_extra = getattr(self, '_reshuf_extra', 0) + 2
+                if self.rise.get('fetchAtk'):                     # v0.54 작은개
+                    self.fetch_atk_top()
             self.hand.append(self.deck.pop())
             got += 1
+        if getattr(self, '_reshuf_extra', 0):
+            n2 = self._reshuf_extra; self._reshuf_extra = 0
+            self.draw(n2)
         if got and not getattr(self, '_in_aura_draw', False):     # v0.47 항성풍(재귀 방지)
             self._in_aura_draw = True
             self.aura_fire('draw')
@@ -238,7 +283,9 @@ class Sim:
             return
         if self.rise.get('pierce'):                               # v0.50 궁수 패시브
             pierce = True
-        if self.rise.get('execBonus') and e.hp * 2 <= e.maxhp:    # v0.50 페르세우스 패시브
+            if self.rise.get('pierceBonus') and (e.block or 0) > 0:   # v0.54 — 성막 두른 적에게 더
+                dmg += self.rise['pierceBonus']
+        if self.rise.get('execBonus') and e.hp * 2 <= e.maxhp:    # (rise에서는 v0.54부터 미사용 — 훅 유지)
             dmg += self.rise['execBonus']
         if e.sp.get('huddle') and any(x.id == 'babystar' and x.hp > 0 for x in self.enemies):
             dmg = math.ceil(dmg * (1 - e.sp['huddle']))
@@ -249,7 +296,22 @@ class Sim:
             e.block -= b
             dmg -= b
         was_alive = e.hp > 0
+        _pre = e.hp
         e.hp = max(0, e.hp - dmg)
+        if e.hp > 0:
+            if self.rise.get('biteHalf') and not getattr(e, '_bitten', False) and _pre * 2 > e.maxhp and e.hp * 2 <= e.maxhp:
+                e._bitten = True                                   # v0.54 큰개 — 절반을 넘긴 순간 문다
+                self.hit(e, self.rise['biteHalf'], True)
+            if e.hp > 0 and self.rise.get('execute30') and e.hp <= e.maxhp * 0.3 and not e.sp.get('boss') and not e.sp.get('elite'):
+                self.hit(e, e.hp, True)                            # v0.54 페르세우스 — 즉시 처형
+        if self.rise.get('overkill') and e.hp == 0 and _pre > 0 and not getattr(self, '_ovk', False):
+            left = dmg - _pre                                      # v0.54 황소 — 과잉 이월
+            if left > 0 and self.alive():
+                self._ovk = True
+                self.hit(self.alive()[0], left, pierce)
+                self._ovk = False
+        if was_alive and e.hp == 0:
+            self.corpse_check(e)
         if was_alive and e.hp == 0:                               # v0.47 강착·공전·항성풍
             if self._grow_kill:
                 cid, gv = self._grow_kill
@@ -295,6 +357,8 @@ class Sim:
         if self.dawn and self.turn + 1 >= self.dawn['from']:
             t = self.turn + 1
             self.hp = max(0, self.hp - (self.dawn['dmg'] + (t - self.dawn['from']) * self.dawn['step']))
+            if self.hp <= 0 and self.rise.get('undying') and not getattr(self, '_undying_used', False):
+                self._undying_used = True; self.hp = 1            # v0.54 염소
         for _e in self.enemies:
             _c = _e.sp.get('creep')
             if _c and self.turn >= 1 and _e.hp > 0:
@@ -308,13 +372,14 @@ class Sim:
             pass                                                  # v0.50 케페우스 — 성막 유지
         else:
             self.block = 0
-        self.block += self.power_block
+        self.add_block(self.power_block)
         if self.turn > 1:
             self.aura_fire('turn')                                # v0.47 항성풍 — 매 턴
         if self.power_atk > 0:
             t = self.rng.choice(self.alive()) if self.alive() else None
             self.hit(t, self.power_atk)
-        self.energy = 3 + (min(2 + self.rise.get('carryPlus', 0), self.energy) if self.turn > 1 else 0)   # v0.46 이월 + v0.50 작은곰
+        _cv = (min(2 + self.rise.get('carryPlus', 0), self.energy) if self.turn > 1 else 0)
+        self.energy = 3 + _cv                                     # v0.46 이월 + v0.50 작은곰
         self.con_seal = self.con_seal_next
         self.con_seal_next = None
         if self.gravity_always:
@@ -327,8 +392,15 @@ class Sim:
         self.need_reduce = 0
         self.played_turn = 0
         self.thorns = 0
-        self.atk_buff = self.def_buff = self.cost_down = 0
+        if not self.rise.get('keepAtkBuff'):                      # v0.54 목동 — 조준 유지
+            self.atk_buff = 0
+        self.def_buff = self.cost_down = 0
         self.no_draw = False; self.next_atk_x2 = 0                # v0.53
+        self._atk_vuln_done = False; self._skill_turn_done = False; self._first_free = False; self._atk_played = 0   # v0.54
+        if self.rise.get('firstAtkX2'):                           # v0.54 쌍둥이 — 매 턴 첫 공격 2배
+            self.next_atk_x2 = max(self.next_atk_x2, 1)
+        if self.rise.get('firstFree'):                            # v0.54 페가수스 — 첫 카드 0코
+            self._first_free = True
         for _c in list(self.hand):        # v0.47 노출(retain) — 손에 남긴 채 턴을 넘기면 밝아진다
             _d = cdata(_c)
             _rf = next((f for f in _d['fx'] if f['t'] == 'retain'), None)
@@ -336,8 +408,11 @@ class Sim:
                 k = id(_c)
                 self.expose[k] = self.expose.get(k, 0) + _rf.get('v', 0)
         n = max(2, 5 - len(self.hand))
+        if self.rise.get('carryDraw') and _cv > 0:                # v0.54 작은곰
+            n += 1
+        n += getattr(self, '_aq_draw', 0); self._aq_draw = 0      # v0.54 물병
         if 'compass' in self.relics and self.turn == 1:
-            self.block += 5
+            self.add_block(5)
         if 'ember' in self.relics:
             self.atk_buff += 2
         if 'lens' in self.relics and self.turn == 1:
@@ -350,7 +425,7 @@ class Sim:
             self.need_reduce += 1
         for a in self.allies:
             if a == 'brahe':
-                self.block += 2
+                self.add_block(2)
             elif a == 'herschel' and self.turn % 2 == 0:
                 n += 1
             elif a == 'kepler' and self.turn % 3 == 0:
@@ -370,7 +445,7 @@ class Sim:
         if getattr(self, 'delay_mana', 0):                        # v0.53
             self.energy += self.delay_mana; self.delay_mana = 0
         if getattr(self, 'delay_block', 0):                       # v0.53
-            self.block += self.delay_block; self.delay_block = 0
+            self.add_block(self.delay_block); self.delay_block = 0
         for e in self.enemies:
             self.set_intent(e)
         for k in {cdata(c)['con'] for c in self.hand}:
@@ -417,6 +492,18 @@ class Sim:
         return sum(e.intent[1] for e in self.enemies if e.hp > 0 and e.intent and e.intent[0] in ('atk', 'jet'))
 
     def enemy_turn(self):
+        if self.rise.get('endBlockStrike') and self.block > 1 and self.alive():   # v0.54 천칭
+            self.hit(self.rng.choice(self.alive()), self.block // 2)
+        if self.rise.get('manaCarryDraw'):                                        # v0.54 물병
+            self._aq_draw = min(2, self.energy)
+        if getattr(self, 'bombs', None):                                          # v0.54 화염구
+            for b in self.bombs:
+                b['t'] -= 1
+            go = [b for b in self.bombs if b['t'] <= 0]
+            self.bombs = [b for b in self.bombs if b['t'] > 0]
+            for b in go:
+                for e in self.alive():
+                    self.hit(e, b['v'])
         self.disc.extend(self.hand)
         self.hand = []
         for a in self.allies:
@@ -427,11 +514,17 @@ class Sim:
             if e.hp <= 0:
                 continue
             if e.poison > 0:
-                e.hp = max(0, e.hp - e.poison); e.poison -= 1
+                e.hp = max(0, e.hp - e.poison)
+                if not self.rise.get('poisonKeep'):               # v0.54 전갈 — 독이 마르지 않는다
+                    e.poison -= 1
+                if e.hp == 0:
+                    self.corpse_check(e)
             if e.hp > 0 and e.burn > 0 and e.burn_t > 0:
-                e.hp = max(0, e.hp - e.burn); e.burn_t -= 1
-                if e.burn_t == 0:
-                    e.burn = 0
+                e.hp = max(0, e.hp - e.burn)
+                if not self.rise.get('burnKeep'):                 # v0.54 용 — 불이 꺼지지 않는다
+                    e.burn_t -= 1
+                    if e.burn_t == 0:
+                        e.burn = 0
             if e.hp <= 0:
                 continue
             if e.sealed:
@@ -474,7 +567,11 @@ class Sim:
                 blocked = 0 if (e.sp.get('pierce') or kind == 'jet') else min(self.block, v)
                 self.block -= blocked
                 thru = v - blocked
+                if thru == 0 and v > 0 and self.rise.get('fullBlockCounter') and e.hp > 0:   # v0.54 안드로메다
+                    self.hit(e, self.rise['fullBlockCounter'])
                 self.hp = max(0, self.hp - thru)
+                if self.hp <= 0 and self.rise.get('undying') and not getattr(self, '_undying_used', False):
+                    self._undying_used = True; self.hp = 1                                    # v0.54 염소
                 self.dmg_taken += thru
                 if self.thorns > 0:
                     e.hp = max(0, e.hp - self.thorns)
@@ -487,6 +584,8 @@ class Sim:
     def eff_cost(self, d, card=None):
         if isinstance(card, dict) and card.get('czero'):
             return 0                                              # v0.53 Madness — 전투 내내 0코
+        if getattr(self, '_first_free', False):
+            return 0                                              # v0.54 페가수스 — 첫 카드 0코
         return max(0, d['cost'] - 1) if self.cost_down > 0 else d['cost']
 
     # ═══ v0.47: 조건 리더(cond) — 하나의 프리미티브가 수십 카드 문장을 만든다 ═══
@@ -528,6 +627,8 @@ class Sim:
         return r
 
     def fire_on_discard(self, c):
+        if self.rise.get('discardSting') and self.alive():        # v0.54 까마귀
+            self.hit(self.rng.choice(self.alive()), self.rise['discardSting'])
         d = cdata(c)
         f = next((x for x in d['fx'] if x['t'] == 'onDiscard'), None) if d else None
         if not f:
@@ -537,7 +638,7 @@ class Sim:
         if f.get('mana'):
             self.energy += f['mana']
         if f.get('block'):
-            self.block += f['block']
+            self.add_block(f['block'])
         if f.get('dmg') and self.alive():
             self.hit(self.rng.choice(self.alive()), f['dmg'])
 
@@ -565,13 +666,22 @@ class Sim:
                 for e in self.alive():
                     self.hit(e, q['aoe'])
             if q.get('block'):
-                self.block += q['block']
+                self.add_block(q['block'])
             if q.get('draw'):
                 self.draw(q['draw'])
             if q.get('mana'):
                 self.energy += q['mana']
+            if q.get('maxhpUp'):                              # v0.54 고래
+                self.maxhp += q['maxhpUp']
             if q.get('heal'):
-                self.hp = min(self.maxhp, self.hp + q['heal'])
+                self.heal_hp(q['heal'])
+            if q.get('healStrike'):                           # v0.54 처녀
+                got = self.heal_hp(q['healStrike'])
+                if got > 0 and self.alive():
+                    self.hit(self.rng.choice(self.alive()), got)
+            if q.get('aoeWeakKill') and enemy is not None and enemy.weak > 0:   # v0.54 사자
+                for e in self.alive():
+                    self.hit(e, q['aoeWeakKill'])
             if q.get('poison'):
                 t = enemy if (enemy and enemy.hp > 0) else (self.rng.choice(self.alive()) if self.alive() else None)
                 if t:
@@ -615,7 +725,9 @@ class Sim:
         cost = self.eff_cost(d, card)
         if cost > self.energy:
             return False
-        if not (isinstance(card, dict) and card.get('czero')) and cost < d['cost']:
+        if getattr(self, '_first_free', False) and d['cost'] > 0:
+            self._first_free = False                              # v0.54 페가수스 소비
+        elif not (isinstance(card, dict) and card.get('czero')) and cost < d['cost']:
             self.cost_down -= 1
         self.energy -= cost
         self.hand.pop(idx)
@@ -633,12 +745,18 @@ class Sim:
         ss = CONS[con]['season']
         cd = self.cond_scan(d, target)                                  # v0.47 조건 리더
         grow = self.grown.get(d.get('_id') or card_id(card), 0) + self.expose.get(id(card), 0) \
-            + (self.rise.get('dmgPlus', 0) if d['type'] == '공격' else 0)   # v0.50 오리온 패시브
+            + (self.rise.get('dmgPlus', 0) if d['type'] == '공격' else 0) \
+            + ((getattr(self, 'rise_ramp', 0) + (len(self.completed) * self.rise.get('perRiseDmg', 0))) if d['type'] == '공격' else 0)   # v0.54 오리온·왕관
         sA = lambda v: max(0, round(self.sadj(v, ss) * cd['mult']) + grow)
-        x2 = 1                                                    # v0.53 겹상(Double Tap)
+        x2 = 1                                                    # v0.53 겹상 · v0.54 쌍둥이
         if d['type'] == '공격' and getattr(self, 'next_atk_x2', 0) > 0:
             self.next_atk_x2 -= 1; x2 = 2
-        HIT = lambda e, v, p=False: self.hit(e, round(v * x2), p)
+        _ride = [0]                                               # v0.54 마차부 — 성막을 실어 첫 타에 +4
+        if d['type'] == '공격' and self.rise.get('blockRide') and self.block >= 2:
+            self.block -= 2; _ride[0] = 4
+        def HIT(e, v, p=False):
+            vv = v + _ride[0]; _ride[0] = 0
+            self.hit(e, round(vv * x2), p)
         comp = con in self.completed
         if target is None or target.hp <= 0:
             target = self.alive()[0] if self.alive() else None
@@ -664,15 +782,16 @@ class Sim:
                 HIT(target, v)
             elif t == 'blockPerCon':
                 v = sA(f['v']) + max(0, self.battle_counts[con] - n)
-                self.block += v
+                self.add_block(v)
             elif t == 'dmgMulti':
-                total = sA(f['v'] * f['n'] + f.get('plus', 0))
+                _mn = f['n'] + (1 if self.rise.get('multiPlus1') else 0)   # v0.54 독수리
+                total = sA(f['v'] * _mn + f.get('plus', 0))
                 if comp and d.get('comp', {}).get('multiPlus'):     # v0.44 각성
-                    total += d['comp']['multiPlus'] * f['n']
+                    total += d['comp']['multiPlus'] * _mn
                 if d['type'] == '공격' and self.atk_buff:
                     total += self.atk_buff; self.atk_buff = 0
-                per, rem = total // f['n'], total - (total // f['n']) * f['n']
-                for i in range(f['n']):
+                per, rem = total // _mn, total - (total // _mn) * _mn
+                for i in range(_mn):
                     tt = target if (target and target.hp > 0) else (self.alive()[0] if self.alive() else None)
                     HIT(tt, per + (1 if i < rem else 0), f.get('pierce'))
             elif t == 'aoe':
@@ -693,9 +812,9 @@ class Sim:
                     v += d['comp']['blockPlus']
                 if d['type'] == '수비' and self.def_buff:
                     v += self.def_buff; self.def_buff = 0
-                self.block += v
+                self.add_block(v)
             elif t == 'varBlock':
-                self.block += sA(self.rng.choice(f['opts']))
+                self.add_block(sA(self.rng.choice(f['opts'])))
             elif t == 'varDmg':
                 v = sA(self.rng.choice(f['opts']))
                 if d['type'] == '공격' and self.atk_buff:
@@ -748,7 +867,7 @@ class Sim:
                 self.energy += f['v']
             elif t == 'heal':
                 _hv = f['v'] + (d.get('comp', {}).get('healPlus', 0) if comp else 0)   # v0.44 각성
-                self.hp = min(self.maxhp, self.hp + _hv)
+                self.heal_hp(_hv)
             elif t == 'thorns':
                 self.thorns += f['v']
             elif t == 'buffAtk':
@@ -789,7 +908,7 @@ class Sim:
                     if t == 'sacDmg':
                         HIT(target, f['v'])
                     elif t == 'sacBlock':
-                        self.block += f['v']
+                        self.add_block(f['v'])
                     elif t == 'sacMana':
                         self.energy += f['v']
                     else:
@@ -808,11 +927,11 @@ class Sim:
                 if self.sheliak_atk:
                     HIT(self.rng.choice(self.alive()) if self.alive() else None, sA(6))
                 else:
-                    self.block += sA(5)
+                    self.add_block(sA(5))
                 self.sheliak_atk = not self.sheliak_atk
             elif t == 'choice':
                 if self.incoming() > self.block:
-                    self.block += sA(5)
+                    self.add_block(sA(5))
                 else:
                     HIT(self.rng.choice(self.alive()) if self.alive() else None, sA(6))
             elif t == 'hpCost':                                # v0.46 대가 — 하한 1
@@ -838,8 +957,8 @@ class Sim:
                 if self.rose_this_turn:
                     if f.get('draw'): self.draw(f['draw'])
                     if f.get('mana'): self.energy += f['mana']
-                    if f.get('block'): self.block += f['block']
-                    if f.get('heal'): self.hp = min(self.maxhp, self.hp + f['heal'])
+                    if f.get('block'): self.add_block(f['block'])
+                    if f.get('heal'): self.heal_hp(f['heal'])
             elif t == 'poisonDouble':                          # v0.46 맹독
                 if f.get('all'):
                     for e in self.alive():
@@ -893,9 +1012,9 @@ class Sim:
             elif t == 'blockSteal':                            # 조석
                 if target and target.hp > 0 and (target.block or 0) > 0:
                     bb = min(target.block, f.get('v', 99))
-                    target.block -= bb; self.block += bb
+                    target.block -= bb; self.add_block(bb)
             elif t == 'blockDouble':                           # v0.49 참호
-                self.block += self.block
+                self.add_block(self.block)
             # ═══ v0.53: StS 표 이식 2차 ═══
             elif t == 'delayMana':                             # 다음 턴 물질 (Outmaneuver/Flying Knee)
                 self.delay_mana = getattr(self, 'delay_mana', 0) + f['v']
@@ -913,7 +1032,7 @@ class Sim:
                 for e in self.alive():
                     HIT(e, v)
                 healed = max(0, hb - sum(max(0, e.hp) for e in self.enemies))
-                self.hp = min(self.maxhp, self.hp + healed)
+                self.heal_hp(healed)
             elif t == 'reshuffle':                             # Deep Breath
                 pool = [x for x in self.disc if x is not card]
                 if pool:
@@ -927,6 +1046,61 @@ class Sim:
             elif t == 'exhaustRand':                           # True Grit — 무작위 1장 소멸
                 if self.hand:
                     self.hand.remove(self.rng.choice(self.hand))
+            # ═══ v0.54: StS 표 3차 ═══
+            elif t == 'havocPlay':                             # Havoc — 성도 맨 위 카드를 공짜로 낸다
+                self._havoc_n = getattr(self, '_havoc_n', 0) + 1
+            elif t == 'fiendFire':                             # Fiend Fire
+                burnt = list(self.hand); self.hand = []
+                for _b in burnt:
+                    v = sA(f['v'])
+                    if comp and d.get('comp', {}).get('dmgPlus'):
+                        v += d['comp']['dmgPlus']
+                    HIT(target, v)
+            elif t == 'secondWind':                            # Second Wind
+                keep = [x for x in self.hand if (cdata(x) or {}).get('type') == '공격']
+                burn = len(self.hand) - len(keep)
+                self.hand = keep
+                if burn:
+                    self.add_block(f['v'] * burn)
+            elif t == 'exhume':                                # Exhume — 소멸 회수 (sim은 근사: 무작위 버림 회수)
+                if getattr(self, 'vanished', None):
+                    pk = self.rng.choice(self.vanished)
+                    self.vanished.remove(pk); self.hand.append(pk)
+            elif t == 'mindBlast':                             # Mind Blast
+                v = len(self.deck)
+                if comp and d.get('comp', {}).get('dmgPlus'):
+                    v += d['comp']['dmgPlus']
+                if d['type'] == '공격' and self.atk_buff:
+                    v += self.atk_buff; self.atk_buff = 0
+                HIT(target, v)
+            elif t == 'theBomb':                               # The Bomb
+                if not hasattr(self, 'bombs'):
+                    self.bombs = []
+                self.bombs.append({'t': f.get('turns', 3), 'v': sA(f['v'])})
+            elif t == 'fullBlockDmg':                          # Body Slam 원형
+                v = self.block + f.get('bonus', 0)
+                if d['type'] == '공격' and self.atk_buff:
+                    v += self.atk_buff; self.atk_buff = 0
+                if v > 0:
+                    HIT(target, v)
+            elif t == 'corpseExplosion':                       # Corpse Explosion
+                v = sA(self.fv(f, d))
+                if target and target.hp > 0:
+                    target.poison += v; target.corpse_ex = True
+            elif t == 'finisherDmg':                           # Finisher
+                nn = getattr(self, '_atk_played', 0)
+                v = sA(self.fv(f, d)) * nn
+                if d['type'] == '공격' and self.atk_buff:
+                    v += self.atk_buff; self.atk_buff = 0
+                if v > 0:
+                    HIT(target, v)
+            elif t == 'flechettes':                            # Flechettes
+                nn = len([x for x in self.hand if (cdata(x) or {}).get('type') == '스킬'])
+                v = sA(self.fv(f, d)) * nn
+                if d['type'] == '공격' and self.atk_buff:
+                    v += self.atk_buff; self.atk_buff = 0
+                if v > 0:
+                    HIT(target, v)
             # scry·noCount·vanish 등은 여기서 처리 없음
         a = cd.get('add')                                      # v0.47 조건 추가효과
         if a:
@@ -936,39 +1110,85 @@ class Sim:
                 for e in self.alive():
                     HIT(e, sA(a['aoe']))
             if a.get('block'):
-                self.block += sA(a['block'])
+                self.add_block(sA(a['block']))
             if a.get('draw'):
                 self.draw(a['draw'])
             if a.get('mana'):
                 self.energy += a['mana']
             if a.get('heal'):
-                self.hp = min(self.maxhp, self.hp + sA(a['heal']))
+                self.heal_hp(sA(a['heal']))
             if a.get('poison') and target and target.hp > 0:
                 target.poison += sA(a['poison'])
             if a.get('vuln') and target and target.hp > 0:
                 target.vuln = max(target.vuln or 0, a['vuln'])
             if a.get('weak') and target and target.hp > 0:
                 target.weak = max(target.weak, a['weak'])
+        if d['type'] == '공격':
+            self._atk_played = getattr(self, '_atk_played', 0) + 1   # v0.54 Finisher 카운터
+        if self.rise:
+            if self.rise.get('ramp') and d['type'] == '공격':
+                self.rise_ramp = min(6, getattr(self, 'rise_ramp', 0) + self.rise['ramp'])   # 오리온 (34차: 상한 6)
+            if self.rise.get('playBlock'):
+                self.add_block(self.rise['playBlock'])                                # 백조
+            if self.rise.get('playStingVuln'):
+                for e in list(self.alive()):
+                    if e.vuln > 0:
+                        self.hit(e, self.rise['playStingVuln'])                       # 게
+            if self.rise.get('fourthCardAoe') and self.played_turn > 0 and self.played_turn % 4 == 0:
+                for e in self.alive():
+                    self.hit(e, self.rise['fourthCardAoe'])                           # 카시오페이아
+            if self.rise.get('firstAtkVuln') and d['type'] == '공격' and not getattr(self, '_atk_vuln_done', False):
+                self._atk_vuln_done = True
+                if target and target.hp > 0:
+                    target.vuln = max(target.vuln or 0, self.rise['firstAtkVuln'])    # 양
+            if self.rise.get('firstSkillDraw') and d['type'] == '스킬' and not getattr(self, '_skill_turn_done', False):
+                self._skill_turn_done = True
+                self.draw(self.rise['firstSkillDraw'])                                # 거문고
+        # v0.54 Havoc — 성도 맨 위 카드를 공짜로 내고 소멸 (연쇄 3회 제한)
+        while getattr(self, '_havoc_n', 0) > 0 and getattr(self, '_havoc_depth', 0) < 3:
+            self._havoc_n -= 1
+            if not self.deck and self.disc:
+                pool = [x for x in self.disc if x is not card]
+                self.disc = [x for x in self.disc if x is card]
+                self.deck = pool; self.rng.shuffle(self.deck)
+            if not self.deck:
+                break
+            hv = self.deck.pop()
+            hv = dict(norm(hv)); hv['czero'] = 1
+            self.hand.append(hv)
+            self._havoc_depth = getattr(self, '_havoc_depth', 0) + 1
+            self.play(self.hand.index(hv), self.alive()[0] if self.alive() else None)
+            self._havoc_depth -= 1
+            if hv in self.disc:
+                self.disc.remove(hv)
         self._grow_kill = None; self._return_kill = None; self._maxhp_kill = None
         if any(f['t'] == 'vanish' for f in d['fx']):           # v0.46 소멸 — 이번 전투에서 제거
             for _vi in range(len(self.disc) - 1, -1, -1):
                 if self.disc[_vi] is card:
                     del self.disc[_vi]
+                    if not hasattr(self, 'vanished'):
+                        self.vanished = []
+                    self.vanished.append(card)                 # v0.54 exhume 대상
                     break
         self.check_cons()
         return True
 
     def rise_apply(self, k, r):
-        """v0.50 떠오름 — 전투 상시 패시브 등록"""
         if not r:
             return
         if r.get('on'):
-            self.auras.append({'on': r['on'], 'do': r.get('do', {}), 'rise': k})
-        for key, v in (r.get('static') or {}).items():
-            if isinstance(v, (int, float)):
-                self.rise[key] = self.rise.get(key, 0) + v
-            else:
-                self.rise[key] = v
+            self.auras.append({'on': r['on'], 'do': r.get('do', {})})
+        for a in r.get('auras', []):                              # v0.54 다중 트리거(사자)
+            self.auras.append({'on': a['on'], 'do': a.get('do', {})})
+        st = r.get('static')
+        if st:
+            for key, v in st.items():
+                if isinstance(v, (int, float)) and not isinstance(v, bool):
+                    self.rise[key] = self.rise.get(key, 0) + v
+                else:
+                    self.rise[key] = v
+            if st.get('fetchAtk'):                                # v0.54 작은개 — 떠오른 즉시
+                self.fetch_atk_top()
 
     def check_cons(self):
         if self.con_seal_all:
@@ -1024,7 +1244,7 @@ class Sim:
                 if a.hp > 0:
                     a.vuln = max(a.vuln, b['vuln'])
         elif t == 'manaHeal':
-            self.energy += b['mana']; self.hp = min(self.maxhp, self.hp + b['heal'])
+            self.energy += b['mana']; self.heal_hp(b['heal'])
             if b.get('draw'):
                 self.draw(b['draw'])
         elif t == 'manaDraw':
@@ -1032,7 +1252,7 @@ class Sim:
         elif t == 'buffAtkB':
             self.atk_buff += b['v']
         elif t == 'blockSeal':
-            self.block += b['v']
+            self.add_block(b['v'])
             if alive:
                 self.rng.choice(alive).sealed = True
         elif t == 'dmgRandom':
@@ -1049,21 +1269,21 @@ class Sim:
             for e in alive:
                 e.weak = max(e.weak, b['weak'])
         elif t == 'blockDraw':
-            self.block += b['block']; self.draw(b['draw'])
+            self.add_block(b['block']); self.draw(b['draw'])
         elif t == 'block':
-            self.block += b['v']
+            self.add_block(b['v'])
         elif t == 'blockHeal':   # v0.36 염소
-            self.block += b['v']; self.hp = min(self.maxhp, self.hp + b['heal'])
+            self.add_block(b['v']); self.heal_hp(b['heal'])
         elif t == 'dmgRandBlock2':   # v0.36 천칭
             a2 = self.rng.choice(self.alive()) if self.alive() else None
             if a2: self.hit(a2, b['v'])
-            self.block += b['block']
+            self.add_block(b['block'])
         elif t == 'blockThorns':
-            self.block += b['v']; self.thorns += b['thorns']
+            self.add_block(b['v']); self.thorns += b['thorns']
         elif t == 'draw':
             self.draw(b['n'])
         elif t == 'squareBlock':
-            self.block += b['v']; self.keep_block = True
+            self.add_block(b['v']); self.keep_block = True
         elif t == 'needDownB':
             self.need_reduce += b['v']
             if b.get('draw'):
@@ -1091,7 +1311,7 @@ class Sim:
         elif t == 'dmgHeal':
             if alive:
                 self.hit(self.rng.choice(alive), b['v'])
-            self.hp = min(self.maxhp, self.hp + b['heal'])
+            self.heal_hp(b['heal'])
 
     # ── 그리디 AI ──
     def card_score(self, idx):
@@ -1229,6 +1449,30 @@ class Sim:
                 s += 1.0
             elif t == 'exhaustRand':
                 s -= 0.2
+            # ═══ v0.54 채점 ═══
+            elif t == 'havocPlay':
+                s += 1.0
+            elif t == 'fiendFire':
+                s += max(0, len(self.hand) - 1) * (f['v'] / 6.0 - 0.45)
+            elif t == 'secondWind':
+                nn = len([x for x in self.hand if (cdata(x) or {}).get('type') != '공격']) - 1
+                s += max(0, nn) * (f['v'] / 5.0 - 0.35)
+            elif t == 'exhume':
+                s += 0.6
+            elif t == 'mindBlast':
+                s += len(self.deck) / 6.0
+            elif t == 'theBomb':
+                s += f['v'] * max(1, len(self.alive())) / 6.0 * 0.7
+            elif t == 'fullBlockDmg':
+                s += (self.block + f.get('bonus', 0)) / 6.0
+            elif t == 'corpseExplosion':
+                v = self.sadj(f['v'], ss)
+                s += v * (v + 1) / 2 / 6.0 + 0.6
+            elif t == 'finisherDmg':
+                s += self.sadj(f['v'], ss) * getattr(self, '_atk_played', 0) / 6.0
+            elif t == 'flechettes':
+                nn = len([x for x in self.hand if (cdata(x) or {}).get('type') == '스킬'])
+                s += self.sadj(f['v'], ss) * nn / 6.0
         # v0.50 성좌 기여 — 전투 누적: 이 카드로 떠오르면 크게, 다가가면 조금
         con = d['con']
         _noc = any(f['t'] == 'noCount' for f in d['fx'])
