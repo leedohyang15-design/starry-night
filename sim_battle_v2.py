@@ -250,7 +250,7 @@ class Sim:
         return [e for e in self.enemies if e.hp > 0]
 
     def need(self, k):
-        return max(1, CONS[k]['need'] - self.need_reduce)
+        return max(1, CONS[k]['need'] - self.need_reduce - getattr(self, 'need_cut', {}).get(k, 0))   # v0.55 대관
 
     def draw(self, n):
         if getattr(self, 'no_draw', False):                       # v0.53 Battle Trance
@@ -459,6 +459,8 @@ class Sim:
             v = math.ceil(v * 1.5) if m == 1 else math.floor(v * 0.75) if m == -1 else v
         if self.turn >= self.night_from:
             v += self.turn - self.night_from + 1
+        if getattr(e, 'atk_down', 0):
+            v = max(1, v - e.atk_down)                            # v0.55 약탈
         return v
 
     def set_intent(self, e):
@@ -563,6 +565,15 @@ class Sim:
             else:
                 if e.weak > 0:
                     v = int(v * 0.75)
+                if getattr(e, 'betrayed', False):                 # v0.55 이간질
+                    e.betrayed = False
+                    others = [x for x in self.alive() if x is not e]
+                    tt = self.rng.choice(others) if others else e
+                    tt.hp = max(0, tt.hp - v)
+                    if tt.hp == 0:
+                        self.corpse_check(tt)
+                    e.weak = max(0, e.weak - 1); e.vuln = max(0, e.vuln - 1)
+                    continue
                 self.aura_fire('hurt')                            # v0.47 항성풍 — 맞을 때마다
                 blocked = 0 if (e.sp.get('pierce') or kind == 'jet') else min(self.block, v)
                 self.block -= blocked
@@ -736,6 +747,7 @@ class Sim:
         con, n = d['con'], d.get('countAs', 1)
         _noc = any(f['t'] == 'noCount' for f in d['fx'])       # v0.46 대가 — 성좌 계산 제외
         if not _noc:
+            self.stage_con = con                                  # v0.55 메아리 — 마지막으로 그린 별
             self.turn_counts[con] += n
             self.battle_counts[con] += n
             if d.get('alsoCon'):
@@ -744,9 +756,10 @@ class Sim:
         self.check_cons()
         ss = CONS[con]['season']
         cd = self.cond_scan(d, target)                                  # v0.47 조건 리더
+        prev_con = getattr(self, 'stage_con', None)               # v0.55 메아리
         grow = self.grown.get(d.get('_id') or card_id(card), 0) + self.expose.get(id(card), 0) \
             + (self.rise.get('dmgPlus', 0) if d['type'] == '공격' else 0) \
-            + ((getattr(self, 'rise_ramp', 0) + (len(self.completed) * self.rise.get('perRiseDmg', 0))) if d['type'] == '공격' else 0)   # v0.54 오리온·왕관
+            + ((getattr(self, 'rise_ramp', 0) + getattr(self, 'stolen_atk', 0) + (len(self.completed) * self.rise.get('perRiseDmg', 0))) if d['type'] == '공격' else 0)   # v0.54~55
         sA = lambda v: max(0, round(self.sadj(v, ss) * cd['mult']) + grow)
         x2 = 1                                                    # v0.53 겹상 · v0.54 쌍둥이
         if d['type'] == '공격' and getattr(self, 'next_atk_x2', 0) > 0:
@@ -1101,6 +1114,46 @@ class Sim:
                     v += self.atk_buff; self.atk_buff = 0
                 if v > 0:
                     HIT(target, v)
+            # ═══ v0.55 신동사 ═══
+            elif t == 'drawStarBest':                          # 별 그리기
+                ks = [k for k in CONS if k not in self.completed and self.battle_counts[k] > 0]
+                ks.sort(key=lambda k: -self.battle_counts[k])
+                if ks:
+                    self.battle_counts[ks[0]] += 1
+                    self.turn_counts[ks[0]] += 1
+            elif t == 'needCut':                               # 대관 — 필요 수 감면
+                ks = [k for k in CONS if k not in self.completed and self.need(k) > 1]
+                ks.sort(key=lambda k: -self.battle_counts[k])
+                if ks:
+                    if not hasattr(self, 'need_cut'):
+                        self.need_cut = {}
+                    self.need_cut[ks[0]] = self.need_cut.get(ks[0], 0) + f.get('v', 1)
+            elif t == 'manaPerRise':
+                self.energy += len(self.completed)
+            elif t == 'starEcho':
+                if prev_con:
+                    self.battle_counts[prev_con] += 1
+                    self.turn_counts[prev_con] += 1
+            elif t == 'stealIntent':                           # 의도 훔치기
+                a = target if (target and target.hp > 0) else (self.rng.choice(self.alive()) if self.alive() else None)
+                if a:
+                    a.sealed = True
+                    kind, vv = a.intent
+                    if kind in ('atk', 'jet', 'charging') and vv > 0 and self.alive():
+                        HIT(self.rng.choice(self.alive()), vv)
+            elif t == 'betray':                                # 이간질
+                a = target if (target and target.hp > 0) else (self.rng.choice(self.alive()) if self.alive() else None)
+                if a:
+                    a.betrayed = True
+            elif t == 'swapBlock':                             # 저울
+                if target and target.hp > 0:
+                    mine, theirs = self.block, (target.block or 0)
+                    self.block, target.block = theirs, mine
+            elif t == 'stealAtk':                              # 약탈
+                a = target if (target and target.hp > 0) else (self.rng.choice(self.alive()) if self.alive() else None)
+                if a:
+                    a.atk_down = getattr(a, 'atk_down', 0) + f['v']
+                    self.stolen_atk = getattr(self, 'stolen_atk', 0) + f['v']
             # scry·noCount·vanish 등은 여기서 처리 없음
         a = cd.get('add')                                      # v0.47 조건 추가효과
         if a:
@@ -1473,6 +1526,24 @@ class Sim:
             elif t == 'flechettes':
                 nn = len([x for x in self.hand if (cdata(x) or {}).get('type') == '스킬'])
                 s += self.sadj(f['v'], ss) * nn / 6.0
+            # ═══ v0.55 채점 ═══
+            elif t == 'drawStarBest':
+                s += 1.2
+            elif t == 'needCut':
+                s += 1.2
+            elif t == 'manaPerRise':
+                s += len(self.completed)
+            elif t == 'starEcho':
+                s += 0.9
+            elif t == 'stealIntent':
+                s += 1.5 + (max((e.intent[1] for e in self.alive() if e.intent[0] in ('atk', 'jet')), default=0) / 6.0)
+            elif t == 'betray':
+                s += 1.2 if len(self.alive()) > 1 else 0.8
+            elif t == 'swapBlock':
+                mx = max(((e.block or 0) for e in self.alive()), default=0)
+                s += max(0, mx - self.block) / 5.0
+            elif t == 'stealAtk':
+                s += f['v'] * 0.8
         # v0.50 성좌 기여 — 전투 누적: 이 카드로 떠오르면 크게, 다가가면 조금
         con = d['con']
         _noc = any(f['t'] == 'noCount' for f in d['fx'])
