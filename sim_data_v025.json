@@ -132,19 +132,15 @@
    "con": "canis",
    "rank": 2,
    "type": "스킬",
-   "cost": 2,
+   "cost": 1,
    "target": false,
    "fx": [
     {
-     "t": "aura",
-     "on": "kill",
-     "do": {
-      "draw": 1
-     },
-     "txt": "적을 처치할 때마다 카드를 1장 뽑습니다"
+     "t": "exhume"
     },
     {
-     "t": "vanish"
+     "t": "draw",
+     "n": 1
     }
    ],
    "si": 1
@@ -495,12 +491,15 @@
    "con": "leo",
    "rank": 4,
    "type": "스킬",
-   "cost": 1,
+   "cost": 0,
    "target": false,
    "fx": [
     {
      "t": "weakAllFx",
      "n": 2
+    },
+    {
+     "t": "vanish"
     }
    ],
    "si": 6
@@ -705,12 +704,8 @@
    "target": true,
    "fx": [
     {
-     "t": "dmg",
-     "v": 6
-    },
-    {
-     "t": "buffAtk",
-     "v": 2
+     "t": "finisherDmg",
+     "v": 5
     }
    ],
    "si": 1
@@ -1021,12 +1016,12 @@
    "con": "scorpius",
    "rank": 4,
    "type": "공격",
-   "cost": 1,
+   "cost": 2,
    "target": true,
    "fx": [
     {
-     "t": "poison",
-     "v": 5
+     "t": "corpseExplosion",
+     "v": 6
     }
    ],
    "si": 6
@@ -1358,7 +1353,10 @@
    "fx": [
     {
      "t": "block",
-     "v": 11
+     "v": 26
+    },
+    {
+     "t": "vanish"
     }
    ],
    "comp": {
@@ -1517,16 +1515,12 @@
    "name": "일둔",
    "con": "ursaminor",
    "rank": 4,
-   "type": "공격",
+   "type": "스킬",
    "cost": 1,
    "target": false,
    "fx": [
     {
-     "t": "dmgRand",
-     "v": 3
-    },
-    {
-     "t": "scry"
+     "t": "havocPlay"
     }
    ],
    "si": 1
@@ -1935,10 +1929,10 @@
    "fx": [
     {
      "t": "block",
-     "v": 8
+     "v": 6
     },
     {
-     "t": "halfBlockDmg"
+     "t": "fullBlockDmg"
     }
    ],
    "comp": {
@@ -2176,21 +2170,20 @@
    "rank": 1,
    "type": "공격",
    "cost": 2,
-   "target": false,
+   "target": true,
    "fx": [
     {
-     "t": "hpCost",
-     "v": 2
+     "t": "fiendFire",
+     "v": 7
     },
     {
-     "t": "aoe",
-     "v": 9
+     "t": "vanish"
     }
    ],
    "comp": {
-    "aoePlus": 3
+    "dmgPlus": 2
    },
-   "compTxt": "떠 있는 동안: 전체 피해 +3",
+   "compTxt": "떠 있는 동안: 1장당 피해 +2",
    "si": 9
   },
   "rastaban": {
@@ -2234,13 +2227,14 @@
    "name": "알타이스",
    "con": "draco",
    "rank": 4,
-   "type": "공격",
-   "cost": 1,
-   "target": true,
+   "type": "스킬",
+   "cost": 2,
+   "target": false,
    "fx": [
     {
-     "t": "burn",
-     "v": 5
+     "t": "theBomb",
+     "v": 25,
+     "turns": 3
     }
    ],
    "si": 4
@@ -2605,12 +2599,8 @@
    "target": false,
    "fx": [
     {
-     "t": "hpCost",
-     "v": 2
-    },
-    {
-     "t": "block",
-     "v": 12
+     "t": "secondWind",
+     "v": 5
     }
    ],
    "si": 2
@@ -2765,22 +2755,21 @@
    "name": "알레샤",
    "con": "pisces",
    "rank": 1,
-   "type": "스킬",
+   "type": "공격",
    "cost": 2,
-   "target": false,
+   "target": true,
    "fx": [
     {
-     "t": "draw",
-     "n": 2
+     "t": "mindBlast"
     },
     {
      "t": "scry"
     }
    ],
    "comp": {
-    "drawPlus": 1
+    "dmgPlus": 4
    },
-   "compTxt": "떠 있는 동안: 뽑기 +1",
+   "compTxt": "떠 있는 동안: 피해 +4",
    "si": 0
   },
   "fumalsamakah": {
@@ -2843,16 +2832,13 @@
    "name": "토르쿨라르",
    "con": "pisces",
    "rank": 5,
-   "type": "수비",
+   "type": "공격",
    "cost": 1,
-   "target": false,
+   "target": true,
    "fx": [
     {
-     "t": "recall",
-     "con": "pisces"
-    },
-    {
-     "t": "scry"
+     "t": "flechettes",
+     "v": 4
     }
    ],
    "si": 4
@@ -2866,10 +2852,10 @@
    "need": 3,
    "rise": {
     "static": {
-     "dmgPlus": 2
+     "ramp": 1
     }
    },
-   "bonusTxt": "내 공격 카드의 피해가 2 강해집니다"
+   "bonusTxt": "공격을 낼 때마다 이 전투 동안 공격이 1씩 강해집니다 (최대 6)"
   },
   "canis": {
    "name": "큰개자리",
@@ -2877,12 +2863,11 @@
    "season": "겨울",
    "need": 2,
    "rise": {
-    "on": "turn",
-    "do": {
-     "dmgLow": 3
+    "static": {
+     "biteHalf": 5
     }
    },
-   "bonusTxt": "매 턴 HP가 가장 낮은 적에게 3의 피해를 줍니다"
+   "bonusTxt": "적이 처음 HP 절반 아래로 떨어지면 즉시 5의 피해를 물어뜯습니다"
   },
   "canisminor": {
    "name": "작은개자리",
@@ -2890,12 +2875,11 @@
    "season": "겨울",
    "need": 1,
    "rise": {
-    "on": "turn",
-    "do": {
-     "dmg": 2
+    "static": {
+     "fetchAtk": true
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 2의 피해를 줍니다"
+   "bonusTxt": "떠오를 때와 성도를 되섞을 때마다 무작위 공격 카드가 성도 맨 위로 옵니다"
   },
   "gemini": {
    "name": "쌍둥이자리",
@@ -2903,12 +2887,11 @@
    "season": "겨울",
    "need": 3,
    "rise": {
-    "on": "turn",
-    "do": {
-     "copy": 1
+    "static": {
+     "firstAtkX2": true
     }
    },
-   "bonusTxt": "매 턴 손패의 무작위 카드 1장을 복사합니다"
+   "bonusTxt": "매 턴 처음 낸 공격 카드의 피해가 2배가 됩니다"
   },
   "taurus": {
    "name": "황소자리",
@@ -2916,12 +2899,11 @@
    "season": "겨울",
    "need": 3,
    "rise": {
-    "on": "turn",
-    "do": {
-     "atk": 3
+    "static": {
+     "overkill": true
     }
    },
-   "bonusTxt": "매 턴 다음 공격이 3 강해집니다"
+   "bonusTxt": "적을 처치하고 남은 피해가 다음 적에게 넘어갑니다"
   },
   "leo": {
    "name": "사자자리",
@@ -2929,12 +2911,22 @@
    "season": "봄",
    "need": 3,
    "rise": {
-    "on": "turn",
-    "do": {
-     "weakAll": 1
-    }
+    "auras": [
+     {
+      "on": "turn",
+      "do": {
+       "weakAll": 1
+      }
+     },
+     {
+      "on": "kill",
+      "do": {
+       "aoeWeakKill": 5
+      }
+     }
+    ]
    },
-   "bonusTxt": "적 전체가 계속 약화 상태가 됩니다"
+   "bonusTxt": "적 전체가 계속 약화 상태가 되고, 약화된 적을 처치하면 적 전체에게 5의 피해를 줍니다"
   },
   "virgo": {
    "name": "처녀자리",
@@ -2944,10 +2936,10 @@
    "rise": {
     "on": "turn",
     "do": {
-     "heal": 3
+     "healStrike": 3
     }
    },
-   "bonusTxt": "매 턴 HP를 3 회복합니다"
+   "bonusTxt": "매 턴 HP를 3 회복하고, 회복한 만큼 무작위 적에게 피해를 줍니다"
   },
   "bootes": {
    "name": "목동자리",
@@ -2955,12 +2947,11 @@
    "season": "봄",
    "need": 2,
    "rise": {
-    "on": "turn",
-    "do": {
-     "atk": 2
+    "static": {
+     "keepAtkBuff": true
     }
    },
-   "bonusTxt": "매 턴 다음 공격이 2 강해집니다"
+   "bonusTxt": "\"다음 공격 강화\"가 턴이 지나도 사라지지 않습니다"
   },
   "lyra": {
    "name": "거문고자리",
@@ -2968,12 +2959,11 @@
    "season": "여름",
    "need": 2,
    "rise": {
-    "on": "kill",
-    "do": {
-     "draw": 1
+    "static": {
+     "firstSkillDraw": 1
     }
    },
-   "bonusTxt": "적을 처치할 때마다 카드를 1장 뽑습니다"
+   "bonusTxt": "매 턴 처음 낸 스킬이 카드를 1장 뽑아 옵니다"
   },
   "cygnus": {
    "name": "백조자리",
@@ -2981,12 +2971,11 @@
    "season": "여름",
    "need": 2,
    "rise": {
-    "on": "turn",
-    "do": {
-     "block": 4
+    "static": {
+     "playBlock": 1
     }
    },
-   "bonusTxt": "매 턴 성막을 4 얻습니다"
+   "bonusTxt": "카드를 낼 때마다 성막을 1 얻습니다"
   },
   "aquila": {
    "name": "독수리자리",
@@ -2994,12 +2983,11 @@
    "season": "여름",
    "need": 2,
    "rise": {
-    "on": "kill",
-    "do": {
-     "dmg": 4
+    "static": {
+     "multiPlus1": true
     }
    },
-   "bonusTxt": "적을 처치하면 이어서 무작위 적에게 4의 피해를 줍니다"
+   "bonusTxt": "여러 번 때리는 공격의 타수가 1 늘어납니다"
   },
   "scorpius": {
    "name": "전갈자리",
@@ -3007,12 +2995,11 @@
    "season": "여름",
    "need": 3,
    "rise": {
-    "on": "turn",
-    "do": {
-     "poison": 2
+    "static": {
+     "poisonKeep": true
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 중독 2를 부여합니다"
+   "bonusTxt": "적의 중독이 턴마다 줄어들지 않고 유지됩니다"
   },
   "pegasus": {
    "name": "페가수스자리",
@@ -3020,12 +3007,11 @@
    "season": "가을",
    "need": 2,
    "rise": {
-    "on": "turn",
-    "do": {
-     "costDown": 1
+    "static": {
+     "firstFree": true
     }
    },
-   "bonusTxt": "매 턴 첫 카드의 비용이 1 줄어듭니다"
+   "bonusTxt": "매 턴 첫 카드의 비용이 0이 됩니다"
   },
   "andromeda": {
    "name": "안드로메다자리",
@@ -3033,12 +3019,11 @@
    "season": "가을",
    "need": 2,
    "rise": {
-    "on": "hurt",
-    "do": {
-     "block": 3
+    "static": {
+     "fullBlockCounter": 5
     }
    },
-   "bonusTxt": "맞을 때마다 성막을 3 얻습니다"
+   "bonusTxt": "적의 공격을 성막으로 전부 막아내면 그 적에게 5의 반격 피해를 줍니다"
   },
   "piscis": {
    "name": "남쪽물고기자리",
@@ -3046,12 +3031,11 @@
    "season": "가을",
    "need": 1,
    "rise": {
-    "on": "turn",
-    "do": {
-     "heal": 2
+    "static": {
+     "overhealBlock": true
     }
    },
-   "bonusTxt": "매 턴 HP를 2 회복합니다"
+   "bonusTxt": "초과 회복이 성막이 됩니다"
   },
   "cassiopeia": {
    "name": "카시오페이아자리",
@@ -3059,12 +3043,11 @@
    "season": "주극",
    "need": 2,
    "rise": {
-    "on": "turn",
-    "do": {
-     "dmg": 3
+    "static": {
+     "fourthCardAoe": 4
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 3의 피해를 줍니다"
+   "bonusTxt": "한 턴에 4장째 카드를 낼 때마다 적 전체에게 4의 피해를 줍니다"
   },
   "ursa": {
    "name": "큰곰자리",
@@ -3072,12 +3055,15 @@
    "season": "주극",
    "need": 3,
    "rise": {
+    "static": {
+     "blockSting": 2
+    },
     "on": "turn",
     "do": {
-     "block": 5
+     "block": 3
     }
    },
-   "bonusTxt": "매 턴 성막을 5 얻습니다"
+   "bonusTxt": "매 턴 성막을 3 얻고, 성막을 얻을 때마다 무작위 적에게 2의 피해를 줍니다"
   },
   "ursaminor": {
    "name": "작은곰자리",
@@ -3086,10 +3072,11 @@
    "need": 2,
    "rise": {
     "static": {
-     "carryPlus": 2
+     "carryPlus": 2,
+     "carryDraw": true
     }
    },
-   "bonusTxt": "남긴 성간 물질을 4까지 이월할 수 있습니다"
+   "bonusTxt": "성간 물질을 4까지 이월하고, 이월한 턴은 카드를 1장 더 뽑습니다"
   },
   "sagittarius": {
    "name": "궁수자리",
@@ -3098,10 +3085,11 @@
    "need": 3,
    "rise": {
     "static": {
-     "pierce": true
+     "pierce": true,
+     "pierceBonus": 2
     }
    },
-   "bonusTxt": "내 모든 피해가 적의 성막을 관통합니다"
+   "bonusTxt": "내 모든 피해가 성막을 관통하고, 성막을 두른 적에게 2 더 줍니다"
   },
   "corona": {
    "name": "왕관자리",
@@ -3110,10 +3098,10 @@
    "need": 2,
    "rise": {
     "static": {
-     "riseDraw": 2
+     "perRiseDmg": 1
     }
    },
-   "bonusTxt": "이후 성좌가 떠오를 때마다 카드를 2장 뽑습니다"
+   "bonusTxt": "떠 있는 성좌 하나당 내 공격이 1씩 강해집니다"
   },
   "corvus": {
    "name": "까마귀자리",
@@ -3121,12 +3109,11 @@
    "season": "봄",
    "need": 2,
    "rise": {
-    "on": "kill",
-    "do": {
-     "mana": 1
+    "static": {
+     "discardSting": 2
     }
    },
-   "bonusTxt": "적을 처치할 때마다 성간 물질을 1 얻습니다"
+   "bonusTxt": "카드를 버릴 때마다 무작위 적에게 2의 피해를 줍니다"
   },
   "cancer": {
    "name": "게자리",
@@ -3134,12 +3121,11 @@
    "season": "봄",
    "need": 3,
    "rise": {
-    "on": "turn",
-    "do": {
-     "vulnAll": 1
+    "static": {
+     "playStingVuln": 1
     }
    },
-   "bonusTxt": "적 전체가 계속 취약 상태가 됩니다"
+   "bonusTxt": "카드를 낼 때마다 취약 상태의 적 전체가 1의 피해를 받습니다"
   },
   "auriga": {
    "name": "마차부자리",
@@ -3147,12 +3133,11 @@
    "season": "겨울",
    "need": 2,
    "rise": {
-    "on": "hurt",
-    "do": {
-     "dmg": 3
+    "static": {
+     "blockRide": true
     }
    },
-   "bonusTxt": "맞을 때마다 무작위 적에게 반격으로 3의 피해를 줍니다"
+   "bonusTxt": "공격할 때 성막 2를 실어 보내 피해 4로 바꿉니다"
   },
   "perseus": {
    "name": "페르세우스자리",
@@ -3161,10 +3146,10 @@
    "need": 2,
    "rise": {
     "static": {
-     "execBonus": 4
+     "execute30": true
     }
    },
-   "bonusTxt": "HP가 절반 이하인 적에게 내 피해가 4 강해집니다"
+   "bonusTxt": "HP가 30% 이하인 적은 즉시 쓰러집니다 (보스·중간보스 제외)"
   },
   "cepheus": {
    "name": "케페우스자리",
@@ -3184,12 +3169,11 @@
    "season": "주극",
    "need": 2,
    "rise": {
-    "on": "turn",
-    "do": {
-     "burnRand": 2
+    "static": {
+     "burnKeep": true
     }
    },
-   "bonusTxt": "매 턴 무작위 적에게 화상 2를 부여합니다"
+   "bonusTxt": "내가 붙인 화상이 꺼지지 않고 계속 타오릅니다"
   },
   "cetus": {
    "name": "고래자리",
@@ -3199,10 +3183,11 @@
    "rise": {
     "on": "kill",
     "do": {
-     "heal": 4
+     "heal": 4,
+     "maxhpUp": 2
     }
    },
-   "bonusTxt": "적을 처치할 때마다 HP를 4 회복합니다"
+   "bonusTxt": "적을 처치할 때마다 HP를 4 회복하고 이번 전투의 최대 HP가 2 늘어납니다"
   },
   "aries": {
    "name": "양자리",
@@ -3210,12 +3195,11 @@
    "season": "가을",
    "need": 3,
    "rise": {
-    "on": "turn",
-    "do": {
-     "vulnHigh": 1
+    "static": {
+     "firstAtkVuln": 1
     }
    },
-   "bonusTxt": "HP가 가장 높은 적이 계속 취약 상태가 됩니다"
+   "bonusTxt": "매 턴 처음 낸 공격이 취약 1을 함께 부여합니다"
   },
   "libra": {
    "name": "천칭자리",
@@ -3223,13 +3207,11 @@
    "season": "봄",
    "need": 3,
    "rise": {
-    "on": "turn",
-    "do": {
-     "block": 3,
-     "dmg": 3
+    "static": {
+     "endBlockStrike": true
     }
    },
-   "bonusTxt": "매 턴 성막을 3 얻고 무작위 적에게 3의 피해를 줍니다"
+   "bonusTxt": "턴이 끝날 때 남은 성막의 절반만큼 무작위 적에게 피해를 줍니다"
   },
   "capricornus": {
    "name": "염소자리",
@@ -3237,13 +3219,11 @@
    "season": "가을",
    "need": 3,
    "rise": {
-    "on": "turn",
-    "do": {
-     "block": 3,
-     "heal": 2
+    "static": {
+     "undying": true
     }
    },
-   "bonusTxt": "매 턴 성막을 3 얻고 HP를 2 회복합니다"
+   "bonusTxt": "쓰러질 피해를 받아도 HP 1로 버팁니다 (전투당 1회)"
   },
   "aquarius": {
    "name": "물병자리",
@@ -3251,12 +3231,11 @@
    "season": "가을",
    "need": 3,
    "rise": {
-    "on": "turn",
-    "do": {
-     "mana": 1
+    "static": {
+     "manaCarryDraw": true
     }
    },
-   "bonusTxt": "매 턴 성간 물질 1을 얻습니다"
+   "bonusTxt": "턴에 남긴 성간 물질 1마다 다음 턴 카드를 1장 더 뽑습니다 (최대 2)"
   },
   "pisces": {
    "name": "물고기자리",
@@ -3264,12 +3243,11 @@
    "season": "봄",
    "need": 3,
    "rise": {
-    "on": "hurt",
-    "do": {
-     "draw": 1
+    "static": {
+     "reshufflePay": true
     }
    },
-   "bonusTxt": "맞을 때마다 카드를 1장 뽑습니다"
+   "bonusTxt": "버림 더미를 성도로 되섞을 때마다 성간 물질 2를 얻고 카드를 2장 뽑습니다"
   }
  },
  "ENEMIES": {
@@ -3296,14 +3274,14 @@
     "txt": "성운이 크게 부푼다 — 아기별이 더 많이 태어나고 장막이 두꺼워진다!"
    },
    "act1": {
-    "hp": 170,
-    "atk": 14
+    "hp": 220,
+    "atk": 19
    }
   },
   "pleiades": {
    "name": "플레이아데스 성단",
-   "hp": 105,
-   "atk": 10,
+   "hp": 120,
+   "atk": 12,
    "season": "겨울",
    "minionMax": 2,
    "summonN": 2,
@@ -3322,7 +3300,7 @@
   },
   "hyades": {
    "name": "히아데스 성단",
-   "hp": 240,
+   "hp": 250,
    "atk": 20,
    "season": "겨울",
    "pattern": [
@@ -3342,8 +3320,8 @@
   },
   "babystar": {
    "name": "아기별",
-   "hp": 11,
-   "atk": 5
+   "hp": 13,
+   "atk": 6
   },
   "asteroid": {
    "name": "떠도는 소행성",
@@ -3494,13 +3472,13 @@
   },
   "m1": {
    "name": "게 성운 M1",
-   "hp": 280,
-   "atk": 20,
+   "hp": 310,
+   "atk": 22,
    "season": "겨울",
    "pattern": [
-    20,
-    20,
-    28
+    22,
+    22,
+    30
    ],
    "elite": true,
    "defend": {
@@ -3513,8 +3491,8 @@
   },
   "m13": {
    "name": "헤르쿨레스 구상성단 M13",
-   "hp": 235,
-   "atk": 18,
+   "hp": 260,
+   "atk": 19,
    "season": "여름",
    "minionMax": 2,
    "summonN": 2,
@@ -3532,14 +3510,14 @@
   },
   "blackhole": {
    "name": "은하핵의 블랙홀",
-   "hp": 440,
-   "atk": 27,
+   "hp": 510,
+   "atk": 31,
    "boss": true,
    "season": "여름",
    "pattern": [
-    25,
-    25,
-    33
+    28,
+    28,
+    37
    ],
    "defend": {
     "every": 3,
@@ -3645,8 +3623,8 @@
   },
   "m31": {
    "name": "안드로메다 은하 M31",
-   "hp": 195,
-   "atk": 13,
+   "hp": 255,
+   "atk": 17,
    "season": "가을",
    "elite": true,
    "defend": {
@@ -3664,8 +3642,8 @@
   },
   "quasar": {
    "name": "퀘이사 3C 273",
-   "hp": 215,
-   "atk": 15,
+   "hp": 235,
+   "atk": 16,
    "season": "봄",
    "pattern": [
     15,
@@ -3685,13 +3663,13 @@
   },
   "darkmatter": {
    "name": "암흑 물질",
-   "hp": 670,
-   "atk": 20,
+   "hp": 880,
+   "atk": 28,
    "boss": true,
    "pattern": [
-    18,
-    18,
-    26
+    26,
+    26,
+    35
    ],
    "defend": {
     "every": 3,
@@ -4185,7 +4163,13 @@
   "ifAtk",
   "ifLast",
   "blockNextTurn",
-  "aoeReap"
+  "aoeReap",
+  "fiendFire",
+  "secondWind",
+  "flechettes",
+  "finisherDmg",
+  "corpseExplosion",
+  "theBomb"
  ],
  "SEASONS": [
   "봄",
