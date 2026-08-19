@@ -777,19 +777,11 @@
    "con": "lyra",
    "rank": 4,
    "type": "스킬",
-   "cost": 2,
+   "cost": 1,
    "target": false,
    "fx": [
     {
-     "t": "aura",
-     "on": "kill",
-     "do": {
-      "mana": 1
-     },
-     "txt": "적을 처치할 때마다 성간 물질을 1 얻습니다"
-    },
-    {
-     "t": "vanish"
+     "t": "starEcho"
     }
    ],
    "si": 2
@@ -1457,8 +1449,7 @@
    "target": false,
    "fx": [
     {
-     "t": "mana",
-     "v": 1
+     "t": "drawStarBest"
     },
     {
      "t": "draw",
@@ -1650,7 +1641,8 @@
      "v": 4
     },
     {
-     "t": "crown"
+     "t": "needCut",
+     "v": 1
     }
    ],
    "comp": {
@@ -1686,17 +1678,12 @@
    "by": "γ",
    "con": "corona",
    "rank": 3,
-   "type": "성좌",
-   "cost": 1,
+   "type": "스킬",
+   "cost": 0,
    "target": false,
    "fx": [
     {
-     "t": "aura",
-     "on": "conDone",
-     "do": {
-      "dmg": 5
-     },
-     "txt": "성좌가 떠오를 때마다 무작위 적에게 5의 피해를 줍니다"
+     "t": "manaPerRise"
     },
     {
      "t": "vanish"
@@ -1729,15 +1716,11 @@
    "rank": 1,
    "type": "스킬",
    "cost": 2,
-   "target": false,
+   "target": true,
    "fx": [
     {
-     "t": "draw",
-     "n": 1
-    },
-    {
-     "t": "sacMana",
-     "v": 1
+     "t": "stealAtk",
+     "v": 3
     }
    ],
    "si": 4
@@ -2026,15 +2009,11 @@
    "target": true,
    "fx": [
     {
-     "t": "dmgExec",
-     "v": 6,
-     "plus": 4
+     "t": "dmg",
+     "v": 6
     },
     {
-     "t": "growth",
-     "on": "kill",
-     "v": 3,
-     "scope": "battle"
+     "t": "betray"
     }
    ],
    "si": 1
@@ -2049,11 +2028,7 @@
    "target": true,
    "fx": [
     {
-     "t": "vuln",
-     "n": 2
-    },
-    {
-     "t": "seal"
+     "t": "stealIntent"
     }
    ],
    "si": 2
@@ -2469,7 +2444,7 @@
    "target": true,
    "fx": [
     {
-     "t": "blockSteal"
+     "t": "swapBlock"
     },
     {
      "t": "heal",
@@ -2855,7 +2830,7 @@
      "ramp": 1
     }
    },
-   "bonusTxt": "공격을 낼 때마다 이 전투 동안 공격이 1씩 강해집니다 (최대 6)"
+   "bonusTxt": "공격을 낼 때마다 공격이 1씩 강해집니다 (최대 6)"
   },
   "canis": {
    "name": "큰개자리",
@@ -4169,7 +4144,8 @@
   "flechettes",
   "finisherDmg",
   "corpseExplosion",
-  "theBomb"
+  "theBomb",
+  "stealAtk"
  ],
  "SEASONS": [
   "봄",
