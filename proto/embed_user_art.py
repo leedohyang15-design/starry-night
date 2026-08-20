@@ -1,31 +1,29 @@
 # -*- coding: utf-8 -*-
-"""사용자 제공 아트를 프로토타입에 임베드한다 (v0.6).
+"""사용자 제공 아트를 프로토타입에 임베드한다 (v0.8).
 
-사용법:  python embed_user_art.py [빌드html]   (기본: starry-night-proto-v0.6.html)
+사용법:  python embed_user_art.py [빌드html]   (기본: starry-night-proto-v0.8.html)
 
 - 조력자 초상: ../조력자/{galilei,copernicus,brahe}-talk-sheet.png (2048×512 = 512² 4프레임)
   → 프레임별 크롭 (88,0,424,512) → NEAREST 높이 132px → PNG base64 4프레임 배열
-- 성좌 삽화: ../별자리 그림/plate1·2-cutout.png (1536×1024, 알파 누끼 + 칸 아래 한글 라벨)
-  → 알파 투영으로 행/열 분할 → 라벨 밴드 제거 → LANCZOS 최대 240px → WebP q80 base64
+- 성좌 삽화: ../별자리 그림/plate-black.webp (1536×1024, **검은 배경** 판화 10종 + 한글 라벨)
+  → 3행 고정 격자 → 셀별 밝기(루마) 기반 누끼로 알파 생성 → 라벨 밴드 제거
+  → LANCZOS 최대 240px → WebP q80 base64
+  ※ 검은 배경이라 루마를 그대로 알파로 쓰면 얇은 판화 획까지 살아남는다 (구 알파 누끼판보다 깨끗).
 
 HTML의 /*UART-START*/~/*UART-END*/ 블록을 통째로 교체(멱등). 재실행해도 결과 동일.
 검증용 콘택트 시트(uart_contact.png)를 같은 폴더에 남긴다.
 """
 import base64, io, json, os, re, sys
-from PIL import Image
+from PIL import Image, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+PLATE = os.path.join(ROOT, '별자리 그림', 'plate-black.webp')
 
-# 판 배치 (왼쪽 위부터, 행별) — 고정 격자와 이 순서를 짝지어 이름을 붙인다
-PLATE1_ROWS = [['cma', 'ori', 'gem', 'tau', 'sco'],
-               ['leo', 'vir', 'boo', 'lyr', 'cyg', 'aql'],
-               ['peg', 'uma', 'umi', 'cas', 'and'],
-               ['psa', 'psc']]
-PLATE2_ROWS = [['aries', 'lib', 'cap', 'aqr', 'cmi'],
-               ['aur', 'crv', 'cnc', 'sgr', 'crb'],
-               ['per', 'cet', 'cep', 'dra']]
-NEED = {'lib', 'sgr', 'ori', 'gem', 'sco', 'leo', 'cyg', 'uma', 'umi', 'cas'}  # 이번 빌드 10종
+# 검은 배경 판 배치 (왼쪽 위부터, 행별) — 게임의 10개 별자리와 정확히 일치
+PLATE_ROWS = [['sgr', 'lib', 'uma'],
+              ['umi', 'cas', 'ori', 'gem'],
+              ['cyg', 'leo', 'sco']]
 
 def b64(im, fmt='PNG', **kw):
     buf = io.BytesIO()
@@ -45,53 +43,79 @@ def portraits(art):
         art['al_' + key] = frames
         print(f'  초상 {key}: 4프레임')
 
-# ── 성좌 삽화 — 알파 투영 분할 ──
-def bands(profile, gap):
-    """0이 아닌 구간(밴드) 목록 — gap보다 짧은 틈은 무시하고 이어붙인다"""
+# ── 성좌 삽화 (검은 배경 → 루마 누끼) ──
+def bands(flags, gap):
+    """True 구간 목록 — gap보다 짧은 틈은 이어붙인다"""
     out, start = [], None
-    for i, v in enumerate(profile):
+    for i, v in enumerate(flags):
         if v and start is None: start = i
         if not v and start is not None:
             out.append([start, i]); start = None
-    if start is not None: out.append([start, len(profile)])
+    if start is not None: out.append([start, len(flags)])
     merged = []
     for b in out:
         if merged and b[0] - merged[-1][1] < gap: merged[-1][1] = b[1]
         else: merged.append(b)
     return merged
 
-def plate_cells(im, rows_layout, art, contact):
+def luma_cut(cell, floor=26, ceil=120):
+    """검은 배경 컷아웃 — 밝기를 알파로 (floor 이하 = 완전 투명, ceil 이상 = 불투명)"""
+    rgb = cell.convert('RGB')
+    lum = rgb.convert('L')
+    a = lum.point(lambda v: 0 if v <= floor else (255 if v >= ceil else int((v - floor) * 255 / (ceil - floor))))
+    a = a.filter(ImageFilter.MedianFilter(3))   # 배경의 압축 잡티 제거
+    out = rgb.convert('RGBA')
+    out.putalpha(a)
+    return out
+
+def strip_label(cell):
+    """한글 라벨 글자만 지운다 — 연결 성분 필터.
+
+    y띠로 잘라내면 그림이 라벨 높이까지 내려온 칸(오리온의 발·쌍둥이 다리)이 함께 잘린다.
+    라벨 글자는 셀 하단에 있는 '작고 낮은' 성분들이므로, 크기와 위치로만 골라 지운다.
+    """
+    import numpy as np
+    from scipy import ndimage
+    a = np.array(cell.getchannel('A'))
+    h, w = a.shape
+    lab, n = ndimage.label(a > 60)
+    if n == 0: return cell
+    sizes = ndimage.sum(a > 60, lab, range(1, n + 1))
+    biggest = sizes.max()
+    objs = ndimage.find_objects(lab)
+    kill = np.zeros_like(a, dtype=bool)
+    for i, sl in enumerate(objs):
+        if sl is None: continue
+        ys, xs = sl
+        oh, ow = ys.stop - ys.start, xs.stop - xs.start
+        area = sizes[i]
+        if lab[ys, xs].size == 0: continue
+        # 글자 판정: 하단 28% 안에서 시작 · 낮고(≤h*0.14) 지나치게 넓지 않으며(≤w*0.62)
+        #            면적이 글자 규모(≤h*w*0.02)이고 본체가 아니다
+        is_label = (ys.start > h * 0.72 and oh <= h * 0.14
+                    and ow <= w * 0.62 and area <= h * w * 0.02 and area < biggest * 0.5)
+        # 배경 압축 잡티: 아주 작은 점 (어디에 있든)
+        is_speck = area <= 12
+        if is_label or is_speck:
+            kill |= (lab == i + 1)
+    if kill.any():
+        a[kill] = 0
+        out = cell.copy()
+        out.putalpha(Image.fromarray(a))
+        return out
+    return cell
+
+def plate_cells(art, contact):
+    im = Image.open(PLATE).convert('RGB')
     W, H = im.size
-    apx = im.getchannel('A').load()
-    # 행은 고정 격자 (라벨 텍스트가 행 사이 여백에 걸쳐 있어 투영 분할이 안 된다)
-    rh = H / len(rows_layout)
-    row_bands = [(int(i * rh), int((i + 1) * rh)) for i in range(len(rows_layout))]
-    for ri, ((y0, y1), names) in enumerate(zip(row_bands, rows_layout)):
-        # 열도 고정 격자 — 시트는 행마다 균등 배치돼 있다 (스케치 잔점이 셀 사이까지 퍼져 투영 분할 불가)
-        cw_row = W / len(names)
-        # 라벨이 행 경계에 걸친다: 2행부터 위 36px = 윗행 라벨 넘침, 아래 12px = 자기 라벨 슬리버
-        cy0 = y0 + (36 if ri > 0 else 0)
-        cy1 = y1 - 12
+    rh = H / len(PLATE_ROWS)
+    for ri, names in enumerate(PLATE_ROWS):
+        y0, y1 = int(ri * rh), int((ri + 1) * rh)
+        cw = W / len(names)
         for ci, name in enumerate(names):
-            if name not in NEED: continue
-            x0, x1 = int(ci * cw_row), int((ci + 1) * cw_row)
-            cell = im.crop((x0, cy0, x1, cy1)).copy()
-            cw, ch = cell.size
-            # 옆 칸에서 넘어온 잔재 차단: 좌우 가장자리 8px 알파 제거
-            a_ch = cell.getchannel('A')
-            ap = a_ch.load()
-            for y in range(ch):
-                for x in list(range(0, 8)) + list(range(cw - 8, cw)):
-                    ap[x, y] = 0
-            cell.putalpha(a_ch)
-            # 텍스트 밴드 제거: 짧고(높이<45px) 좁은(피크 밀도<60%) 밴드 = 라벨 (위·아래 모두)
-            cys = [sum(1 for x in range(0, cw, 2) if ap[x, y] > 24) for y in range(ch)]
-            cell_bands = bands([v > 0 for v in cys], 4)
-            peaks = [max(cys[b[0]:b[1]]) for b in cell_bands]
-            top = max(peaks) if peaks else 1
-            keep = [b for b, p in zip(cell_bands, peaks) if not ((b[1] - b[0]) < 45 and p < top * 0.6)]
-            if keep:
-                cell = cell.crop((0, keep[0][0], cw, keep[-1][1]))
+            x0, x1 = int(ci * cw), int((ci + 1) * cw)
+            cell = luma_cut(im.crop((x0, y0, x1, y1)))
+            cell = strip_label(cell)
             bbox = cell.getbbox()
             if bbox: cell = cell.crop(bbox)
             cell.thumbnail((240, 240), Image.LANCZOS)
@@ -100,15 +124,13 @@ def plate_cells(im, rows_layout, art, contact):
             print(f'  삽화 {name}: {cell.size}')
 
 def main(path):
-    art = {}
-    contact = []
+    art, contact = {}, []
     print('조력자 talk-sheet →')
     portraits(art)
-    print('성좌 삽화 →')
-    plate_cells(Image.open(os.path.join(ROOT, '별자리 그림', 'plate1-cutout.png')).convert('RGBA'), PLATE1_ROWS, art, contact)
-    plate_cells(Image.open(os.path.join(ROOT, '별자리 그림', 'plate2-cutout.png')).convert('RGBA'), PLATE2_ROWS, art, contact)
-    assert len([k for k in art if k.startswith('con_')]) == len(NEED), '삽화 수 불일치'
-    # 콘택트 시트 (육안 검증용 — 저장소 커밋 대상 아님)
+    print('성좌 삽화 (검은 배경 누끼) →')
+    plate_cells(art, contact)
+    assert len([k for k in art if k.startswith('con_')]) == 10, '삽화 10종이 아니다'
+    # 콘택트 시트 (육안 검증용 — .gitignore 대상)
     sheet = Image.new('RGBA', (250 * 5, 260 * 2), (16, 20, 40, 255))
     for i, (name, cell) in enumerate(contact):
         sheet.paste(cell, (250 * (i % 5) + 5, 260 * (i // 5) + 10), cell)
@@ -123,4 +145,4 @@ def main(path):
     print(f'주입 완료 → {path} ({os.path.getsize(path)//1024}KB)')
 
 if __name__ == '__main__':
-    main(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, 'starry-night-proto-v0.6.html'))
+    main(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, 'starry-night-proto-v0.8.html'))
