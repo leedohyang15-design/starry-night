@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Starry Night 프로토타입 — 절차 생성 도트 아트 (v0.5)
+"""Starry Night 프로토타입 — 절차 생성 도트 아트 + 정식 별자리 형태 (v0.7)
 
 사용법:  python gen_proto_art.py [빌드html]   (기본: starry-night-proto-v0.5.html)
 
@@ -281,40 +281,29 @@ def gen_nodes():
     nd('nd_event', ['#c9a4ff', '#8fd3ff', '#4a2358'], lambda g: (g.line(5, 3, 8, 3, 0), g.px(9, 4, 0), g.px(9, 5, 0), g.px(8, 6, 0), g.px(7, 7, 0), g.px(7, 8, 1), g.px(7, 11, 1)))
     nd('nd_boss', ['#ffd76a', '#c8a04a', '#a82a1c'], lambda g: (g.line(3, 10, 11, 10, 1), g.line(3, 5, 3, 10, 0), g.line(11, 5, 11, 10, 0), g.line(7, 3, 7, 10, 0), g.px(5, 7, 0), g.px(9, 7, 0), g.px(3, 4, 2), g.px(7, 2, 2), g.px(11, 4, 2)))
 
-# ══════════════════ 별자리 형태 (좌표 ±12/±8 · lines = 별 인덱스 경로들) ══════════════════
+# ══════════════════ 별자리 형태 — 정식 성도 (../const_lines.json, 실제 J2000 좌표) ══════════════════
+# 형식: stars=[[x,y,크기]..] (중심 0,0 · ±11 정규화) · segs=[[i,j]..] 선분 목록
+# 사용자 확정 (2026-08-20): 별자리 선은 constellation line 차트(=const_lines.json)와 동일해야 한다
 
-CONST_SHAPES = {
- # 큰곰 — 북두칠성 (자루 3 + 국자 4)
- 'uma': {'stars': [[-11, -2], [-7, -4], [-3, -3], [0, -1], [1, 4], [7, 5], [8, -1]],
-         'lines': [[0, 1, 2, 3, 4, 5, 6, 3]]},
- # 작은곰 — 작은 국자 (북극성 = 자루 끝)
- 'umi': {'stars': [[10, -6], [7, -4], [4, -2], [0, 0], [-4, 2], [-7, 0], [-3, -2]],
-         'lines': [[0, 1, 2, 3, 4, 5, 6, 3]]},
- # 카시오페이아 — W
- 'cas': {'stars': [[-10, 2], [-5, -3], [0, 1], [5, -4], [10, 0]],
-         'lines': [[0, 1, 2, 3, 4]]},
- # 오리온 — 모래시계 + 삼태성
- 'ori': {'stars': [[-5, -7], [5, -7], [2, 0], [0, 0], [-2, 0], [5, 7], [-5, 7]],
-         'lines': [[0, 1], [1, 2], [2, 3, 4], [4, 0], [2, 5], [4, 6]]},
- # 쌍둥이 — 나란한 두 기둥 + 어깨선
- 'gem': {'stars': [[-4, -7], [-4, -1], [-6, 6], [4, -7], [4, -1], [6, 6]],
-         'lines': [[0, 1, 2], [3, 4, 5], [1, 4]]},
- # 전갈 — J자 갈고리 (안타레스 = 심장)
- 'sco': {'stars': [[-8, -7], [-5, -5], [-3, -2], [-2, 1], [0, 5], [3, 7], [7, 5], [8, 2]],
-         'lines': [[0, 1, 2, 3, 4, 5, 6, 7]]},
- # 궁수 — 찻주전자
- 'sgr': {'stars': [[-6, 3], [-2, -2], [2, -3], [6, 0], [4, 5], [-1, 6], [0, -7]],
-         'lines': [[0, 1, 2, 3, 4, 5, 0], [1, 6, 2]]},
- # 사자 — 낫(머리) + 몸통
- 'leo': {'stars': [[6, -7], [3, -8], [1, -5], [3, -2], [6, -1], [-3, 2], [-9, 5]],
-         'lines': [[0, 1, 2, 3, 4], [4, 5, 6]]},
- # 백조 — 북십자
- 'cyg': {'stars': [[0, -7], [0, -1], [0, 7], [-9, 3], [9, -5]],
-         'lines': [[0, 1, 2], [3, 1, 4]]},
- # 천칭 — 저울대 삼각 + 두 접시
- 'lib': {'stars': [[0, -7], [-5, -1], [5, -2], [-7, 6], [7, 5]],
-         'lines': [[0, 1], [0, 2], [1, 2], [1, 3], [2, 4]]},
-}
+CONST_KEY_MAP = {'ori': 'orion', 'uma': 'uma', 'umi': 'umi', 'cas': 'cassiopeia',
+                 'cyg': 'cygnus', 'gem': 'gemini', 'sco': 'scorpius', 'leo': 'leo',
+                 'lib': 'libra', 'sgr': 'sagittarius'}
+
+def build_const_shapes():
+    import os
+    src = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'const_lines.json'), encoding='utf-8'))
+    out = {}
+    for k, sk in CONST_KEY_MAP.items():
+        d = src[sk]
+        xs = [s[0] for s in d['stars']]; ys = [s[1] for s in d['stars']]
+        cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+        span = max(max(xs) - min(xs), max(ys) - min(ys)) or 1
+        f = 22.0 / span
+        out[k] = {'stars': [[round((s[0] - cx) * f, 2), round((s[1] - cy) * f, 2), s[2]] for s in d['stars']],
+                  'segs': d['lines']}
+    return out
+
+CONST_SHAPES = build_const_shapes()
 
 # ══════════════════ 생성 & 주입 ══════════════════
 
