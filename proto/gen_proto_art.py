@@ -212,7 +212,7 @@ def al_brahe():  # 콧수염 + 금빛 코(!) + 사슬
     for x in range(8, 17, 2): g.px(x, 17 + (x % 4) // 2, 4)     # 금 사슬
     ART['al_brahe'] = g.data()
 
-def al_ptolemy():  # 월계관 + 두루마리
+def al_copernicus():  # 월계관 + 두루마리 (폴백 도트 초상)
     g = G(24, 24, ['#f0d8b8', '#cfa87a', '#7a3a8f', '#4a2358', '#7fd87f', '#3a8f3a', '#3a2f22', '#f4eedd'])
     g.disk(12, 9, 5.5, 1)
     for y in range(4, 7):                       # 곱슬머리
@@ -225,7 +225,7 @@ def al_ptolemy():  # 월계관 + 두루마리
         for x in range(4, 21):
             if abs(x - 12) < (y - 13) * 0.95: g.px(x, y, 2 if x < 13 else 3)
     g.line(16, 18, 21, 18, 7); g.line(16, 19, 21, 19, 7); g.px(15, 18, 1); g.px(22, 19, 1)  # 두루마리
-    ART['al_ptolemy'] = g.data()
+    ART['al_copernicus'] = g.data()
 
 # ══════════════════ 아이템(12×12) · 유물(12×12) · 맵 노드(14×14) ══════════════════
 
@@ -321,7 +321,7 @@ CONST_SHAPES = {
 def build():
     en_shard(); en_comet(); en_moonlet(); en_mars(); en_titan(); en_rogue()
     en_pleiades(); en_hyades(); en_m1(); en_m42()
-    al_galileo(); al_brahe(); al_ptolemy()
+    al_galileo(); al_brahe(); al_copernicus()
     it_potion(); it_meteorite(); it_flask()
     gen_relics(); gen_nodes()
 
