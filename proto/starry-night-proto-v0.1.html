@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Starry Night — 프로토타입 v0.1</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% -20%, #1b2547 0%, #0b1020 55%, #070b16 100%);color:#e8ecf7;font-family:system-ui,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;overflow:hidden}
+#app{max-width:1100px;height:100%;margin:0 auto;display:flex;flex-direction:column;padding:10px 14px}
+header{display:flex;align-items:baseline;gap:14px;padding-bottom:6px}
+header h1{font-size:18px;letter-spacing:2px;color:#ffd76a}
+header .sub{font-size:12px;color:#9aa4c0}
+#stageTag{margin-left:auto;font-size:13px;color:#8fd3ff}
+
+/* ── 적 구역 ── */
+#enemyZone{display:flex;align-items:center;gap:18px;justify-content:center;padding:8px 0}
+#enemySprite{width:92px;height:92px;border-radius:50%;flex:none;box-shadow:0 0 28px rgba(255,120,90,.35)}
+.sp-mars{background:radial-gradient(circle at 35% 30%, #ff9a6b, #b33a1f 65%, #6e1d0e)}
+.sp-pleiades{background:radial-gradient(circle at 30% 30%, #dff1ff, #6fa8ff 40%, #1c3a7a 75%);box-shadow:0 0 34px rgba(140,190,255,.55)}
+.sp-m42{background:radial-gradient(circle at 40% 45%, #ffd7f0, #b76bff 45%, #3a1c6e 80%);box-shadow:0 0 40px rgba(200,120,255,.6)}
+#enemyInfo{min-width:280px}
+#enemyName{font-size:16px;font-weight:700}
+#enemyIntent{font-size:13px;color:#ffb56b;margin:4px 0}
+.hpbar{width:280px;height:14px;background:#222b45;border-radius:7px;overflow:hidden;border:1px solid #38436b}
+.hpbar i{display:block;height:100%;background:linear-gradient(90deg,#ff5f6d,#ff9a6b);transition:width .25s}
+.stat{font-size:12px;color:#c7ccd6;margin-top:3px}
+.chips{margin-top:4px;font-size:11.5px;display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:#1d2742;border:1px solid #3a4670;border-radius:4px;padding:1px 6px}
+.chip.bad{border-color:#8a4a4a;color:#ffb0a6}
+.chip.good{border-color:#4a8a5c;color:#a6ffc0}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ── 밤하늘(성좌판) ── */
+#sky{position:relative;flex:1;min-height:150px;border:1px solid #26325a;border-radius:10px;background:radial-gradient(ellipse at 50% 120%, #141d3d 0%, #0a0f22 70%);overflow:hidden}
+#skysvg{position:absolute;inset:0;width:100%;height:100%}
+#banner{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-size:26px;font-weight:800;color:#ffd76a;text-shadow:0 0 18px rgba(255,215,106,.8);opacity:0;pointer-events:none;transition:opacity .3s;text-align:center}
+#banner small{display:block;font-size:13px;color:#ffe9b0;font-weight:400;margin-top:2px}
+#banner.show{opacity:1}
+#log{position:absolute;left:10px;bottom:8px;font-size:11.5px;color:#9aa4c0;line-height:1.5;pointer-events:none}
+#log .l0{color:#dfe6ff}
+
+/* ── 성좌 진행 트래커 ── */
+#tracker{display:flex;gap:8px;flex-wrap:wrap;padding:7px 2px;font-size:12px}
+.trk{border:1px solid #2c3760;border-radius:6px;padding:3px 8px;color:#aab4d4;background:#121a33}
+.trk b{color:#e8ecf7}
+.trk.ready{border-color:#7ee08a;color:#a6ffc0;box-shadow:0 0 8px rgba(120,255,150,.25)}
+.trk.done{border-color:#ffd76a;color:#ffd76a}
+
+/* ── 플레이어 줄 ── */
+#playerBar{display:flex;align-items:center;gap:16px;padding:6px 0}
+#manaOrb{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 30%, #9fd8ff, #2f6fd0 60%, #16336e);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;box-shadow:0 0 16px rgba(90,160,255,.5);flex:none}
+#pstats{font-size:13px;line-height:1.55}
+#pchips{display:flex;gap:6px;font-size:11.5px}
+#endTurn{margin-left:auto;background:#ffd76a;color:#221a04;border:0;border-radius:8px;font-size:15px;font-weight:800;padding:12px 22px;cursor:pointer}
+#endTurn:disabled{opacity:.4;cursor:default}
+#piles{font-size:12px;color:#9aa4c0;text-align:right;line-height:1.5}
+
+/* ── 손패 ── */
+#hand{display:flex;gap:8px;justify-content:center;align-items:flex-end;min-height:196px;padding-bottom:6px}
+.card{width:132px;height:186px;background:linear-gradient(180deg,#1a2340,#111831);border:1.5px solid var(--gc,#556);border-radius:9px;padding:7px 8px;cursor:pointer;position:relative;transition:transform .12s;display:flex;flex-direction:column;flex:none}
+.card:hover{transform:translateY(-26px) scale(1.24);z-index:5}
+.card.unplayable{filter:grayscale(.7) brightness(.6);cursor:default}
+.card.willfinish{box-shadow:0 0 14px rgba(255,215,106,.75);border-color:#ffd76a}
+.cname{font-size:11.5px;font-weight:700;color:var(--gc);line-height:1.25;min-height:28px;padding-left:14px}
+.cname small{color:#c7ccd6;font-weight:400}
+.ccost{position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%, #9fd8ff, #2f6fd0 70%);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#fff}
+.ctype{font-size:10px;color:#9aa4c0;margin:2px 0}
+.cfx{flex:1;display:flex;align-items:center;justify-content:center;font-size:11.5px;color:#e8ecf7}
+.cfx span{display:block;text-align:center;line-height:1.45}
+.cfx b{color:#ffd76a}
+.ccon{font-size:10.5px;color:#8fd3ff;text-align:center;border-top:1px dashed #2c3760;padding-top:4px}
+.clore{display:none;font-size:9.5px;color:#9aa4c0;line-height:1.3;padding-top:3px;font-style:italic}
+.card:hover .clore{display:block}
+.num{position:absolute;font-size:20px;font-weight:800;pointer-events:none;animation:rise 1s forwards}
+@keyframes rise{to{transform:translateY(-46px);opacity:0}}
+
+/* ── 오버레이 ── */
+.ovl{position:fixed;inset:0;background:rgba(5,8,18,.86);display:none;align-items:center;justify-content:center;z-index:20}
+.ovl.show{display:flex}
+.panel{background:#121a33;border:1px solid #34406b;border-radius:12px;padding:26px 30px;max-width:760px;text-align:center}
+.panel h2{color:#ffd76a;font-size:20px;margin-bottom:6px}
+.panel p{font-size:13px;color:#aab4d4;margin-bottom:16px}
+.optRow{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.conOpt{width:180px;border:1.5px solid #3a4670;border-radius:9px;padding:12px;cursor:pointer;background:#18213e}
+.conOpt:hover{border-color:#ffd76a}
+.conOpt b{font-size:15px}
+.conOpt .idn{color:#8fd3ff;font-size:12px;margin:4px 0}
+.conOpt .own{color:#9aa4c0;font-size:11.5px}
+.card.pick{cursor:pointer}
+.card.picked{outline:2.5px solid #7ee08a;box-shadow:0 0 12px rgba(120,255,150,.5)}
+.card.pick:hover{transform:scale(1.06)}
+.btn{background:#ffd76a;color:#221a04;border:0;border-radius:7px;font-size:14px;font-weight:700;padding:10px 20px;cursor:pointer;margin:0 5px}
+.btn.ghost{background:transparent;color:#9aa4c0;border:1px solid #3a4670}
+#kwHelp{font-size:11px;color:#767f9c;text-align:center;padding-bottom:4px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>STARRY NIGHT</h1><span class="sub">전투 프로토타입 v0.1 — M0·M1 검증판</span>
+    <span id="stageTag"></span>
+  </header>
+
+  <div id="enemyZone">
+    <div id="enemySprite"></div>
+    <div id="enemyInfo">
+      <div id="enemyName"></div>
+      <div id="enemyIntent"></div>
+      <div class="hpbar"><i id="ehp"></i></div>
+      <div class="stat" id="ehpTxt"></div>
+      <div class="chips" id="echips"></div>
+    </div>
+  </div>
+
+  <div id="sky">
+    <svg id="skysvg" viewBox="0 0 100 60" preserveAspectRatio="none"></svg>
+    <div id="banner"></div>
+    <div id="log"></div>
+  </div>
+
+  <div id="tracker"></div>
+
+  <div id="playerBar">
+    <div id="manaOrb">3</div>
+    <div>
+      <div id="pstats"></div>
+      <div id="pchips" class="chips"></div>
+    </div>
+    <button id="endTurn" onclick="endTurn()">턴 종료 (Space)</button>
+    <div id="piles"></div>
+  </div>
+
+  <div id="hand"></div>
+  <div id="kwHelp">중독: 적 턴마다 그만큼 피해 후 1 감소(성막 무시) · 취약: 받는 피해 +50% · 약화: 주는 피해 −25% · 가시: 공격당하면 반사 · 관통: 성막 무시 · 힘: 공격마다 피해 추가 — 숫자키 1~9 = 카드 내기</div>
+</div>
+
+<div class="ovl" id="rewardOvl"><div class="panel" id="rewardPanel"></div></div>
+<div class="ovl" id="endOvl"><div class="panel" id="endPanel"></div></div>
+
+<script>
+'use strict';
+/* ═══════════ M0 데이터 — card-design 스킬 기준 적용 ═══════════
+   환율: 물질1 = 피해6 = 성막5 = 뽑기1 = 회복4 = 중독3 = 취약/약화1턴
+   등급 예산: α150 · β134 · γ122 · δ/기타110 · 최하100 (%)
+   각 카드의 budget 주석 = 환율 합계 / 비용×등급예산            */
+
+const GRADE_CLR={1:'#ffd76a',2:'#c9a4ff',3:'#8fd3ff',4:'#9fe6a0',5:'#c7ccd6'};
+const GRADE_NAME={1:'으뜸별',2:'버금별',3:'셋째별',4:'넷째별',5:'다섯째별'};
+const GRADE_W={1:.16,2:.34,3:.60,4:.85,5:1.0};
+
+const CONS={
+ uma:{name:'큰곰자리',need:3,idn:'성벽',idnDesc:'방어와 가시',bonus:{block:8,thorns:2},sky:[20,22]},
+ umi:{name:'작은곰자리',need:2,idn:'길잡이',idnDesc:'물질과 순환',bonus:{mana:1},sky:[50,10]},
+ cas:{name:'카시오페이아자리',need:2,idn:'변광',idnDesc:'변동 수치와 드로우',bonus:{draw:2},sky:[76,18]},
+ ori:{name:'오리온자리',need:3,idn:'사냥',idnDesc:'커져 가는 한 방',bonus:{str:2},sky:[14,44]},
+ gem:{name:'쌍둥이자리',need:2,idn:'짝',idnDesc:'2연격',bonus:{dmg:4,hits:2},sky:[33,38]},
+ sco:{name:'전갈자리',need:3,idn:'독침',idnDesc:'중독 누적',bonus:{poison:4},sky:[86,48]},
+ sgr:{name:'궁수자리',need:2,idn:'겨눔',idnDesc:'관통 사격',bonus:{dmg:8,pierce:1},sky:[64,52]},
+ leo:{name:'사자자리',need:2,idn:'포효',idnDesc:'강타와 취약',bonus:{vuln:2},sky:[38,54]},
+ cyg:{name:'백조자리',need:2,idn:'나래',idnDesc:'회복 비행',bonus:{heal:5},sky:[60,32]},
+ lib:{name:'천칭자리',need:2,idn:'균형',idnDesc:'공방 동시',bonus:{dmg:6,block:6},sky:[88,30]},
+};
+
+const STARS={
+ /* 큰곰 — 성벽 */
+ dubhe:{con:'uma',by:'α',name:'두베',rank:1,cost:1,type:'수비',fx:{block:8},lore:'북두칠성 국자 끝 — 북극성을 가리키는 지극성'},                       // 1.6 / 1.5 ✓
+ merak:{con:'uma',by:'β',name:'메라크',rank:2,cost:2,type:'수비',fx:{block:10,thorns:2},lore:'두베와 짝지어 북쪽 길을 여는 지극성'},                    // 2.0+가시 / 2.68 ✓
+ phecda:{con:'uma',by:'γ',name:'페크다',rank:3,cost:1,type:'수비',fx:{block:5,thorns:1},lore:'큰곰의 뒷다리 — "넓적다리"라는 뜻'},                     // 1.0+가시 / 1.22 ✓
+ megrez:{con:'uma',by:'δ',name:'메그레즈',rank:4,cost:0,type:'수비',fx:{block:3},lore:'국자와 손잡이가 만나는 가장 흐린 일곱째 별'},                    // 0.6 / 0(0코 소품) ✓
+ /* 작은곰 — 길잡이 */
+ polaris:{con:'umi',by:'α',name:'북극성',rank:1,cost:1,type:'스킬',fx:{mana:2,draw:1},lore:'천구 북극에 붙박인 길잡이 별 — 모든 별이 그를 돈다'},        // 3.0 / 1.5 α시그니처(순이득 물질1)
+ kochab:{con:'umi',by:'β',name:'코카브',rank:2,cost:1,type:'공격',fx:{dmg:4,mana:1},lore:'북극성 이전 시대의 옛 북극성'},                              // 1.67 / 1.34 ✓
+ pherkad:{con:'umi',by:'γ',name:'페르카드',rank:3,cost:1,type:'스킬',fx:{draw:1,mana:1},lore:'코카브와 나란히 "북극의 두 수호자"'},                     // 2.0 / 1.22 (순환 소품)
+ yildun:{con:'umi',by:'δ',name:'이을딘',rank:4,cost:1,type:'수비',fx:{block:3,mana:1},lore:'꼬리 한가운데의 조용한 별 — "별"이라는 뜻의 터키어'},        // 1.6 / 1.1 ✓
+ /* 카시오페이아 — 변광 */
+ schedar:{con:'cas',by:'α',name:'셰다르',rank:1,cost:1,type:'스킬',fx:{draw:2},lore:'옥좌에 앉은 왕비의 심장 — "가슴"이라는 뜻'},                       // 2.0 / 1.5 ✓
+ caph:{con:'cas',by:'β',name:'카프',rank:2,cost:1,type:'수비',fx:{block:4,draw:1},lore:'W의 서쪽 끝 — "손바닥"이라는 뜻'},                             // 1.8 / 1.34 ✓
+ tsih:{con:'cas',by:'γ',name:'치흐',rank:3,cost:1,type:'공격',fx:{randDmg:[2,12]},lore:'예고 없이 밝아지는 변광성 — W의 한가운데'},                     // 기대 1.17 / 1.22 ✓
+ ruchbah:{con:'cas',by:'δ',name:'루크바',rank:4,cost:1,type:'수비',fx:{randBlock:[2,8]},lore:'왕비의 "무릎" — 식쌍성'},                                // 기대 1.0 / 1.1 ✓
+ /* 오리온 — 사냥 */
+ betelgeuse:{con:'ori',by:'α',name:'베텔게우스',rank:1,cost:3,type:'공격',fx:{dmg:24},lore:'사냥꾼의 어깨에서 붉게 저무는 초거성 — 언젠가 초신성이 된다'},// 4.0 / 4.5 (민무늬 한 방 예산 아래) ✓
+ rigel:{con:'ori',by:'β',name:'리겔',rank:2,cost:2,type:'공격',fx:{dmg:13},lore:'사냥꾼의 왼발을 밝히는 청백색 초거성'},                                // 2.17 / 2.68 ✓
+ bellatrix:{con:'ori',by:'γ',name:'벨라트릭스',rank:3,cost:2,type:'공격',fx:{dmg:9,draw:1},lore:'"여전사"라는 이름의 오리온 어깨별'},                    // 2.5 / 2.44 ✓
+ saiph:{con:'ori',by:'κ',name:'사이프',rank:4,cost:1,type:'공격',fx:{dmg:7},lore:'사냥꾼의 오른발 — "검"이라는 뜻'},                                    // 1.17 / 1.1 (시작 덱 급 민무늬) ✓
+ /* 쌍둥이 — 짝 */
+ castor:{con:'gem',by:'α',name:'카스토르',rank:1,cost:1,type:'공격',fx:{dmg:4,hits:2},lore:'여섯 별이 겹친 육중성 — 필멸의 형'},                        // 1.33 / 1.5 ✓
+ pollux:{con:'gem',by:'β',name:'폴룩스',rank:2,cost:2,type:'공격',fx:{dmg:6,hits:2,weak:1},lore:'불멸의 아우 — 쌍둥이 중 더 밝은 오렌지빛'},             // 2.33 / 2.68 ✓
+ alhena:{con:'gem',by:'γ',name:'알헤나',rank:3,cost:1,type:'공격',fx:{dmg:3,hits:2,block:2},lore:'쌍둥이의 발끝 — "낙인"이라는 뜻'},                    // 1.4 / 1.22 ✓
+ wasat:{con:'gem',by:'δ',name:'와사트',rank:4,cost:0,type:'공격',fx:{dmg:2,hits:2},lore:'황도가 지나는 "한가운데" 별'},                                 // 0.67 / 0코 소품 ✓
+ /* 전갈 — 독침 */
+ antares:{con:'sco',by:'α',name:'안타레스',rank:1,cost:2,type:'공격',fx:{dmg:10,poison:4},lore:'전갈의 심장에서 타오르는 붉은 초거성 — "화성의 라이벌"'},// 3.0 / 3.0 ✓
+ acrab:{con:'sco',by:'β',name:'아크라브',rank:2,cost:1,type:'공격',fx:{dmg:5,poison:2},lore:'전갈의 집게 끝 — 이름 자체가 "전갈"'},                     // 1.5 / 1.34 ✓
+ dschubba:{con:'sco',by:'δ',name:'드슈바',rank:3,cost:1,type:'스킬',fx:{poison:2,block:3},lore:'전갈의 "이마" — 가끔 갑자기 밝아진다'},                 // 1.27 / 1.22 ✓
+ shaula:{con:'sco',by:'λ',name:'샤울라',rank:5,cost:1,type:'공격',fx:{dmg:4,poison:1},lore:'치켜든 꼬리의 "독침" — 전갈 2위 밝기의 막내 문자'},          // 1.0 / 1.0 ✓
+ /* 궁수 — 겨눔 */
+ rukbat:{con:'sgr',by:'α',name:'루크바트',rank:1,cost:1,type:'공격',fx:{dmg:7,pierce:1},lore:'궁수의 "무릎" — 활을 버티는 축'},                         // 1.17+관통 / 1.5 ✓
+ kaus:{con:'sgr',by:'ε',name:'카우스 아우스트랄리스',rank:2,cost:2,type:'공격',fx:{dmg:9,pierce:1,vuln:1},lore:'"남쪽 활" — 궁수에서 가장 밝은 별'},     // 1.83+관통 / 2.68 ✓
+ ascella:{con:'sgr',by:'ζ',name:'아셀라',rank:3,cost:2,type:'공격',fx:{dmg:8,pierce:1,draw:1},lore:'궁수의 "겨드랑이" — 찻주전자 손잡이 아래'},          // 2.33+관통 / 2.44 ✓
+ nunki:{con:'sgr',by:'σ',name:'눈키',rank:4,cost:1,type:'공격',fx:{dmg:6,pierce:1},lore:'바빌로니아에서 온 가장 오래된 별 이름 중 하나'},               // 1.0+관통 / 1.1 ✓
+ /* 사자 — 포효 */
+ regulus:{con:'leo',by:'α',name:'레굴루스',rank:1,cost:2,type:'공격',fx:{dmg:12,vuln:1},lore:'"작은 왕" — 사자의 심장, 황도에 가장 가까운 1등성'},       // 2.33 / 3.0 ✓
+ denebola:{con:'leo',by:'β',name:'데네볼라',rank:2,cost:1,type:'공격',fx:{dmg:6,vuln:1},lore:'사자의 "꼬리" — 봄의 대삼각형 한 꼭짓점'},                 // 1.33 / 1.34 ✓
+ algieba:{con:'leo',by:'γ',name:'알기에바',rank:3,cost:2,type:'공격',fx:{dmg:10,weak:1},lore:'사자의 "갈기" — 금빛 쌍성'},                              // 2.0 / 2.44 ✓
+ zosma:{con:'leo',by:'δ',name:'조스마',rank:4,cost:1,type:'스킬',fx:{vuln:1,weak:1,block:2},lore:'사자의 "허리띠" — 도약 직전의 등줄기'},               // 1.07 / 1.1 ✓
+ /* 백조 — 나래 */
+ deneb:{con:'cyg',by:'α',name:'데네브',rank:1,cost:2,type:'수비',fx:{block:8,heal:4},lore:'백조의 "꼬리" — 초원거리에서 빛나는 초거성'},                 // 2.6 / 3.0 ✓
+ albireo:{con:'cyg',by:'β',name:'알비레오',rank:2,cost:1,type:'스킬',fx:{heal:3,draw:1},lore:'금빛과 청옥빛 두 별 — 하늘에서 가장 아름다운 쌍성'},        // 1.75 / 1.34 (회복 약세 보정)
+ sadr:{con:'cyg',by:'γ',name:'사드르',rank:3,cost:1,type:'수비',fx:{block:4,heal:2},lore:'백조의 "가슴" — 십자가의 교차점'},                            // 1.3 / 1.22 ✓
+ gienah:{con:'cyg',by:'ε',name:'기에나',rank:4,cost:1,type:'공격',fx:{dmg:5,heal:2},lore:'백조의 "날개" — 남쪽으로 펼친 깃'},                           // 1.33 / 1.1 ✓
+ /* 천칭 — 균형 */
+ zubgen:{con:'lib',by:'α',name:'주벤엘게누비',rank:1,cost:1,type:'공격',fx:{dmg:5,block:4},lore:'"남쪽 집게" — 한때 전갈의 것이었던 저울판'},            // 1.63 / 1.5 ✓
+ zubesch:{con:'lib',by:'β',name:'주벤에샤마리',rank:2,cost:2,type:'공격',fx:{dmg:8,block:6},lore:'"북쪽 집게" — 초록빛으로 보인다는 유일한 별'},         // 2.53 / 2.68 ✓
+ zubelak:{con:'lib',by:'γ',name:'주벤엘아크랍',rank:3,cost:2,type:'공격',fx:{dmg:5,block:4,draw:1},lore:'"전갈의 집게" — 저울대의 끝'},                 // 2.63 / 2.44 ✓
+ zubelakri:{con:'lib',by:'δ',name:'주벤엘아크리비',rank:4,cost:0,type:'공격',fx:{dmg:2,block:2},lore:'가려지며 깜빡이는 식변광성'},                     // 0.73 / 0코 소품 ✓
+};
+
+/* 적 — "별자리에 못 낀 천체들" */
+const ENCOUNTERS=[
+ {id:'mars',name:'화성 — 붉은 배회자',cls:'sp-mars',hp:42,
+  pattern:[{atk:7},{atk:9},{blk:6,atk:4}]},
+ {id:'pleiades',name:'플레이아데스 성단 — 일곱 자매',cls:'sp-pleiades',hp:75,
+  pattern:[{atk:5,hits:2},{blk:9},{atk:6,hits:2},{charge:'별빛을 모은다'},{atk:16}]},
+ {id:'m42',name:'오리온 대성운 M42 — 별들의 요람',cls:'sp-m42',hp:135,boss:1,enrage:1,
+  pattern:[{atk:12},{atk:6,weakP:2,label:'성운의 안개'},{blk:14},{charge:'장막이 요동친다'},{atk:22}]},
+];
+
+/* ═══════════ 유틸 ═══════════ */
+const $=id=>document.getElementById(id);
+const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function eul(n){return [0,1,3,6,7,8].includes(n%10)?'을':'를';}
+function cardName(id){const d=STARS[id];return `${CONS[d.con].name} ${d.by}`+(d.name?` <small>(${d.name})</small>`:'');}
+
+function fxText(fx){
+ const t=[];
+ if(fx.dmg!=null){
+  const p=fx.pierce?'관통 ':'';
+  if((fx.hits||1)>1)t.push(`${p}피해를 <b>${fx.dmg}</b>씩 <b>${fx.hits}</b>번 줍니다.`);
+  else t.push(`${p}피해를 <b>${fx.dmg}</b> 줍니다.`);
+ }
+ if(fx.randDmg)t.push(`피해를 <b>${fx.randDmg[0]}~${fx.randDmg[1]}</b> 무작위로 줍니다.`);
+ if(fx.block!=null)t.push(`성막을 <b>${fx.block}</b> 얻습니다.`);
+ if(fx.randBlock)t.push(`성막을 <b>${fx.randBlock[0]}~${fx.randBlock[1]}</b> 무작위로 얻습니다.`);
+ if(fx.poison)t.push(`중독 <b>${fx.poison}</b>${eul(fx.poison)} 부여합니다.`);
+ if(fx.vuln)t.push(`취약 <b>${fx.vuln}</b>${eul(fx.vuln)} 부여합니다.`);
+ if(fx.weak)t.push(`약화 <b>${fx.weak}</b>${eul(fx.weak)} 부여합니다.`);
+ if(fx.thorns)t.push(`가시 <b>${fx.thorns}</b>${eul(fx.thorns)} 얻습니다.`);
+ if(fx.str)t.push(`힘 <b>${fx.str}</b>${eul(fx.str)} 얻습니다.`);
+ if(fx.draw)t.push(`카드를 <b>${fx.draw}</b>장 뽑습니다.`);
+ if(fx.mana)t.push(`물질 <b>${fx.mana}</b>${eul(fx.mana)} 얻습니다.`);
+ if(fx.heal)t.push(`HP를 <b>${fx.heal}</b> 회복합니다.`);
+ return t.join(' ');
+}
+
+const LOGMAX=5;let logs=[];
+function log(m){logs.unshift(m);logs=logs.slice(0,LOGMAX);
+ $('log').innerHTML=logs.map((s,i)=>`<div class="${i?'':'l0'}">${s}</div>`).join('');}
+
+/* ═══════════ 런/전투 상태 ═══════════ */
+const R={hp:70,maxHp:70,deck:[],battle:0};
+let S=null,E=null,over=false;
+
+function startRun(){
+ R.hp=70;R.battle=0;
+ R.deck=['caph','caph','tsih','phecda','phecda','megrez','castor','castor','saiph','saiph'];
+ startBattle();
+}
+function startBattle(){
+ const enc=ENCOUNTERS[R.battle];over=false;
+ E={...enc,hp:enc.hp,maxHp:enc.hp,block:0,poison:0,weak:0,vuln:0,str:0,pi:0,turn:0};
+ S={mana:3,block:0,thorns:0,str:0,weak:0,hand:[],drawPile:shuffle([...R.deck]),discard:[],
+    turnCounts:{},doneTurn:{},skyDots:{},lines:[]};
+ logs=[];$('skysvg').innerHTML='';
+ $('stageTag').textContent=`전투 ${R.battle+1} / ${ENCOUNTERS.length}` + (enc.boss?' — 보스':'');
+ $('enemySprite').className=enc.cls;
+ log(`<b>${enc.name}</b> 등장!`);
+ startTurn();
+}
+function startTurn(){
+ S.mana=3;S.block=0;S.turnCounts={};S.doneTurn={};
+ draw(5);renderAll();
+}
+function draw(n){
+ for(let i=0;i<n;i++){
+  if(!S.drawPile.length){if(!S.discard.length)break;S.drawPile=shuffle(S.discard);S.discard=[];}
+  if(S.hand.length>=10)break;
+  S.hand.push(S.drawPile.pop());
+ }
+}
+
+/* ═══════════ 효과 실행 ═══════════ */
+function dealDmg(base,pierce){
+ let n=base+S.str;
+ if(S.weak)n=Math.floor(n*0.75);
+ if(E.vuln)n=Math.floor(n*1.5);
+ if(!pierce&&E.block>0){const b=Math.min(E.block,n);E.block-=b;n-=b;}
+ E.hp=Math.max(0,E.hp-n);
+ float(n,'#ffd76a');
+ return n;
+}
+function applyFx(fx,src){
+ if(fx.dmg!=null){const h=fx.hits||1;let tot=0;for(let i=0;i<h;i++)tot+=dealDmg(fx.dmg,fx.pierce);log(`${src} — 피해 ${tot}`);}
+ if(fx.randDmg){const v=rand(fx.randDmg[0],fx.randDmg[1]);const d=dealDmg(v,fx.pierce);log(`${src} — 변광! 피해 ${d}`);}
+ if(fx.block)S.block+=fx.block;
+ if(fx.randBlock){const v=rand(fx.randBlock[0],fx.randBlock[1]);S.block+=v;log(`${src} — 성막 ${v}`);}
+ if(fx.poison)E.poison+=fx.poison;
+ if(fx.vuln)E.vuln+=fx.vuln;
+ if(fx.weak)E.weak+=fx.weak;
+ if(fx.thorns)S.thorns+=fx.thorns;
+ if(fx.str)S.str+=fx.str;
+ if(fx.draw)draw(fx.draw);
+ if(fx.mana)S.mana+=fx.mana;
+ if(fx.heal)R.hp=Math.min(R.maxHp,R.hp+fx.heal);
+}
+
+function playCard(i){
+ if(over)return;
+ const id=S.hand[i];if(id==null)return;
+ const d=STARS[id];
+ if(d.cost>S.mana){$('manaOrb').classList.remove('shake');void $('manaOrb').offsetWidth;$('manaOrb').classList.add('shake');return;}
+ S.mana-=d.cost;
+ S.hand.splice(i,1);S.discard.push(id);
+ applyFx(d.fx,cardName(id).replace(/<[^>]*>/g,''));
+ addSkyDot(d.con);
+ S.turnCounts[d.con]=(S.turnCounts[d.con]||0)+1;
+ checkCons(d.con);
+ renderAll();
+ if(E.hp<=0)win();
+}
+function checkCons(c){
+ const C=CONS[c];
+ if(S.turnCounts[c]>=C.need&&!S.doneTurn[c]){
+  S.doneTurn[c]=true;
+  drawConLines(c);
+  banner(`✦ ${C.name} 완성!`,`${C.idn} — ${fxText(C.bonus).replace(/<[^>]*>/g,'')}`);
+  applyFx(C.bonus,`성좌 「${C.name}」`);
+  if(E.hp<=0){renderAll();win();}
+ }
+}
+
+/* ═══════════ 밤하늘 ═══════════ */
+function addSkyDot(c){
+ const [cx,cy]=CONS[c].sky;
+ const x=cx+(Math.random()*10-5),y=cy+(Math.random()*8-4);
+ (S.skyDots[c]=S.skyDots[c]||[]).push([x,y]);
+ const s=document.createElementNS('http://www.w3.org/2000/svg','circle');
+ s.setAttribute('cx',x);s.setAttribute('cy',y);s.setAttribute('r',.7);
+ s.setAttribute('fill','#fff');s.setAttribute('opacity','.9');
+ $('skysvg').appendChild(s);
+}
+function drawConLines(c){
+ const pts=S.skyDots[c]||[];if(pts.length<2)return;
+ const p=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+ p.setAttribute('points',pts.map(q=>q.join(',')).join(' '));
+ p.setAttribute('fill','none');p.setAttribute('stroke','#ffd76a');
+ p.setAttribute('stroke-width','.35');p.setAttribute('opacity','.85');
+ $('skysvg').appendChild(p);
+}
+let bannerT=null;
+function banner(t,sub){
+ const b=$('banner');b.innerHTML=`${t}<small>${sub||''}</small>`;
+ b.classList.add('show');clearTimeout(bannerT);
+ bannerT=setTimeout(()=>b.classList.remove('show'),2200);
+}
+function float(n,clr){
+ const r=$('enemySprite').getBoundingClientRect(),f=document.createElement('div');
+ f.className='num';f.textContent=n;f.style.color=clr;f.style.position='fixed';
+ f.style.left=(r.right+10+Math.random()*50)+'px';f.style.top=(r.top+10+Math.random()*30)+'px';
+ document.body.appendChild(f);setTimeout(()=>f.remove(),1000);
+}
+
+/* ═══════════ 적 턴 ═══════════ */
+function endTurn(){
+ if(over)return;
+ S.discard.push(...S.hand);S.hand=[];
+ enemyTurn();
+ if(over)return;
+ if(S.weak)S.weak--;
+ startTurn();
+}
+function enemyTurn(){
+ E.block=0;
+ if(E.poison>0){E.hp=Math.max(0,E.hp-E.poison);log(`중독 — ${E.name.split(' ')[0]}에게 피해 ${E.poison}`);E.poison--;
+  if(E.hp<=0){renderAll();win();return;}}
+ const act=E.pattern[E.pi];
+ if(act.atk!=null){
+  const h=act.hits||1;let tot=0;
+  for(let i=0;i<h;i++){
+   let n=act.atk+E.str;
+   if(E.weak)n=Math.floor(n*0.75);
+   const b=Math.min(S.block,n);S.block-=b;const hit=n-b;
+   R.hp=Math.max(0,R.hp-hit);tot+=hit;
+   if(S.thorns>0){E.hp=Math.max(0,E.hp-S.thorns);}
+  }
+  log(`${act.label||'공격'} — 피해 ${tot}${S.thorns?` (가시 반사 ${S.thorns*h})`:''}`);
+  document.body.classList.remove('shake');void document.body.offsetWidth;
+  if(tot>0)document.body.classList.add('shake');
+ }
+ if(act.blk){E.block+=act.blk;log(`${E.name.split(' ')[0]} — 성막 ${act.blk}`);}
+ if(act.weakP){S.weak+=act.weakP;log(`약화 ${act.weakP} 부여받음`);}
+ if(act.charge)log(`${act.charge}…`);
+ E.pi=(E.pi+1)%E.pattern.length;
+ if(E.pi===0&&E.enrage){E.str+=1;log(`${E.name.split(' ')[0]}의 힘이 커진다! (+1)`);}
+ if(E.weak)E.weak--;if(E.vuln)E.vuln--;
+ if(E.hp<=0){renderAll();win();return;}
+ if(R.hp<=0){lose();return;}
+ renderAll();
+}
+
+/* ═══════════ 렌더 ═══════════ */
+function intentTxt(){
+ const act=E.pattern[E.pi];const parts=[];
+ if(act.atk!=null){
+  let n=act.atk+E.str;if(E.weak)n=Math.floor(n*0.75);
+  parts.push(`⚔ 공격 ${n}${(act.hits||1)>1?`×${act.hits}`:''}`);
+ }
+ if(act.blk)parts.push(`🛡 성막 ${act.blk}`);
+ if(act.weakP)parts.push(`☁ 약화 ${act.weakP}`);
+ if(act.charge)parts.push(`⚡ ${act.charge}`);
+ return '다음 의도: '+parts.join(' + ');
+}
+function chips(o,isEnemy){
+ const c=[];
+ if(o.block)c.push(`<span class="chip good">성막 ${o.block}</span>`);
+ if(o.poison)c.push(`<span class="chip bad">중독 ${o.poison}</span>`);
+ if(o.weak)c.push(`<span class="chip bad">약화 ${o.weak}</span>`);
+ if(o.vuln)c.push(`<span class="chip bad">취약 ${o.vuln}</span>`);
+ if(o.str)c.push(`<span class="chip good">힘 ${o.str}</span>`);
+ if(o.thorns)c.push(`<span class="chip good">가시 ${o.thorns}</span>`);
+ return c.join('');
+}
+function renderAll(){
+ $('enemyName').textContent=E.name;
+ $('enemyIntent').textContent=intentTxt();
+ $('ehp').style.width=(E.hp/E.maxHp*100)+'%';
+ $('ehpTxt').textContent=`HP ${E.hp} / ${E.maxHp}`;
+ $('echips').innerHTML=chips(E);
+ $('manaOrb').textContent=S.mana;
+ $('pstats').innerHTML=`별지기 HP <b>${R.hp}</b>/${R.maxHp} · 성막 <b>${S.block}</b>`;
+ $('pchips').innerHTML=chips({weak:S.weak,str:S.str,thorns:S.thorns});
+ $('piles').innerHTML=`뽑을 카드 ${S.drawPile.length}<br>버린 카드 ${S.discard.length}`;
+ /* 트래커: 이번 턴 성좌 진행 */
+ const consInPlay=[...new Set([...R.deck.map(id=>STARS[id].con)])];
+ $('tracker').innerHTML=consInPlay.map(c=>{
+  const C=CONS[c],n=S.turnCounts[c]||0;
+  const cls=S.doneTurn[c]?'done':(n===C.need-1?'ready':'');
+  return `<span class="trk ${cls}">${C.name.replace('자리','')} <b>${Math.min(n,C.need)}/${C.need}</b>${S.doneTurn[c]?' ✦':''}</span>`;
+ }).join('');
+ /* 손패 */
+ $('hand').innerHTML=S.hand.map((id,i)=>{
+  const d=STARS[id],C=CONS[d.con];
+  const un=d.cost>S.mana?' unplayable':'';
+  const wf=((S.turnCounts[d.con]||0)>=C.need-1&&!S.doneTurn[d.con])?' willfinish':'';
+  return `<div class="card${un}${wf}" style="--gc:${GRADE_CLR[d.rank]}" onclick="playCard(${i})">
+   <div class="ccost">${d.cost}</div>
+   <div class="cname">${cardName(id)}</div>
+   <div class="ctype">${d.type} · ${GRADE_NAME[d.rank]}</div>
+   <div class="cfx"><span>${fxText(d.fx)}</span></div>
+   <div class="ccon">★ ${C.name.replace('자리','')} +1 <span style="color:#767f9c">(${C.need}성 → ${C.idn})</span></div>
+   <div class="clore">${d.lore}</div>
+  </div>`;
+ }).join('');
+}
+
+/* ═══════════ 승리/보상/패배 ═══════════ */
+function win(){
+ if(over)return;over=true;
+ banner('승리!','');
+ setTimeout(()=>{
+  if(R.battle>=ENCOUNTERS.length-1){clearRun();return;}
+  R.hp=Math.min(R.maxHp,R.hp+12);
+  showReward();
+ },900);
+}
+function showReward(){
+ const owned=[...new Set(R.deck.map(id=>STARS[id].con))];
+ const all=Object.keys(CONS);
+ const ownPick=shuffle(owned.slice()).slice(0,2);
+ const rest=shuffle(all.filter(c=>!ownPick.includes(c)));
+ const opts=[...ownPick,...rest].slice(0,3);
+ $('rewardPanel').innerHTML=`<h2>전투 보상 — 별자리를 고르세요</h2>
+  <p>HP 12 회복! 고른 별자리에서 별 3개가 떠오릅니다. 담고 싶은 만큼만 담으세요.</p>
+  <div class="optRow">${opts.map(c=>{
+   const C=CONS[c],own=R.deck.filter(id=>STARS[id].con===c).length;
+   return `<div class="conOpt" onclick="pickCon('${c}')"><b>${C.name}</b>
+    <div class="idn">${C.idn} — ${C.idnDesc} (${C.need}성)</div>
+    <div class="own">보유 ${own}장</div></div>`;
+  }).join('')}</div>`;
+ $('rewardOvl').classList.add('show');
+}
+let offer=[],picked=[];
+window.pickCon=function(c){
+ const pool=Object.keys(STARS).filter(id=>STARS[id].con===c);
+ offer=[];picked=[];
+ for(let i=0;i<3;i++){
+  const tot=pool.reduce((s,id)=>s+GRADE_W[STARS[id].rank],0);
+  let r=Math.random()*tot,pick=pool[0];
+  for(const id of pool){r-=GRADE_W[STARS[id].rank];if(r<=0){pick=id;break;}}
+  offer.push(pick);
+ }
+ $('rewardPanel').innerHTML=`<h2>${CONS[c].name}의 별들</h2>
+  <p>담을 별을 클릭하세요 (0~3장). 덱이 얇을수록 성좌는 빨리 이어집니다.</p>
+  <div class="optRow" id="offerRow">${offer.map((id,i)=>{
+   const d=STARS[id],C=CONS[d.con];
+   return `<div class="card pick" id="of${i}" style="--gc:${GRADE_CLR[d.rank]}" onclick="togglePick(${i})">
+    <div class="ccost">${d.cost}</div><div class="cname">${cardName(id)}</div>
+    <div class="ctype">${d.type} · ${GRADE_NAME[d.rank]}</div>
+    <div class="cfx"><span>${fxText(d.fx)}</span></div>
+    <div class="ccon">★ ${C.name.replace('자리','')} +1</div></div>`;
+  }).join('')}</div>
+  <button class="btn" onclick="confirmPick()">담기</button>
+  <button class="btn ghost" onclick="confirmPick(true)">하나도 안 담기</button>`;
+};
+window.togglePick=function(i){
+ const k=picked.indexOf(i);
+ if(k>=0)picked.splice(k,1);else picked.push(i);
+ $('of'+i).classList.toggle('picked',k<0);
+};
+window.confirmPick=function(skip){
+ if(!skip)picked.forEach(i=>R.deck.push(offer[i]));
+ $('rewardOvl').classList.remove('show');
+ R.battle++;startBattle();
+};
+function clearRun(){
+ $('endPanel').innerHTML=`<h2>🌌 여정 완주!</h2>
+  <p>오리온 대성운을 잠재웠습니다. 별지기의 덱: ${R.deck.length}장 · 남은 HP ${R.hp}</p>
+  <p style="font-size:12px">${R.deck.map(id=>cardName(id).replace(/<[^>]*>/g,'')).join(' · ')}</p>
+  <button class="btn" onclick="location.reload()">새 여정</button>`;
+ $('endOvl').classList.add('show');
+}
+function lose(){
+ over=true;
+ $('endPanel').innerHTML=`<h2>별이 지다…</h2>
+  <p>${E.name}에게 쓰러졌습니다. (전투 ${R.battle+1}에서)</p>
+  <button class="btn" onclick="location.reload()">다시 도전</button>`;
+ $('endOvl').classList.add('show');
+}
+
+/* 키보드: 1~9 = 카드, Space/E = 턴 종료 */
+document.addEventListener('keydown',e=>{
+ if($('rewardOvl').classList.contains('show')||$('endOvl').classList.contains('show'))return;
+ if(e.code==='Space'||e.key==='e'||e.key==='E'){e.preventDefault();endTurn();}
+ const n=parseInt(e.key);
+ if(n>=1&&n<=9)playCard(n-1);
+});
+
+startRun();
+</script>
+</body>
+</html>

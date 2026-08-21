@@ -1,0 +1,1271 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Starry Night — 프로토타입 v0.4</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% -20%, #1b2547 0%, #0b1020 55%, #070b16 100%);color:#e8ecf7;font-family:system-ui,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;overflow:hidden}
+#app,#mapScr{max-width:1100px;height:100%;margin:0 auto;display:flex;flex-direction:column;padding:10px 14px}
+header{display:flex;align-items:center;gap:12px;padding-bottom:6px;flex-wrap:wrap}
+header h1{font-size:18px;letter-spacing:2px;color:#ffd76a}
+header .sub{font-size:12px;color:#9aa4c0}
+#relicRow{display:flex;gap:5px}
+.relic{font-size:11px;background:#1d2742;border:1px solid #6b5a2e;color:#ffe9b0;border-radius:4px;padding:1px 6px;cursor:default}
+#dustTag{margin-left:auto;font-size:13px;color:#ffe9b0}
+#stageTag{font-size:13px;color:#8fd3ff}
+
+/* ── 맵 ── */
+#mapWrap{flex:1;overflow-y:auto;border:1px solid #26325a;border-radius:10px;background:radial-gradient(ellipse at 50% 120%, #141d3d 0%, #0a0f22 70%);position:relative}
+#mapInner{position:relative;width:640px;margin:0 auto}
+#mapSvg{position:absolute;inset:0;width:100%;height:100%}
+.mapnode{position:absolute;width:84px;height:52px;transform:translate(-50%,-50%);border-radius:9px;border:1.5px solid #3a4670;background:#141d3d;color:#aab4d4;font-size:11.5px;text-align:center;cursor:default;line-height:1.3;padding-top:8px}
+.mapnode b{display:block;font-size:13px}
+.mapnode.avail{border-color:#ffd76a;color:#ffe9b0;cursor:pointer;box-shadow:0 0 12px rgba(255,215,106,.4)}
+.mapnode.avail:hover{background:#26325a}
+.mapnode.here{border-color:#8fd3ff;color:#8fd3ff;box-shadow:0 0 12px rgba(140,210,255,.5)}
+.mapnode.past{opacity:.35}
+.mapnode.elite{border-style:double;border-width:3.5px}
+#mapHint{font-size:12px;color:#9aa4c0;text-align:center;padding:6px}
+
+/* ── 적 구역 ── */
+#enemyZone{display:flex;align-items:center;gap:18px;justify-content:center;padding:6px 0}
+#enemySprite{width:88px;height:88px;border-radius:50%;flex:none;box-shadow:0 0 28px rgba(255,120,90,.35)}
+.sp-mars{background:radial-gradient(circle at 35% 30%, #ff9a6b, #b33a1f 65%, #6e1d0e)}
+.sp-shard{background:radial-gradient(circle at 35% 30%, #d8dce8, #7a8298 60%, #3a4152);border-radius:22%}
+.sp-comet{background:radial-gradient(circle at 30% 30%, #eafcff, #7fd8e8 45%, #1c5a7a)}
+.sp-moonlet{background:radial-gradient(circle at 35% 30%, #e8e2d2, #a89c7c 60%, #5a5040)}
+.sp-titan{background:radial-gradient(circle at 35% 30%, #ffe2a8, #c8963e 60%, #6e4a14)}
+.sp-rogue{background:radial-gradient(circle at 35% 30%, #b8c4ff, #4a5ab3 60%, #1c2260)}
+.sp-pleiades{background:radial-gradient(circle at 30% 30%, #dff1ff, #6fa8ff 40%, #1c3a7a 75%);box-shadow:0 0 34px rgba(140,190,255,.55)}
+.sp-hyades{background:radial-gradient(circle at 30% 30%, #ffe8d0, #e8a86f 45%, #7a4a1c 80%);box-shadow:0 0 30px rgba(230,170,110,.5)}
+.sp-m1{background:radial-gradient(circle at 40% 40%, #d0fff2, #6fe8c8 40%, #1c7a5f 80%);box-shadow:0 0 34px rgba(110,230,200,.5)}
+.sp-m42{background:radial-gradient(circle at 40% 45%, #ffd7f0, #b76bff 45%, #3a1c6e 80%);box-shadow:0 0 40px rgba(200,120,255,.6)}
+#enemyInfo{min-width:300px}
+#enemyName{font-size:16px;font-weight:700}
+#enemyAbility{font-size:11.5px;color:#e8a86f}
+#enemyIntent{font-size:13px;color:#ffb56b;margin:3px 0}
+.hpbar{width:300px;height:14px;background:#222b45;border-radius:7px;overflow:hidden;border:1px solid #38436b}
+.hpbar i{display:block;height:100%;background:linear-gradient(90deg,#ff5f6d,#ff9a6b);transition:width .25s}
+.stat{font-size:12px;color:#c7ccd6;margin-top:3px}
+.chips{margin-top:4px;font-size:11.5px;display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:#1d2742;border:1px solid #3a4670;border-radius:4px;padding:1px 6px}
+.chip.bad{border-color:#8a4a4a;color:#ffb0a6}
+.chip.good{border-color:#4a8a5c;color:#a6ffc0}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ── 밤하늘 ── */
+#sky{position:relative;flex:1;min-height:130px;border:1px solid #26325a;border-radius:10px;background:radial-gradient(ellipse at 50% 120%, #141d3d 0%, #0a0f22 70%);overflow:hidden}
+#skysvg{position:absolute;inset:0;width:100%;height:100%}
+#banner{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-size:26px;font-weight:800;color:#ffd76a;text-shadow:0 0 18px rgba(255,215,106,.8);opacity:0;pointer-events:none;transition:opacity .3s;text-align:center}
+#banner small{display:block;font-size:13px;color:#ffe9b0;font-weight:400;margin-top:2px}
+#banner.show{opacity:1}
+#log{position:absolute;left:10px;bottom:8px;font-size:11.5px;color:#9aa4c0;line-height:1.5;pointer-events:none;max-width:64%}
+#log .l0{color:#dfe6ff}
+
+/* ── 트래커 ── */
+#tracker{display:flex;gap:8px;flex-wrap:wrap;padding:6px 2px;font-size:12px}
+.trk{border:1px solid #2c3760;border-radius:6px;padding:3px 8px;color:#aab4d4;background:#121a33}
+.trk b{color:#e8ecf7}
+.trk.ready{border-color:#7ee08a;color:#a6ffc0;box-shadow:0 0 8px rgba(120,255,150,.25)}
+.trk.done{border-color:#ffd76a;color:#ffd76a}
+.trk.sealed{border-color:#8a4a4a;color:#ffb0a6}
+
+/* ── 플레이어 줄 ── */
+#playerBar{display:flex;align-items:center;gap:12px;padding:6px 0;flex-wrap:wrap}
+#manaOrb{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 30%, #9fd8ff, #2f6fd0 60%, #16336e);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;box-shadow:0 0 16px rgba(90,160,255,.5);flex:none}
+#pstats{font-size:13px;line-height:1.55}
+#pchips{display:flex;gap:6px;font-size:11.5px}
+#skillRow,#itemRow{display:flex;gap:6px}
+#skillRow{margin-left:auto}
+.skillbtn,.itembtn{background:#18213e;border:1px solid #3a4670;color:#dfe6ff;border-radius:7px;padding:5px 9px;font-size:10.5px;cursor:pointer;text-align:left;line-height:1.35}
+.skillbtn b{display:block;font-size:12px;color:#8fd3ff}
+.itembtn{border-color:#5a8a4a;color:#c8f0b8}
+.skillbtn.off,.itembtn.off{opacity:.35;cursor:default}
+#endTurn{background:#ffd76a;color:#221a04;border:0;border-radius:8px;font-size:15px;font-weight:800;padding:12px 22px;cursor:pointer;flex:none}
+#piles{font-size:12px;color:#9aa4c0;text-align:right;line-height:1.5;flex:none}
+
+/* ── 카드 ── */
+#hand{display:flex;gap:8px;justify-content:center;align-items:flex-end;min-height:196px;padding-bottom:4px}
+.card{width:136px;height:190px;background:linear-gradient(180deg,#1a2340,#111831);border:1.5px solid var(--gc,#556);border-radius:9px;padding:7px 8px;cursor:pointer;position:relative;transition:transform .12s;display:flex;flex-direction:column;flex:none}
+#hand .card:hover{transform:translateY(-26px) scale(1.24);z-index:5}
+.card.unplayable{filter:grayscale(.7) brightness(.6);cursor:default}
+.card.sealedcard{filter:grayscale(1) brightness(.45);cursor:default;outline:2px dashed #8a4a4a}
+.card.willfinish{box-shadow:0 0 14px rgba(255,215,106,.75);border-color:#ffd76a}
+.card.upframe{border-color:#9fc8e8;box-shadow:0 0 8px rgba(160,200,230,.35)}
+.card.mergeframe{border-color:#b06fe8;box-shadow:0 0 8px rgba(176,111,232,.4)}
+.cchip{position:absolute;top:-8px;right:-6px;font-size:10px;font-weight:800;border-radius:4px;padding:1px 5px}
+.cchip.up{background:#9fc8e8;color:#0e1a26}
+.cchip.merge{background:#b06fe8;color:#1c0e26}
+.cname{font-size:11px;font-weight:700;color:var(--gc);line-height:1.25;min-height:28px;padding-left:14px}
+.cname small{color:#c7ccd6;font-weight:400}
+.ccost{position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%, #9fd8ff, #2f6fd0 70%);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#fff}
+.ctype{font-size:10px;color:#9aa4c0;margin:2px 0}
+.cfx{flex:1;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:#e8ecf7;overflow:hidden}
+.cfx span{display:block;text-align:center;line-height:1.4}
+.cfx b{color:#ffd76a}
+.ccon{font-size:10px;color:#8fd3ff;text-align:center;border-top:1px dashed #2c3760;padding-top:3px}
+.clore{display:none;font-size:9.5px;color:#9aa4c0;line-height:1.3;padding-top:3px;font-style:italic}
+#hand .card:hover .clore{display:block}
+.num{position:absolute;font-size:20px;font-weight:800;pointer-events:none;animation:rise 1s forwards}
+@keyframes rise{to{transform:translateY(-46px);opacity:0}}
+
+/* ── 오버레이 ── */
+.ovl{position:fixed;inset:0;background:rgba(5,8,18,.88);display:none;align-items:center;justify-content:center;z-index:20}
+.ovl.show{display:flex}
+.panel{background:#121a33;border:1px solid #34406b;border-radius:12px;padding:24px 28px;max-width:860px;max-height:92vh;overflow:auto;text-align:center}
+.panel h2{color:#ffd76a;font-size:19px;margin-bottom:6px}
+.panel p{font-size:13px;color:#aab4d4;margin-bottom:14px}
+.optRow{display:flex;gap:11px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.conOpt{width:190px;border:1.5px solid #3a4670;border-radius:9px;padding:12px;cursor:pointer;background:#18213e}
+.conOpt:hover{border-color:#ffd76a}
+.conOpt b{font-size:15px}
+.conOpt .idn{color:#8fd3ff;font-size:12px;margin:4px 0}
+.conOpt .own{color:#9aa4c0;font-size:11.5px;line-height:1.4}
+.card.pick{cursor:pointer}
+.card.picked{outline:2.5px solid #7ee08a;box-shadow:0 0 12px rgba(120,255,150,.5)}
+.card.pick:hover{transform:scale(1.06)}
+.btn{background:#ffd76a;color:#221a04;border:0;border-radius:7px;font-size:14px;font-weight:700;padding:10px 20px;cursor:pointer;margin:4px 5px}
+.btn.ghost{background:transparent;color:#9aa4c0;border:1px solid #3a4670}
+.btn:disabled{opacity:.4;cursor:default}
+#kwHelp{font-size:10.5px;color:#767f9c;text-align:center;padding-bottom:4px}
+</style>
+</head>
+<body>
+<!-- ═══ 맵 화면 ═══ -->
+<div id="mapScr" style="display:none">
+  <header>
+    <h1>STARRY NIGHT</h1><span class="sub">성도(맵) — 길을 고르세요</span>
+    <div id="relicRowM" class="chips"></div>
+    <span id="dustTagM" style="margin-left:auto;font-size:13px;color:#ffe9b0"></span>
+    <span id="hpTagM" style="font-size:13px;color:#ffb0a6"></span>
+  </header>
+  <div id="mapWrap"><div id="mapInner"><svg id="mapSvg"></svg></div></div>
+  <div id="mapHint">⚔ 전투 · ☠ 중간보스 · ✧ 상점 · ♨ 휴식 · ⚒ 대장간 · ? 이벤트 · ★ 보스 — 빛나는 관문을 눌러 이동</div>
+</div>
+
+<!-- ═══ 전투 화면 ═══ -->
+<div id="app" style="display:none">
+  <header>
+    <h1>STARRY NIGHT</h1><span class="sub">v0.4</span>
+    <div id="relicRow" class="chips"></div>
+    <span id="dustTag"></span><span id="stageTag"></span>
+  </header>
+  <div id="enemyZone">
+    <div id="enemySprite"></div>
+    <div id="enemyInfo">
+      <div id="enemyName"></div>
+      <div id="enemyAbility"></div>
+      <div id="enemyIntent"></div>
+      <div class="hpbar"><i id="ehp"></i></div>
+      <div class="stat" id="ehpTxt"></div>
+      <div class="chips" id="echips"></div>
+    </div>
+  </div>
+  <div id="sky">
+    <svg id="skysvg" viewBox="0 0 100 60" preserveAspectRatio="none"></svg>
+    <div id="banner"></div>
+    <div id="log"></div>
+  </div>
+  <div id="tracker"></div>
+  <div id="playerBar">
+    <div id="manaOrb">3</div>
+    <div>
+      <div id="pstats"></div>
+      <div id="pchips" class="chips"></div>
+    </div>
+    <div id="itemRow"></div>
+    <div id="skillRow"></div>
+    <button id="endTurn" onclick="endTurn()">턴 종료 (Space)</button>
+    <div id="piles"></div>
+  </div>
+  <div id="hand"></div>
+  <div id="kwHelp">중독: 적 턴마다 피해 후 1 감소(성막 무시) · 취약: 받는 피해 +50% · 약화: 주는 피해 −25% · 가시: 공격당하면 반사 · 관통: 성막 무시 · 힘: 공격마다 추가 · 소멸: 이 전투에서 제외 — 숫자키 1~9 = 카드</div>
+</div>
+
+<div class="ovl" id="rewardOvl"><div class="panel" id="rewardPanel"></div></div>
+<div class="ovl" id="endOvl"><div class="panel" id="endPanel"></div></div>
+
+<script>
+'use strict';
+/* ═══════════ 데이터 — card-design 스킬(환율·등급 예산·기믹 어휘) 적용 ═══════════
+   환율: 물질1 = 피해6 = 성막5 = 뽑기1 = 회복4 = 중독3 = 취약/약화1턴
+   등급 예산: α150 · β134 · γ122 · δ110 · ε100 (%) — 조건·스케일링은 +20~30% 허용
+   v0.3 재설계: 순수 수치 카드는 시작 덱 급 + α 피니셔뿐, 나머지는 기믹 어휘에서
+   고유한 작동 방식 하나씩 (StS 265장 분석 반영)                                */
+
+const GRADE_CLR={1:'#ffd76a',2:'#c9a4ff',3:'#8fd3ff',4:'#9fe6a0',5:'#c7ccd6'};
+const GRADE_NAME={1:'으뜸별',2:'버금별',3:'셋째별',4:'넷째별',5:'다섯째별'};
+const GRADE_W={1:.16,2:.34,3:.60,4:.85,5:1.0};
+const PRICE={1:90,2:70,3:55,4:40,5:30};
+
+const CONS={
+ uma:{name:'큰곰자리',need:3,idn:'성벽',idnDesc:'성막을 쌓으면 그 자체가 무기다',
+      bonus:{mode:'passive',turnFx:{block:3},label:'전투 내내 매 턴 성막 3'},sky:[20,22]},
+ umi:{name:'작은곰자리',need:2,idn:'길잡이',idnDesc:'물질의 흐름을 다스린다',
+      bonus:{mode:'passive',turnFx:{mana:1},label:'전투 내내 매 턴 물질 +1'},sky:[50,10]},
+ cas:{name:'카시오페이아자리',need:2,idn:'변광',idnDesc:'운에 맡기고, 나쁜 운은 다시 섞는다',
+      bonus:{mode:'instant',fx:{draw:2}},sky:[76,18]},
+ ori:{name:'오리온자리',need:3,idn:'사냥',idnDesc:'공격만으로 손을 채우는 사냥꾼',
+      bonus:{mode:'passive',onceFx:{str:2},label:'힘 +2 — 전투 지속'},sky:[14,44]},
+ gem:{name:'쌍둥이자리',need:2,idn:'짝',idnDesc:'같은 것을 두 번 — 모든 것이 짝으로',
+      bonus:{mode:'instant',fx:{dmg:4,hits:2}},sky:[33,38]},
+ sco:{name:'전갈자리',need:3,idn:'독침',idnDesc:'중독을 심고, 불리고, 터뜨린다',
+      bonus:{mode:'passive',onceFx:{poison:4},flag:'poisonKeep',label:'중독 4 · 이 전투 동안 중독이 줄지 않음'},sky:[86,48]},
+ sgr:{name:'궁수자리',need:2,idn:'겨눔',idnDesc:'얇은 화살을 몰아 쏘고 마지막에 겨눈다',
+      bonus:{mode:'instant',fx:{dmg:8,pierce:1}},sky:[64,52]},
+ leo:{name:'사자자리',need:2,idn:'포효',idnDesc:'취약을 새기고 왕의 일격으로 벌한다',
+      bonus:{mode:'instant',fx:{vuln:2}},sky:[38,54]},
+ cyg:{name:'백조자리',need:2,idn:'나래',idnDesc:'오래 나는 날개 — 지킨 것은 다음 턴에도 남는다',
+      bonus:{mode:'instant',fx:{block:4,nextTurn:{block:4}}},sky:[60,32]},
+ lib:{name:'천칭자리',need:2,idn:'균형',idnDesc:'공격과 수비를 오가면 저울이 보상한다',
+      bonus:{mode:'instant',fx:{dmg:6,block:6}},sky:[88,30]},
+};
+
+const STARS={
+ /* 큰곰 — 성벽 (셋업: 성막 쌓기 → 페이오프: 두베 2배·천칭 α 참조) */
+ dubhe:{con:'uma',by:'α',name:'두베',rank:1,cost:2,type:'스킬',fx:{doubleBlock:1},lore:'북두칠성 국자 끝 — 북극성을 가리키는 지극성'},                    // Entrench형 증폭
+ merak:{con:'uma',by:'β',name:'메라크',rank:2,cost:2,type:'수비',fx:{block:8,counter:4},lore:'두베와 짝지어 북쪽 길을 여는 지극성'},                       // Flame Barrier형 반격
+ phecda:{con:'uma',by:'γ',name:'페크다',rank:3,cost:1,type:'수비',fx:{block:5,thorns:1},lore:'큰곰의 뒷다리 — "넓적다리"라는 뜻'},                        // 1.2 / 1.22 ✓
+ megrez:{con:'uma',by:'δ',name:'메그레즈',rank:4,cost:0,type:'수비',fx:{block:3},lore:'국자와 손잡이가 만나는 가장 흐린 일곱째 별'},                       // 시작 덱 급 민무늬
+ /* 작은곰 — 길잡이 (물질 조작 아키타입) */
+ polaris:{con:'umi',by:'α',name:'북극성',rank:1,cost:1,type:'스킬',fx:{mana:2,draw:1},lore:'천구 북극에 붙박인 길잡이 별 — 모든 별이 그를 돈다'},           // Adrenaline형
+ kochab:{con:'umi',by:'β',name:'코카브',rank:2,cost:1,type:'공격',fx:{dmg:4,mana:1},lore:'북극성 이전 시대의 옛 북극성'},                                 // 1.67 / 1.34 ✓
+ pherkad:{con:'umi',by:'γ',name:'페르카드',rank:3,cost:1,type:'스킬',fx:{draw:1,mana:1},lore:'코카브와 나란히 "북극의 두 수호자"'},                        // 순환 소품
+ yildun:{con:'umi',by:'δ',name:'이을딘',rank:4,cost:1,type:'수비',fx:{block:3,mana:1},lore:'꼬리 한가운데의 조용한 별 — "별"이라는 뜻의 터키어'},           // 1.6 / 1.1 ✓
+ /* 카시오페이아 — 변광 (무작위·손패 조작) */
+ schedar:{con:'cas',by:'α',name:'셰다르',rank:1,cost:1,type:'스킬',fx:{handRedraw:1},lore:'옥좌에 앉은 왕비의 심장 — "가슴"이라는 뜻'},                    // Calculated Gamble형
+ caph:{con:'cas',by:'β',name:'카프',rank:2,cost:1,type:'수비',fx:{block:4,draw:1},lore:'W의 서쪽 끝 — "손바닥"이라는 뜻'},                                // Backflip형 1.8 / 1.34
+ tsih:{con:'cas',by:'γ',name:'치흐',rank:3,cost:1,type:'공격',fx:{randDmg:[2,12],jackpot:1},lore:'예고 없이 밝아지는 변광성 — W의 한가운데'},                        // 기대 1.17 / 1.22 ✓
+ ruchbah:{con:'cas',by:'δ',name:'루크바',rank:4,cost:1,type:'수비',fx:{randBlock:[2,8]},lore:'왕비의 "무릎" — 식쌍성'},                                   // 기대 1.0 / 1.1 ✓
+ /* 오리온 — 사냥 (커져 가는 한 방) */
+ betelgeuse:{con:'ori',by:'α',name:'베텔게우스',rank:1,cost:3,type:'공격',fx:{dmg:24},lore:'사냥꾼의 어깨에서 붉게 저무는 초거성 — 언젠가 초신성이 된다'},   // Bludgeon 자리(α 대형 민무늬 허용)
+ rigel:{con:'ori',by:'β',name:'리겔',rank:2,cost:2,type:'공격',fx:{dmg:8,rampSelf:4},lore:'사냥꾼의 왼발을 밝히는 청백색 초거성'},                         // Rampage형 스케일링
+ bellatrix:{con:'ori',by:'γ',name:'벨라트릭스',rank:3,cost:2,type:'공격',fx:{dmg:9,draw:1},lore:'"여전사"라는 이름의 오리온 어깨별'},                       // Pommel Strike형 2.5 / 2.44
+ saiph:{con:'ori',by:'κ',name:'사이프',rank:4,cost:0,type:'공격',fx:{dmg:12,cond:{t:'allAtkOnly'}},lore:'사냥꾼의 오른발 — "검"이라는 뜻'},                // Clash형 조건 발동
+ /* 쌍둥이 — 짝 (2연·재발동) */
+ castor:{con:'gem',by:'α',name:'카스토르',rank:1,cost:1,type:'공격',fx:{dmg:4,hits:2},lore:'여섯 별이 겹친 육중성 — 필멸의 형'},                           // Twin Strike 코어
+ pollux:{con:'gem',by:'β',name:'폴룩스',rank:2,cost:1,type:'스킬',fx:{nextAtkTwice:1},lore:'불멸의 아우 — 쌍둥이 중 더 밝은 오렌지빛'},                     // Double Tap형 증폭
+ alhena:{con:'gem',by:'γ',name:'알헤나',rank:3,cost:1,type:'공격',fx:{dmg:5,pairCon:1},lore:'쌍둥이의 발끝 — "낙인"이라는 뜻'},                            // 짝 조건 재발동
+ wasat:{con:'gem',by:'δ',name:'와사트',rank:4,cost:0,type:'공격',fx:{dmg:2,hits:2},lore:'황도가 지나는 "한가운데" 별'},                                    // 시작 덱 급
+ /* 전갈 — 독침 (셋업: 중독 → 페이오프: 2배·추가타) */
+ antares:{con:'sco',by:'α',name:'안타레스',rank:1,cost:2,type:'공격',fx:{dmg:10,poison:4},lore:'전갈의 심장에서 타오르는 붉은 초거성 — "화성의 라이벌"'},    // 아키타입 코어 3.0 / 3.0
+ acrab:{con:'sco',by:'β',name:'아크라브',rank:2,cost:1,type:'스킬',fx:{doublePoison:1,vanish:1},lore:'전갈의 집게 끝 — 이름 자체가 "전갈"'},               // Catalyst형 증폭+소멸
+ dschubba:{con:'sco',by:'δ',name:'드슈바',rank:3,cost:1,type:'공격',fx:{dmg:7,againIfPoison:1},lore:'전갈의 "이마" — 가끔 갑자기 밝아진다'},               // Bane형 조건 재발동
+ shaula:{con:'sco',by:'λ',name:'샤울라',rank:5,cost:1,type:'스킬',fx:{poison:3},lore:'치켜든 꼬리의 "독침" — 전갈 2위 밝기의 막내 문자'},                   // Deadly Poison형 셋업 1.0 / 1.0
+ /* 궁수 — 겨눔 (관통 아키타입) */
+ rukbat:{con:'sgr',by:'α',name:'루크바트',rank:1,cost:1,type:'공격',fx:{dmg:7,pierce:1},lore:'궁수의 "무릎" — 활을 버티는 축'},                             // 관통 코어
+ kaus:{con:'sgr',by:'ε',name:'카우스 아우스트랄리스',rank:2,cost:2,type:'공격',fx:{dmg:9,pierce:1,cond:{t:'enemyBlock',fx:{vuln:2}}},lore:'"남쪽 활" — 궁수에서 가장 밝은 별'}, // 대(對)성막 조건
+ ascella:{con:'sgr',by:'ζ',name:'아셀라',rank:3,cost:2,type:'공격',fx:{dmg:6,pierce:1,nextTurn:{draw:2}},lore:'궁수의 "겨드랑이" — 찻주전자 손잡이 아래'},   // Predator형 지연
+ nunki:{con:'sgr',by:'σ',name:'눈키',rank:4,cost:1,type:'공격',fx:{dmg:4,pierce:1,perAtkPlayed:3},lore:'바빌로니아에서 온 가장 오래된 별 이름 중 하나'},     // Finisher형 스케일링
+ /* 사자 — 포효 (취약 셋업 → 페이오프) */
+ regulus:{con:'leo',by:'α',name:'레굴루스',rank:1,cost:2,type:'공격',fx:{dmg:12,cond:{t:'enemyDebuff',k:'vuln',fx:{mana:1,draw:1}}},lore:'"작은 왕" — 사자의 심장, 황도에 가장 가까운 1등성'}, // Drop Kick형
+ denebola:{con:'leo',by:'β',name:'데네볼라',rank:2,cost:1,type:'공격',fx:{dmg:6,vuln:1},lore:'사자의 "꼬리" — 봄의 대삼각형 한 꼭짓점'},                    // 셋업 1.33 / 1.34
+ algieba:{con:'leo',by:'γ',name:'알기에바',rank:3,cost:2,type:'공격',fx:{dmg:10,weak:1},lore:'사자의 "갈기" — 금빛 쌍성'},                                 // 2.0 / 2.44 ✓
+ zosma:{con:'leo',by:'δ',name:'조스마',rank:4,cost:1,type:'스킬',fx:{vuln:1,weak:1,block:2},lore:'사자의 "허리띠" — 도약 직전의 등줄기'},                   // Uppercut-lite 셋업
+ /* 백조 — 나래 (성막 지속·회복) */
+ deneb:{con:'cyg',by:'α',name:'데네브',rank:1,cost:2,type:'수비',fx:{block:10,keepBlock:1},lore:'백조의 "꼬리" — 초원거리에서 빛나는 초거성'},              // Blur형 지속
+ albireo:{con:'cyg',by:'β',name:'알비레오',rank:2,cost:1,type:'스킬',fx:{nextTurn:{mana:1,draw:1}},lore:'금빛과 청옥빛 두 별 — 하늘에서 가장 아름다운 쌍성'},           // 1.75 / 1.34
+ sadr:{con:'cyg',by:'γ',name:'사드르',rank:3,cost:1,type:'수비',fx:{block:4,nextTurn:{block:4}},lore:'백조의 "가슴" — 십자가의 교차점'},                    // Dodge and Roll형 지연
+ gienah:{con:'cyg',by:'ε',name:'기에나',rank:4,cost:1,type:'공격',fx:{dmg:5,nextTurn:{block:3}},lore:'백조의 "날개" — 남쪽으로 펼친 깃'},                              // Reaper-lite 1.33 / 1.1
+ /* 천칭 — 균형 (공방 동시, 성막 참조 페이오프) */
+ zubgen:{con:'lib',by:'α',name:'주벤엘게누비',rank:1,cost:1,type:'공격',fx:{dmgEqBlock:1},lore:'"남쪽 집게" — 한때 전갈의 것이었던 저울판'},                // Body Slam형 참조
+ zubesch:{con:'lib',by:'β',name:'주벤에샤마리',rank:2,cost:2,type:'공격',fx:{dmg:8,block:6},lore:'"북쪽 집게" — 초록빛으로 보인다는 유일한 별'},            // Dash형 코어 2.53 / 2.68
+ zubelak:{con:'lib',by:'γ',name:'주벤엘아크랍',rank:3,cost:2,type:'공격',fx:{dmg:5,block:4,cond:{t:'balanced',fx:{draw:1}}},lore:'"전갈의 집게" — 저울대의 끝'},                    // 2.63 / 2.44
+ zubelakri:{con:'lib',by:'δ',name:'주벤엘아크리비',rank:4,cost:0,type:'공격',fx:{dmg:2,block:2},lore:'가려지며 깜빡이는 식변광성'},                        // 시작 덱 급
+};
+
+/* ═══════════ 적 — 전 몹 개인 능력 ═══════════ */
+const ENEMIES={
+ shard:{name:'오르트 파편',cls:'sp-shard',hp:33,tier:'easy',dust:25,deathBurst:4,nightAt:7,
+  ability:'임종 폭발 — 죽을 때 피해 4',
+  pattern:[{atk:7},{atk:10},{blk:5}]},
+ comet:{name:'혜성',cls:'sp-comet',hp:38,tier:'easy',dust:25,accel:2,nightAt:7,
+  ability:'가속 — 2턴마다 공격 +1',
+  pattern:[{atk:9},{atk:6,hits:2},{blk:6}]},
+ moonlet:{name:'미아 위성',cls:'sp-moonlet',hp:48,tier:'easy',dust:25,blockSteal:1,nightAt:7,
+  ability:'성막 흡수 — 깎은 내 성막의 절반을 가져감',
+  pattern:[{atk:9},{blk:6,atk:5},{atk:12}]},
+ mars:{name:'화성 — 붉은 배회자',cls:'sp-mars',hp:57,tier:'mid',dust:35,rage:3,nightAt:7,
+  ability:'전의 — HP 절반 이하가 되면 공격 +3',
+  pattern:[{atk:9},{atk:12},{blk:6,atk:6}]},
+ titan:{name:'타이탄',cls:'sp-titan',hp:68,tier:'mid',dust:35,autoBlock:4,nightAt:7,
+  ability:'얼음 갑주 — 매 턴 자동 성막 4',
+  pattern:[{atk:11},{blk:8},{atk:14}]},
+ rogue:{name:'떠돌이 행성',cls:'sp-rogue',hp:64,tier:'mid',dust:35,nightAt:7,
+  ability:'표류 인력 — 주기적으로 내 손패 1장을 봉인',
+  pattern:[{atk:10},{seal:1,atk:7,label:'표류 인력'},{charge:'인력을 모은다'},{atk:19}]},
+ pleiades:{name:'플레이아데스 성단 — 일곱 자매',cls:'sp-pleiades',hp:108,tier:'elite',dust:60,aegis:7,nightAt:9,
+  ability:'일곱 자매 — 가호 1스택당 받는 피해 −1, 성좌 완성마다 2스택 제거',
+  pattern:[{atk:8,hits:2},{blk:9},{atk:10,hits:2},{charge:'별빛을 모은다'},{atk:26}]},
+ hyades:{name:'히아데스 성단 — 황소의 눈',cls:'sp-hyades',hp:112,tier:'elite',dust:60,nightAt:9,
+  ability:'흐린 하늘 — 주기적으로 다음 턴 별자리 하나를 봉인',
+  pattern:[{atk:12},{conSeal:1,atk:7,label:'흐린 하늘'},{blk:10},{atk:17}]},
+ m1:{name:'게 성운 M1',cls:'sp-m1',hp:118,tier:'elite',dust:60,nightAt:9,
+  ability:'펄서 파동 — 주기적으로 내 성막 전부를 흡수',
+  pattern:[{atk:12},{pulsar:1,label:'펄서 파동'},{atk:16},{blk:12}]},
+ m42:{name:'오리온 대성운 M42 — 별들의 요람',cls:'sp-m42',hp:205,tier:'boss',dust:0,boss:1,phase2:1,nightAt:11,
+  ability:'성운의 장막 — 손패 봉인 · HP 절반부터 격노(공격 +3)',
+  pattern:[{atk:14},{seal:1,atk:8,label:'성운의 장막'},{blk:14},{charge:'장막이 요동친다'},{atk:30}],
+  pattern2:[{atk:16},{seal:1,atk:10,label:'성운의 장막'},{charge:'장막이 요동친다'},{atk:32}]},
+};
+const POOL={easy:['shard','comet','moonlet'],mid:['mars','titan','rogue'],elite:['pleiades','hyades','m1']};
+
+/* ═══════════ 조력자 영능 — 전부 무료, 횟수로 제한 ═══════════
+   1인 = 단독 영능 · 2인+ = 짝마다 시너지 스킬 1개, 턴당 전체 1회만.
+   성좌판 조작(+1성)이 든 스킬은 전투당 1회 (무료라서 매 턴이면 성좌가 공짜) */
+const ALLIES={
+ galileo:{n:'갈릴레오',sh:'갈',s:'망원경 관측',per:'turn',
+  desc:'카드를 <b>1</b>장 뽑습니다.',run(){draw(1);},
+  bark:{start:['오늘 밤 하늘은 맑군.','렌즈는 닦아 두었네.'],con:['그래도 별은 이어진다!','아름다운 관측이야.'],crisis:['버티게! 아직 별은 지지 않았네.']}},
+ brahe:{n:'튀코 브라헤',sh:'브',s:'하늘의 성',per:'turn',
+  desc:'성막을 <b>3</b> 얻습니다.',run(){S.block+=3;},
+  bark:{start:['우라니보르의 이름으로.','기록 없는 관측은 없다.'],con:['정확한 배열이군.','내 목록에 적어 두지.'],crisis:['방벽을 세워라!']}},
+ ptolemy:{n:'프톨레마이오스',sh:'프',s:'알마게스트',per:'battle',plus:1,
+  desc:'가장 많이 이은 별자리에 별 <b>1</b>성을 더합니다.',
+  bark:{start:['천구는 오늘도 돈다.','좌표는 이미 계산해 두었네.'],con:['알마게스트에 있던 그대로다!','완벽한 원운동이야.'],crisis:['궤도를 수정할 시간이다.']}},
+};
+const PAIR_SKILLS=[
+ {k:'gb',pair:['galileo','brahe'],s:'합동 관측',per:'turn',
+  desc:'성막을 <b>3</b> 얻고 카드를 <b>1</b>장 뽑습니다.',run(){S.block+=3;draw(1);}},
+ {k:'gp',pair:['galileo','ptolemy'],s:'신성 논쟁',per:'battle',plus:1,
+  desc:'가장 많이 이은 별자리에 별 <b>1</b>성을 더하고 카드를 <b>1</b>장 뽑습니다.',after(){draw(1);}},
+ {k:'bp',pair:['brahe','ptolemy'],s:'천구 재편',per:'battle',plus:1,
+  desc:'가장 많이 이은 별자리에 별 <b>1</b>성을 더하고 성막을 <b>3</b> 얻습니다.',after(){S.block+=3;}},
+];
+function activeSkills(){
+ if(R.allies.length<=1)return R.allies.map(k=>({key:k,label:ALLIES[k].n,def:ALLIES[k]}));
+ return PAIR_SKILLS.filter(p=>p.pair.every(k=>R.allies.includes(k)))
+  .map(p=>({key:p.k,label:p.pair.map(k=>ALLIES[k].sh).join('+'),def:p}));
+}
+
+/* ═══════════ 유물 (천문·물리 이름) · 소모품 ═══════════ */
+const RELICS={
+ armillary:{n:'혼천의',d:'매 턴 첫 성좌 완성 시 물질 1을 얻는다'},
+ telescope:{n:'굴절 망원경',d:'전투 시작 시 카드를 2장 더 뽑는다'},
+ messier:{n:'메시에 목록',d:'상점 가격 20% 할인'},
+ pendulum:{n:'진자 시계',d:'휴식 회복 +10'},
+ vanallen:{n:'밴앨런대',d:'전투 시작 시 성막 6을 얻는다'},
+ corona:{n:'코로나',d:'전투 시작 시 가시 2를 얻는다'},
+};
+const ITEMS={
+ potion:{n:'별빛 물약',d:'HP를 15 회복한다',run(){R.hp=Math.min(R.maxHp,R.hp+15);}},
+ meteorite:{n:'유성 조각',d:'피해를 12 준다',run(){dealDmg(12,true);}},
+ flask:{n:'물질 병',d:'물질 2를 얻는다',run(){S.mana+=2;}},
+};
+
+/* ═══════════ 유틸 ═══════════ */
+const $=id=>document.getElementById(id);
+const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function eul(n){return [0,1,3,6,7,8].includes(n%10)?'을':'를';}
+function cardName(id){const d=STARS[id];return `${CONS[d.con].name} ${d.by}`+(d.name?` <small>(${d.name})</small>`:'');}
+function stripTags(s){return s.replace(/<[^>]*>/g,'');}
+function hasRelic(k){return R.relics.includes(k);}
+function wpickStar(){
+ const pool=Object.keys(STARS);
+ const tot=pool.reduce((s,id)=>s+GRADE_W[STARS[id].rank],0);
+ let r=Math.random()*tot;
+ for(const id of pool){r-=GRADE_W[STARS[id].rank];if(r<=0)return id;}
+ return pool[pool.length-1];
+}
+
+/* ── 강화: 주 효과 1개만 (사용자 확정 우선순위 — 피해·성막 > 물질·뽑기 > 기타) ── */
+function upFx(fx){
+ const f=JSON.parse(JSON.stringify(fx));
+ if(f.dmg!=null){f.dmg+=(f.hits||1)>1?1:3;return f;}
+ if(f.randDmg){f.randDmg=[f.randDmg[0]+1,f.randDmg[1]+3];return f;}
+ if(f.block!=null){f.block+=3;return f;}
+ if(f.randBlock){f.randBlock=[f.randBlock[0]+1,f.randBlock[1]+3];return f;}
+ if(f.mana){f.mana+=1;return f;}
+ if(f.draw){f.draw+=1;return f;}
+ if(f.poison){f.poison+=2;return f;}
+ if(f.heal){f.heal+=2;return f;}
+ if(f.vuln){f.vuln+=1;return f;}
+ if(f.weak){f.weak+=1;return f;}
+ if(f.thorns){f.thorns+=1;return f;}
+ if(f.str){f.str+=1;return f;}
+ f._costDown=1;return f;   /* 수치가 없는 기믹 카드 → 비용 −1 */
+}
+function partFx(id,up){return up?upFx(STARS[id].fx):STARS[id].fx;}
+function cardFx(en){const l=[partFx(en.id,en.up)];if(en.id2)l.push(partFx(en.id2,en.up2));return l;}
+function partCost(id,up){const base=STARS[id].cost;return up&&partFx(id,up)._costDown?Math.max(0,base-1):base;}
+function costOf(en){return en.id2?Math.max(partCost(en.id,en.up),partCost(en.id2,en.up2)):partCost(en.id,en.up);}
+function countAs(en){return en.id2?2:1;}
+function canMergeWith(a,b){return !a.id2&&!b.id2&&STARS[a.id].con===STARS[b.id].con;}
+
+/* ── 카드 문구 (StS 문체) ── */
+function fxText(fx){
+ const t=[];
+ if(fx.cond&&fx.cond.t==='allAtkOnly')t.push('손패가 전부 공격 카드일 때만 낼 수 있습니다.');
+ if(fx.dmg!=null){
+  const p=fx.pierce?'관통 ':'';
+  if((fx.hits||1)>1)t.push(`${p}피해를 <b>${fx.dmg}</b>씩 <b>${fx.hits}</b>번 줍니다.`);
+  else t.push(`${p}피해를 <b>${fx.dmg}</b> 줍니다.`);
+ }
+ if(fx.dmgEqBlock)t.push('현재 성막만큼 피해를 줍니다.');
+ if(fx.randDmg)t.push(`피해를 <b>${fx.randDmg[0]}~${fx.randDmg[1]}</b> 무작위로 줍니다.`+(fx.jackpot?` <b>${fx.randDmg[1]-2}</b> 이상이 나오면 카드를 <b>1</b>장 뽑습니다.`:''));
+ if(fx.rampSelf)t.push(`이 전투에서 쓸 때마다 피해가 <b>${fx.rampSelf}</b>씩 커집니다.`);
+ if(fx.perAtkPlayed)t.push(`이번 턴 낸 공격 카드 1장마다 피해가 <b>${fx.perAtkPlayed}</b> 커집니다.`);
+ if(fx.againIfPoison)t.push('적이 중독 상태라면 한 번 더 발동합니다.');
+ if(fx.pairCon)t.push('이번 턴 같은 별자리 별을 냈다면 한 번 더 발동합니다.');
+ if(fx.block!=null)t.push(`성막을 <b>${fx.block}</b> 얻습니다.`);
+ if(fx.randBlock)t.push(`성막을 <b>${fx.randBlock[0]}~${fx.randBlock[1]}</b> 무작위로 얻습니다.`);
+ if(fx.doubleBlock)t.push('성막을 <b>2배</b>로 만듭니다.');
+ if(fx.doublePoison)t.push('적의 중독을 <b>2배</b>로 만듭니다.');
+ if(fx.counter)t.push(`이번 턴 공격당할 때마다 <b>${fx.counter}</b>의 피해로 반격합니다.`);
+ if(fx.keepBlock)t.push('이 턴의 성막이 다음 턴에도 유지됩니다.');
+ if(fx.poison)t.push(`중독 <b>${fx.poison}</b>${eul(fx.poison)} 부여합니다.`);
+ if(fx.vuln)t.push(`취약 <b>${fx.vuln}</b>${eul(fx.vuln)} 부여합니다.`);
+ if(fx.weak)t.push(`약화 <b>${fx.weak}</b>${eul(fx.weak)} 부여합니다.`);
+ if(fx.thorns)t.push(`가시 <b>${fx.thorns}</b>${eul(fx.thorns)} 얻습니다.`);
+ if(fx.str)t.push(`힘 <b>${fx.str}</b>${eul(fx.str)} 얻습니다.`);
+ if(fx.handRedraw)t.push('손패를 전부 버리고 그만큼 뽑습니다.');
+ if(fx.draw)t.push(`카드를 <b>${fx.draw}</b>장 뽑습니다.`);
+ if(fx.mana)t.push(`물질 <b>${fx.mana}</b>${eul(fx.mana)} 얻습니다.`);
+ if(fx.heal)t.push(`HP를 <b>${fx.heal}</b> 회복합니다.`);
+ if(fx.nextTurn){
+  if(fx.nextTurn.draw)t.push(`다음 턴에 카드를 <b>${fx.nextTurn.draw}</b>장 더 뽑습니다.`);
+  if(fx.nextTurn.block)t.push(`다음 턴에 성막을 <b>${fx.nextTurn.block}</b> 얻습니다.`);
+  if(fx.nextTurn.mana)t.push(`다음 턴에 물질 <b>${fx.nextTurn.mana}</b>${eul(fx.nextTurn.mana)} 얻습니다.`);
+ }
+ if(fx.nextAtkTwice)t.push('이번 턴 다음 공격 카드가 <b>2번</b> 발동합니다.');
+ if(fx.cond&&fx.cond.t==='enemyBlock')t.push(`적이 성막을 갖고 있다면 ${stripTags(fxText(fx.cond.fx))}`);
+ if(fx.cond&&fx.cond.t==='enemyDebuff')t.push(`적이 ${({vuln:'취약',weak:'약화',poison:'중독'})[fx.cond.k]} 상태라면 ${stripTags(fxText(fx.cond.fx))}`);
+ if(fx.cond&&fx.cond.t==='balanced')t.push(`이번 턴 공격과 비공격 카드를 모두 냈다면 ${stripTags(fxText(fx.cond.fx))}`);
+ if(fx.vanish)t.push('소멸.');
+ return t.join(' ');
+}
+function cardText(en){return cardFx(en).map(f=>fxText(f)).join('<span style="color:#b06fe8"> ✦ </span>');}
+function bonusText(B){return B.mode==='passive'?B.label:stripTags(fxText(B.fx));}
+
+const LOGMAX=5;let logs=[];
+function log(m){logs.unshift(m);logs=logs.slice(0,LOGMAX);
+ $('log').innerHTML=logs.map((s,i)=>`<div class="${i?'':'l0'}">${s}</div>`).join('');}
+
+/* ═══════════ 런 상태 ═══════════ */
+const R={hp:70,maxHp:70,deck:[],dust:0,allies:[],relics:[],items:[],map:null,pos:-1,usedEvents:[],wins:0};
+let S=null,E=null,over=false;
+
+/* ═══════════ 맵 생성 ═══════════ */
+function genMap(){
+ const ROWS=12,nodes=[];
+ for(let r=0;r<ROWS;r++){
+  const cnt=r===ROWS-1?1:(r===0?3:rand(2,3));
+  let cols=r===ROWS-1?[1]:shuffle([0,1,2]).slice(0,cnt).sort();
+  for(const c of cols)nodes.push({i:nodes.length,r,c,type:'battle',edges:[],visited:false});
+ }
+ const rowNodes=r=>nodes.filter(n=>n.r===r);
+ for(let r=0;r<ROWS-1;r++){
+  const cur=rowNodes(r),nxt=rowNodes(r+1);
+  for(const a of cur){
+   const tg=r+1===ROWS-1?nxt:nxt.filter(b=>Math.abs(b.c-a.c)<=1);
+   const pick=shuffle(tg.slice()).slice(0,Math.max(1,rand(1,2)));
+   for(const b of pick)if(!a.edges.includes(b.i))a.edges.push(b.i);
+  }
+  for(const b of nxt){ /* 진입 보장 */
+   if(!cur.some(a=>a.edges.includes(b.i))){
+    const near=cur.filter(a=>Math.abs(a.c-b.c)<=1);
+    const a=(near.length?near:cur)[0];a.edges.push(b.i);
+   }
+  }
+ }
+ /* 종류 배치 */
+ const setOne=(r,type,excl)=>{
+  const cand=rowNodes(r).filter(n=>n.type==='battle'&&!(excl||[]).includes(n.i));
+  if(cand.length){const n=cand[rand(0,cand.length-1)];n.type=type;return n;}
+  return null;
+ };
+ rowNodes(11)[0].type='boss';
+ for(const n of rowNodes(4))n.type='elite';
+ for(const n of rowNodes(8))n.type='elite';
+ setOne(3,'shop');setOne(9,'shop');
+ setOne(6,'rest');setOne(10,'rest');
+ setOne(rand(2,3)===2?2:5,'forge')||setOne(2,'forge')||setOne(5,'forge');
+ setOne(rand(6,7),'elite'); /* 선택 정예 → 2회 확정 + 최대 3회 */
+ let ev=0;
+ for(const r of shuffle([1,2,5,7,10,3,9])){if(ev>=4)break;if(setOne(r,'event'))ev++;}
+ /* 적 배정 */
+ const usedElite=[];
+ for(const n of nodes){
+  if(n.type==='battle')n.enemy=POOL[n.r<=3?'easy':'mid'][rand(0,2)];
+  if(n.type==='elite'){
+   const remain=POOL.elite.filter(e=>!usedElite.includes(e));
+   n.enemy=(remain.length?remain:POOL.elite)[rand(0,(remain.length?remain:POOL.elite).length-1)];
+   usedElite.push(n.enemy);
+  }
+  if(n.type==='boss')n.enemy='m42';
+ }
+ return nodes;
+}
+const NODE_ICON={battle:'⚔',elite:'☠',shop:'✧',rest:'♨',forge:'⚒',event:'?',boss:'★'};
+const NODE_NAME={battle:'전투',elite:'중간보스',shop:'상점',rest:'휴식',forge:'대장간',event:'이벤트',boss:'보스'};
+
+function availables(){
+ if(R.pos<0)return R.map.filter(n=>n.r===0).map(n=>n.i);
+ return R.map[R.pos].edges;
+}
+function showMap(){
+ $('app').style.display='none';$('mapScr').style.display='flex';
+ $('dustTagM').textContent=`✧ 별빛 가루 ${R.dust}`;
+ $('hpTagM').textContent=`♥ HP ${R.hp}/${R.maxHp}`;
+ $('relicRowM').innerHTML=R.relics.map(k=>`<span class="relic" title="${RELICS[k].d}">${RELICS[k].n}</span>`).join('');
+ const ROWH=96,W=640,H=12*ROWH+40;
+ $('mapInner').style.height=H+'px';
+ const xy=n=>[110+n.c*210,H-40-n.r*ROWH];
+ const av=availables();
+ let svg='';
+ for(const n of R.map)for(const t of n.edges){
+  const [x1,y1]=xy(n),[x2,y2]=xy(R.map[t]);
+  const on=(n.i===R.pos&&av.includes(t))||n.visited&&R.map[t].visited;
+  svg+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${on?'#ffd76a':'#2c3760'}" stroke-width="${on?2:1.2}" stroke-dasharray="4 4"/>`;
+ }
+ $('mapSvg').setAttribute('viewBox',`0 0 ${W} ${H}`);
+ $('mapSvg').style.height=H+'px';$('mapSvg').style.width='100%';
+ $('mapSvg').innerHTML=svg;
+ document.querySelectorAll('.mapnode').forEach(e=>e.remove());
+ for(const n of R.map){
+  const [x,y]=xy(n);
+  const d=document.createElement('div');
+  d.className='mapnode'+(n.type==='elite'||n.type==='boss'?' elite':'')+(n.i===R.pos?' here':av.includes(n.i)?' avail':n.visited?' past':'');
+  d.style.left=x+'px';d.style.top=y+'px';
+  d.innerHTML=`<b>${NODE_ICON[n.type]}</b>${NODE_NAME[n.type]}`;
+  if(av.includes(n.i))d.onclick=()=>enterNode(n.i);
+  $('mapInner').appendChild(d);
+ }
+ const cy=R.pos>=0?xy(R.map[R.pos])[1]:H;
+ $('mapWrap').scrollTop=Math.max(0,cy-$('mapWrap').clientHeight+120);
+}
+function enterNode(i){
+ const n=R.map[i];R.pos=i;n.visited=true;
+ if(n.type==='battle'||n.type==='elite'||n.type==='boss'){showBattle(n.enemy);}
+ else if(n.type==='shop')showShop();
+ else if(n.type==='rest')showRest();
+ else if(n.type==='forge')showForge();
+ else if(n.type==='event')showEvent();
+}
+function showBattle(eid){
+ $('mapScr').style.display='none';$('app').style.display='flex';
+ startBattle(eid);
+}
+function backToMap(){$('rewardOvl').classList.remove('show');showMap();}
+
+/* ═══════════ 전투 ═══════════ */
+function startBattle(eid){
+ const enc=ENEMIES[eid];over=false;
+ E={...enc,id:eid,hp:enc.hp,maxHp:enc.hp,block:0,poison:0,weak:0,vuln:0,str:0,pi:0,_t:0,
+    aegis:enc.aegis||0};
+ for(const en of R.deck)en._ramp=0;
+ S={mana:3,block:0,thorns:0,counter:0,str:0,weak:0,hand:[],drawPile:shuffle([...R.deck]),discard:[],vanished:[],
+    turnCounts:{},doneTurn:{},risen:{},flags:{},crisisSaid:false,skyDots:{},
+    atkPlayed:0,nonAtkPlayed:0,skillTurnUsed:false,skillBattleUsed:{},
+    nextAtkTwice:false,next:{},keepBlock:false,sealNext:0,conSealNext:false,conSealed:null,_first:true};
+ logs=[];$('skysvg').innerHTML='';
+ $('stageTag').textContent=NODE_NAME[R.map?R.map[R.pos].type:'battle']||'';
+ $('enemySprite').className=enc.cls;
+ $('enemyAbility').textContent='◈ '+enc.ability;
+ log(`<b>${enc.name}</b> 등장!`);
+ allyBark('start');
+ if(hasRelic('corona')){S.thorns+=2;log('코로나 — 가시 2');}
+ startTurn();
+}
+function startTurn(){
+ S.mana=3;
+ if(S.keepBlock)S.keepBlock=false;else S.block=0;
+ S.counter=0;
+ S.turnCounts={};S.doneTurn={};S.skillTurnUsed=false;S.atkPlayed=0;S.nonAtkPlayed=0;S.nextAtkTwice=false;S._consDone=0;
+ for(const c in S.risen){const B=CONS[c].bonus;if(B.turnFx)applyFx(B.turnFx,`성좌 「${CONS[c].name}」`);}
+ if(S.next.block){S.block+=S.next.block;log(`예비 성막 ${S.next.block}`);}
+ if(S.next.mana){S.mana+=S.next.mana;log(`예비 물질 ${S.next.mana}`);}
+ const extra=(S.next.draw||0)+(S._first&&hasRelic('telescope')?2:0);
+ if(S._first&&hasRelic('vanallen')){S.block+=6;log('밴앨런대 — 성막 6');}
+ S.next={};S._first=false;
+ /* 성좌 봉인 적용 */
+ S.conSealed=null;
+ if(S.conSealNext){
+  const cons=[...new Set(R.deck.map(en=>STARS[en.id].con))];
+  S.conSealed=cons[rand(0,cons.length-1)];S.conSealNext=false;
+  log(`흐린 하늘 — 이번 턴 ${CONS[S.conSealed].name} 완성 불가`);
+ }
+ draw(5+extra);
+ /* 손패 봉인 적용 */
+ if(S.sealNext>0){
+  const cand=S.hand.filter(en=>!en._sealed);
+  for(let i=0;i<S.sealNext&&cand.length;i++){
+   const en=cand.splice(rand(0,cand.length-1),1)[0];
+   en._sealed=true;log(`${stripTags(cardName(en.id))} 봉인됨!`);
+  }
+  S.sealNext=0;
+ }
+ renderAll();
+}
+function draw(n){
+ for(let i=0;i<n;i++){
+  if(!S.drawPile.length){if(!S.discard.length)break;S.drawPile=shuffle(S.discard);S.discard=[];}
+  if(S.hand.length>=10)break;
+  S.hand.push(S.drawPile.pop());
+ }
+}
+
+/* ── 피해·효과 ── */
+function afterEnemyHurt(){
+ if(!E)return;
+ if(E.rage&&!E._raged&&E.hp>0&&E.hp<=E.maxHp/2){E._raged=1;E.str+=E.rage;log(`전의 — ${E.name.split(' ')[0]} 공격 +${E.rage}!`);}
+ if(E.phase2&&!E._p2&&E.hp>0&&E.hp<=E.maxHp/2){E._p2=1;E.str+=3;E.pattern=E.pattern2;E.pi=0;banner('격노!','장막이 붉게 물든다');log('M42가 격노한다!');}
+}
+function dealDmg(base,pierce){
+ let n=base+S.str;
+ if(S.weak)n=Math.floor(n*0.75);
+ if(E.vuln)n=Math.floor(n*1.5);
+ if(E.aegis>0)n=Math.max(0,n-E.aegis);
+ if(!pierce&&E.block>0){const b=Math.min(E.block,n);E.block-=b;n-=b;}
+ E.hp=Math.max(0,E.hp-n);
+ float(n,'#ffd76a');
+ afterEnemyHurt();
+ return n;
+}
+function applyFx(fx,src,en){
+ /* 피해 계열 */
+ if(fx.dmg!=null){
+  let base=fx.dmg;
+  if(fx.rampSelf&&en)base+=en._ramp||0;
+  if(fx.perAtkPlayed)base+=fx.perAtkPlayed*S.atkPlayed;
+  const h=fx.hits||1;
+  const swing=()=>{let tot=0;for(let i=0;i<h;i++)tot+=dealDmg(base,fx.pierce);return tot;};
+  let tot=swing();
+  let again=false;
+  if(fx.againIfPoison&&E.poison>0)again=true;
+  if(fx.pairCon&&en&&(S.turnCounts[STARS[en.id].con]||0)>=1)again=true;
+  if(again&&E.hp>0){tot+=swing();log(`${src} — 한 번 더!`);}
+  log(`${src} — 피해 ${tot}`);
+  if(fx.rampSelf&&en)en._ramp=(en._ramp||0)+fx.rampSelf;
+ }
+ if(fx.dmgEqBlock){const d=dealDmg(S.block,false);log(`${src} — 성막의 무게! 피해 ${d}`);}
+ if(fx.randDmg){const v=rand(fx.randDmg[0],fx.randDmg[1]);const d=dealDmg(v,fx.pierce);log(`${src} — 변광! 피해 ${d}`);
+  if(fx.jackpot&&v>=fx.randDmg[1]-2){draw(1);log(`${src} — 대박! 카드 1장`);}}
+ /* 방어·버프 계열 */
+ if(fx.block)S.block+=fx.block;
+ if(fx.randBlock){const v=rand(fx.randBlock[0],fx.randBlock[1]);S.block+=v;log(`${src} — 성막 ${v}`);}
+ if(fx.doubleBlock){S.block*=2;log(`${src} — 성막 2배!`);}
+ if(fx.counter)S.counter+=fx.counter;
+ if(fx.keepBlock)S.keepBlock=true;
+ if(fx.poison)E.poison+=fx.poison;
+ if(fx.doublePoison){E.poison*=2;log(`${src} — 중독 ${E.poison}(2배)!`);}
+ if(fx.vuln)E.vuln+=fx.vuln;
+ if(fx.weak)E.weak+=fx.weak;
+ if(fx.thorns)S.thorns+=fx.thorns;
+ if(fx.str)S.str+=fx.str;
+ /* 손패·자원 계열 */
+ if(fx.handRedraw){const n=S.hand.length;for(const x of S.hand)x._sealed=false;S.discard.push(...S.hand);S.hand=[];draw(n);log(`${src} — 손패를 새로 폅니다`);}
+ if(fx.draw)draw(fx.draw);
+ if(fx.mana)S.mana+=fx.mana;
+ if(fx.heal)R.hp=Math.min(R.maxHp,R.hp+fx.heal);
+ if(fx.nextTurn){S.next.draw=(S.next.draw||0)+(fx.nextTurn.draw||0);S.next.block=(S.next.block||0)+(fx.nextTurn.block||0);S.next.mana=(S.next.mana||0)+(fx.nextTurn.mana||0);}
+ if(fx.nextAtkTwice)S.nextAtkTwice=true;
+ /* 조건부 추가 효과 */
+ if(fx.cond&&fx.cond.fx){
+  const c=fx.cond;let ok=false;
+  if(c.t==='enemyBlock')ok=E.block>0;
+  if(c.t==='enemyDebuff')ok=(E[c.k]||0)>0;
+  if(c.t==='balanced'){
+   const cur=en?STARS[en.id].type==='공격':false;
+   ok=(S.atkPlayed+(cur?1:0))>0&&(S.nonAtkPlayed+(cur?0:1))>0;
+  }
+  if(ok){applyFx(c.fx,src,en);log(`${src} — 조건 발동!`);}
+ }
+}
+function canPlay(en){
+ if(en._sealed)return false;
+ if(costOf(en)>S.mana)return false;
+ for(const f of cardFx(en))if(f.cond&&f.cond.t==='allAtkOnly'&&!S.hand.every(x=>STARS[x.id].type==='공격'))return false;
+ return true;
+}
+function playCard(i){
+ if(over)return;
+ const en=S.hand[i];if(en==null)return;
+ if(!canPlay(en)){$('manaOrb').classList.remove('shake');void $('manaOrb').offsetWidth;$('manaOrb').classList.add('shake');return;}
+ S.mana-=costOf(en);
+ S.hand.splice(i,1);
+ const isAtk=STARS[en.id].type==='공격';
+ const fxl=cardFx(en);
+ const vanish=fxl.some(f=>f.vanish);
+ if(vanish)S.vanished.push(en);else S.discard.push(en);
+ en._sealed=false;
+ const src=stripTags(cardName(en.id))+(en.id2?'·'+stripTags(cardName(en.id2)):'');
+ let times=1;
+ if(isAtk&&S.nextAtkTwice){times=2;S.nextAtkTwice=false;log('폴룩스의 짝 — 2번 발동!');}
+ for(let t=0;t<times;t++)for(const f of fxl)applyFx(f,src,en);
+ if(isAtk)S.atkPlayed++;else S.nonAtkPlayed++;
+ addSkyDot(STARS[en.id].con);
+ S.turnCounts[STARS[en.id].con]=(S.turnCounts[STARS[en.id].con]||0)+countAs(en);
+ checkCons(STARS[en.id].con);
+ renderAll();
+ if(E.hp<=0)win();
+}
+function checkCons(c){
+ const C=CONS[c],B=C.bonus;
+ if(S.turnCounts[c]<C.need||S.doneTurn[c])return;
+ if(S.conSealed===c){log(`흐린 하늘 — ${C.name}가 봉인되어 완성되지 않는다`);return;}
+ S.doneTurn[c]=true;
+ S._consDone=(S._consDone||0)+1;
+ if(S._consDone===1&&hasRelic('armillary')){S.mana+=1;log('혼천의 — 물질 1');}
+ if(E.aegis>0){E.aegis=Math.max(0,E.aegis-2);log(`일곱 자매의 가호가 흔들린다! (남은 ${E.aegis})`);}
+ if(B.mode==='passive'){
+  if(S.risen[c])return;
+  S.risen[c]=true;
+  drawConLines(c);
+  banner(`✦ ${C.name} 떠오름!`,`${C.idn} — ${B.label} (지속)`);
+  if(B.onceFx)applyFx(B.onceFx,`성좌 「${C.name}」`);
+  if(B.flag)S.flags[B.flag]=true;
+  log(`성좌 「${C.name}」 떠오름 — ${B.label}`);
+ }else{
+  drawConLines(c);
+  banner(`✦ ${C.name} 완성!`,`${C.idn} — ${stripTags(fxText(B.fx))}`);
+  applyFx(B.fx,`성좌 「${C.name}」`);
+ }
+ allyBark('con');
+ if(E.hp<=0){renderAll();win();}
+}
+
+/* ── 영능·소모품 ── */
+function useSkill(key){
+ if(over||S.skillTurnUsed)return;
+ const sk=activeSkills().find(x=>x.key===key);if(!sk)return;
+ const def=sk.def;
+ if(def.per==='battle'&&S.skillBattleUsed[key])return;
+ if(def.plus){
+  const c=ptolemyTarget();
+  if(!c){log('오늘은 더 이을 별자리가 없군.');return;}
+  S.skillTurnUsed=true;S.skillBattleUsed[key]=true;
+  S.turnCounts[c]=(S.turnCounts[c]||0)+def.plus;
+  addSkyDot(c);
+  log(`「${def.s}」 — ${CONS[c].name} +1성`);
+  checkCons(c);
+  if(def.after&&!over)def.after();
+ }else{
+  S.skillTurnUsed=true;
+  if(def.per==='battle')S.skillBattleUsed[key]=true;
+  def.run();
+  log(`「${def.s}」!`);
+ }
+ renderAll();
+ if(E.hp<=0&&!over)win();
+}
+function ptolemyTarget(){
+ const cands=new Set(Object.keys(S.turnCounts).filter(c=>S.turnCounts[c]>0));
+ S.hand.forEach(en=>cands.add(STARS[en.id].con));
+ let best=null,bs=-1;
+ for(const c of cands){
+  if(S.doneTurn[c])continue;
+  if(S.conSealed===c)continue;
+  if(CONS[c].bonus.mode==='passive'&&S.risen[c])continue;
+  const sc=(S.turnCounts[c]||0)/CONS[c].need;
+  if(sc>bs){bs=sc;best=c;}
+ }
+ return best;
+}
+function useItem(i){
+ if(over||!S)return;
+ const k=R.items[i];if(!k)return;
+ R.items.splice(i,1);
+ ITEMS[k].run();
+ log(`${ITEMS[k].n} 사용!`);
+ renderAll();
+ if(E.hp<=0&&!over)win();
+}
+function allyBark(t){
+ if(!R.allies.length)return;
+ const p={start:.6,con:.3,crisis:1}[t];
+ if(Math.random()>p)return;
+ const k=R.allies[Math.floor(Math.random()*R.allies.length)];
+ const arr=ALLIES[k].bark[t];
+ log(`💬 ${ALLIES[k].n}: "${arr[Math.floor(Math.random()*arr.length)]}"`);
+}
+
+/* ── 밤하늘 ── */
+function addSkyDot(c){
+ const [cx,cy]=CONS[c].sky;
+ const x=cx+(Math.random()*10-5),y=cy+(Math.random()*8-4);
+ (S.skyDots[c]=S.skyDots[c]||[]).push([x,y]);
+ const s=document.createElementNS('http://www.w3.org/2000/svg','circle');
+ s.setAttribute('cx',x);s.setAttribute('cy',y);s.setAttribute('r',.7);
+ s.setAttribute('fill','#fff');s.setAttribute('opacity','.9');
+ $('skysvg').appendChild(s);
+}
+function drawConLines(c){
+ const pts=S.skyDots[c]||[];if(pts.length<2)return;
+ const p=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+ p.setAttribute('points',pts.map(q=>q.join(',')).join(' '));
+ p.setAttribute('fill','none');p.setAttribute('stroke','#ffd76a');
+ p.setAttribute('stroke-width','.35');p.setAttribute('opacity','.85');
+ $('skysvg').appendChild(p);
+}
+let bannerT=null;
+function banner(t,sub){
+ const b=$('banner');b.innerHTML=`${t}<small>${sub||''}</small>`;
+ b.classList.add('show');clearTimeout(bannerT);
+ bannerT=setTimeout(()=>b.classList.remove('show'),2200);
+}
+function float(n,clr){
+ const sp=$('enemySprite');if(!sp||!sp.offsetParent)return;
+ const r=sp.getBoundingClientRect(),f=document.createElement('div');
+ f.className='num';f.textContent=n;f.style.color=clr;f.style.position='fixed';
+ f.style.left=(r.right+10+Math.random()*50)+'px';f.style.top=(r.top+10+Math.random()*30)+'px';
+ document.body.appendChild(f);setTimeout(()=>f.remove(),1000);
+}
+
+/* ── 적 턴 ── */
+function nightBonus(){return E&&E.nightAt?Math.max(0,(E._t+1)-E.nightAt+1):0;}
+function endTurn(){
+ if(over)return;
+ for(const x of S.hand)x._sealed=false;
+ S.discard.push(...S.hand);S.hand=[];
+ enemyTurn();
+ if(over)return;
+ if(S.weak)S.weak--;
+ startTurn();
+}
+function enemyTurn(){
+ E.block=E.autoBlock||0;
+ if(E.autoBlock)log(`얼음 갑주 — 성막 ${E.autoBlock}`);
+ if(E.poison>0){
+  E.hp=Math.max(0,E.hp-E.poison);
+  log(`중독 — 피해 ${E.poison}`);
+  if(!S.flags.poisonKeep)E.poison--;
+  afterEnemyHurt();
+  if(E.hp<=0){renderAll();win();return;}
+ }
+ const act=E.pattern[E.pi];
+ if(act.atk!=null){
+  const h=act.hits||1;let tot=0,stolen=0;
+  for(let i=0;i<h;i++){
+   let n=act.atk+E.str+nightBonus();
+   if(E.weak)n=Math.floor(n*0.75);
+   const b=Math.min(S.block,n);S.block-=b;stolen+=b;const hit=n-b;
+   R.hp=Math.max(0,R.hp-hit);tot+=hit;
+   const ret=S.thorns+S.counter;
+   if(ret>0){E.hp=Math.max(0,E.hp-ret);afterEnemyHurt();}
+  }
+  log(`${act.label||'공격'} — 피해 ${tot}${(S.thorns+S.counter)?` (반격 ${(S.thorns+S.counter)*h})`:''}`);
+  if(E.blockSteal&&stolen>0){E.block+=Math.floor(stolen/2);log(`성막 흡수 — ${Math.floor(stolen/2)}`);}
+  document.body.classList.remove('shake');void document.body.offsetWidth;
+  if(tot>0)document.body.classList.add('shake');
+  if(R.hp>0&&R.hp<=21&&!S.crisisSaid){S.crisisSaid=true;allyBark('crisis');}
+ }
+ if(act.blk){E.block+=act.blk;log(`${E.name.split(' ')[0]} — 성막 ${act.blk}`);}
+ if(act.weakP){S.weak+=act.weakP;log(`약화 ${act.weakP} 부여받음`);}
+ if(act.seal)S.sealNext=(S.sealNext||0)+act.seal;
+ if(act.conSeal)S.conSealNext=true;
+ if(act.pulsar){E.block+=S.block;log(`펄서 파동 — 내 성막 ${S.block}이 흡수됐다!`);S.block=0;}
+ if(act.charge)log(`${act.charge}…`);
+ E.pi=(E.pi+1)%E.pattern.length;
+ E._t++;
+ if(E.accel&&E._t%E.accel===0){E.str+=1;log(`가속 — ${E.name.split(' ')[0]} 공격 +1`);}
+ if(E.weak)E.weak--;if(E.vuln)E.vuln--;
+ if(E.hp<=0){renderAll();win();return;}
+ if(R.hp<=0){lose();return;}
+ renderAll();
+}
+
+/* ── 렌더 ── */
+function intentTxt(){
+ const act=E.pattern[E.pi];const parts=[];
+ if(act.atk!=null){
+  let n=act.atk+E.str+nightBonus();if(E.weak)n=Math.floor(n*0.75);
+  parts.push(`⚔ 공격 ${n}${(act.hits||1)>1?`×${act.hits}`:''}`);
+ }
+ if(act.blk)parts.push(`🛡 성막 ${act.blk}`);
+ if(act.weakP)parts.push(`☁ 약화 ${act.weakP}`);
+ if(act.seal)parts.push(`⛓ 손패 봉인`);
+ if(act.conSeal)parts.push(`🌫 별자리 봉인`);
+ if(act.pulsar)parts.push(`🌀 성막 흡수`);
+ if(act.charge)parts.push(`⚡ ${act.charge}`);
+ const nb=nightBonus();
+ let tail='';
+ if(nb>0)tail=` · 🌙 깊은 밤 +${nb}`;
+ else if(E.nightAt&&(E._t+1)>=E.nightAt-2)tail=' · 🌙 깊은 밤 임박';
+ return '다음 의도: '+parts.join(' + ')+tail;
+}
+function chips(o){
+ const c=[];
+ if(o.block)c.push(`<span class="chip good">성막 ${o.block}</span>`);
+ if(o.aegis)c.push(`<span class="chip good">가호 ${o.aegis}</span>`);
+ if(o.poison)c.push(`<span class="chip bad">중독 ${o.poison}${S&&S.flags.poisonKeep?'∞':''}</span>`);
+ if(o.weak)c.push(`<span class="chip bad">약화 ${o.weak}</span>`);
+ if(o.vuln)c.push(`<span class="chip bad">취약 ${o.vuln}</span>`);
+ if(o.str)c.push(`<span class="chip good">힘 ${o.str}</span>`);
+ if(o.thorns)c.push(`<span class="chip good">가시 ${o.thorns}</span>`);
+ if(o.counter)c.push(`<span class="chip good">반격 ${o.counter}</span>`);
+ return c.join('');
+}
+function cardHTML(en,opts){
+ opts=opts||{};
+ const d=STARS[en.id],C=CONS[d.con];
+ const frame=en.id2?' mergeframe':(en.up?' upframe':'');
+ const chip=en.id2?'<span class="cchip merge">쌍성</span>':(en.up?'<span class="cchip up">+</span>':'');
+ const name=cardName(en.id)+(en.id2?`<br>+ ${cardName(en.id2)}`:'');
+ const cls=(opts.cls||'')+frame;
+ return `<div class="card${cls}" style="--gc:${GRADE_CLR[d.rank]}" ${opts.attr||''}>
+  <div class="ccost">${costOf(en)}</div>${chip}
+  <div class="cname">${name}</div>
+  <div class="ctype">${d.type} · ${GRADE_NAME[d.rank]}${en.basic?' · 기본':''}</div>
+  <div class="cfx"><span>${cardText(en)}</span></div>
+  <div class="ccon">★ ${C.name.replace('자리','')} +${countAs(en)} <span style="color:#767f9c">(${C.need}성 → ${C.idn}${C.bonus.mode==='passive'?'·지속':''})</span></div>
+  <div class="clore">${d.lore}</div>
+ </div>`;
+}
+function renderAll(){
+ if(!S||!E)return;
+ $('dustTag').textContent=`✧ ${R.dust}`;
+ $('relicRow').innerHTML=R.relics.map(k=>`<span class="relic" title="${RELICS[k].d}">${RELICS[k].n}</span>`).join('');
+ $('enemyName').textContent=E.name;
+ $('enemyIntent').textContent=intentTxt();
+ $('ehp').style.width=(E.hp/E.maxHp*100)+'%';
+ $('ehpTxt').textContent=`HP ${E.hp} / ${E.maxHp}`;
+ $('echips').innerHTML=chips(E);
+ $('manaOrb').textContent=S.mana;
+ $('pstats').innerHTML=`별지기 HP <b>${R.hp}</b>/${R.maxHp} · 성막 <b>${S.block}</b>`;
+ $('pchips').innerHTML=chips({weak:S.weak,str:S.str,thorns:S.thorns,counter:S.counter});
+ $('piles').innerHTML=`뽑을 카드 ${S.drawPile.length}<br>버린 카드 ${S.discard.length}${S.vanished.length?`<br>소멸 ${S.vanished.length}`:''}`;
+ $('itemRow').innerHTML=R.items.map((k,i)=>
+  `<button class="itembtn${over?' off':''}" onclick="useItem(${i})" title="${ITEMS[k].d}">${ITEMS[k].n}</button>`).join('');
+ $('skillRow').innerHTML=activeSkills().map(sk=>{
+  const def=sk.def;
+  const spent=def.per==='battle'&&S.skillBattleUsed[sk.key];
+  const dis=S.skillTurnUsed||spent||over;
+  return `<button class="skillbtn${dis?' off':''}" onclick="useSkill('${sk.key}')" title="${stripTags(def.desc)} (${def.per==='battle'?'전투당 1회':'턴당 1회'})">
+   <b>${def.s}</b><span>${sk.label} · ${spent?'사용함':def.per==='battle'?'전투 1회':'턴 1회'}</span></button>`;
+ }).join('');
+ const consInPlay=[...new Set(R.deck.map(en=>STARS[en.id].con))];
+ $('tracker').innerHTML=consInPlay.map(c=>{
+  const C=CONS[c],n=S.turnCounts[c]||0;
+  const sealed=S.conSealed===c;
+  const up=S.risen[c]||S.doneTurn[c];
+  const cls=sealed?'sealed':(up?'done':(n===C.need-1?'ready':''));
+  return `<span class="trk ${cls}" title="${C.idn} — ${bonusText(C.bonus)}${C.bonus.mode==='passive'?' (지속)':''}">${C.name.replace('자리','')} <b>${Math.min(n,C.need)}/${C.need}</b>${sealed?' 🔒':S.risen[c]?' ✦떠오름':S.doneTurn[c]?' ✦':''}</span>`;
+ }).join('');
+ $('hand').innerHTML=S.hand.map((en,i)=>{
+  const d=STARS[en.id],C=CONS[d.con];
+  const un=en._sealed?' sealedcard':(!canPlay(en)?' unplayable':'');
+  const wf=((S.turnCounts[d.con]||0)>=C.need-countAs(en)&&!S.doneTurn[d.con]&&!S.risen[d.con]&&S.conSealed!==d.con)?' willfinish':'';
+  return cardHTML(en,{cls:un+wf,attr:`onclick="playCard(${i})"`});
+ }).join('');
+}
+
+/* ═══════════ 승리·보상 ═══════════ */
+function win(){
+ if(over)return;over=true;
+ if(E.deathBurst){
+  const d=E.deathBurst,b=Math.min(S.block,d);
+  S.block-=b;R.hp=Math.max(0,R.hp-(d-b));
+  log(`임종 폭발 — 피해 ${d-b}`);renderAll();
+  if(R.hp<=0){lose();return;}
+ }
+ banner('승리!','');
+ R.wins++;
+ setTimeout(()=>{
+  if(E.boss){clearRun();return;}
+  R.dust+=E.dust;
+  if(E.tier==='elite'){
+   const un=Object.keys(RELICS).filter(k=>!hasRelic(k));
+   if(un.length){const k=un[rand(0,un.length-1)];R.relics.push(k);log(`유물 획득 — ${RELICS[k].n}`);}
+  }
+  showAllyPick(false,showReward);
+ },900);
+}
+let allyCb=null;
+function showAllyPick(initial,cb){
+ const remaining=Object.keys(ALLIES).filter(k=>!R.allies.includes(k));
+ if(!remaining.length){cb();return;}
+ allyCb=cb;
+ $('rewardPanel').innerHTML=`<h2>${initial?'함께 떠날 조력자를 고르세요':'조력자가 합류합니다 — 한 명을 맞이하세요'}</h2>
+  <p>영능은 무료입니다. 2인부터는 단독 영능 대신 <b>두 사람의 시너지 스킬</b>이 생기고, 어느 스킬이든 <b>턴당 1회만</b> 쓸 수 있습니다.</p>
+  <div class="optRow">${remaining.map(k=>{
+   const A=ALLIES[k];
+   return `<div class="conOpt" onclick="pickAlly('${k}')"><b>${A.n}</b>
+    <div class="idn">「${A.s}」 · ${A.per==='battle'?'전투당 1회':'턴당 1회'}</div>
+    <div class="own">${A.desc}</div></div>`;
+  }).join('')}</div>`;
+ $('rewardOvl').classList.add('show');
+}
+window.pickAlly=function(k){
+ if(R.allies.includes(k))return;
+ R.allies.push(k);
+ $('rewardOvl').classList.remove('show');
+ const cb=allyCb;allyCb=null;
+ if(cb)cb();
+};
+function showReward(){
+ const owned=[...new Set(R.deck.map(en=>STARS[en.id].con))];
+ const all=Object.keys(CONS);
+ const ownPick=shuffle(owned.slice()).slice(0,2);
+ const rest=shuffle(all.filter(c=>!ownPick.includes(c)));
+ const opts=[...ownPick,...rest].slice(0,3);
+ $('rewardPanel').innerHTML=`<h2>전투 보상 — 별자리를 고르세요</h2>
+  <p>별빛 가루 +${E.dust}${E.tier==='elite'?' · 유물 획득!':''} 고른 별자리에서 별 3개가 떠오릅니다. 담고 싶은 만큼만 담으세요.</p>
+  <div class="optRow">${opts.map(c=>{
+   const C=CONS[c],own=R.deck.filter(en=>STARS[en.id].con===c).length;
+   return `<div class="conOpt" onclick="pickCon('${c}')"><b>${C.name}</b>
+    <div class="idn">${C.idn} — ${C.idnDesc} (${C.need}성${C.bonus.mode==='passive'?'·지속':''})</div>
+    <div class="own">보유 ${own}장</div></div>`;
+  }).join('')}</div>
+  <button class="btn ghost" onclick="backToMap()">보상 건너뛰기</button>`;
+ $('rewardOvl').classList.add('show');
+}
+let offer=[],picked=[];
+window.pickCon=function(c){
+ const pool=Object.keys(STARS).filter(id=>STARS[id].con===c);
+ offer=[];picked=[];
+ for(let i=0;i<3;i++){
+  const tot=pool.reduce((s,id)=>s+GRADE_W[STARS[id].rank],0);
+  let r=Math.random()*tot,pick=pool[0];
+  for(const id of pool){r-=GRADE_W[STARS[id].rank];if(r<=0){pick=id;break;}}
+  offer.push(pick);
+ }
+ $('rewardPanel').innerHTML=`<h2>${CONS[c].name}의 별들</h2>
+  <p>담을 별을 클릭하세요 (0~3장). 덱이 얇을수록 성좌는 빨리 이어집니다.</p>
+  <div class="optRow">${offer.map((id,i)=>
+   cardHTML({id},{cls:' pick',attr:`id="of${i}" onclick="togglePick(${i})"`})).join('')}</div>
+  <button class="btn" onclick="confirmPick()">담기</button>
+  <button class="btn ghost" onclick="confirmPick(true)">하나도 안 담기</button>`;
+};
+window.togglePick=function(i){
+ const k=picked.indexOf(i);
+ if(k>=0)picked.splice(k,1);else picked.push(i);
+ $('of'+i).classList.toggle('picked',k<0);
+};
+window.confirmPick=function(skip){
+ if(!skip)picked.forEach(i=>R.deck.push({id:offer[i]}));
+ backToMap();
+};
+
+/* ═══════════ 상점 ═══════════ */
+let shopOffer=[],shopRelic=null,shopPotions=null;
+function price(p){return hasRelic('messier')?Math.ceil(p*0.8):p;}
+function showShop(){
+ shopOffer=[wpickStar(),wpickStar(),wpickStar()];
+ const un=Object.keys(RELICS).filter(k=>!hasRelic(k));
+ shopRelic=un.length?un[rand(0,un.length-1)]:null;
+ shopPotions=shuffle(Object.keys(ITEMS)).slice(0,2);
+ renderShop();
+ $('rewardOvl').classList.add('show');
+}
+function renderShop(){
+ $('rewardPanel').innerHTML=`<h2>상점 — ✧ 별빛 가루 ${R.dust}${hasRelic('messier')?' <small style="color:#8fd3ff">(메시에 목록 20% 할인)</small>':''}</h2>
+  <p>별을 사거나, <b>기본 카드</b>(시작 덱)를 지워 덱을 얇게 만드세요.</p>
+  <div class="optRow">${shopOffer.map((id,i)=>{
+   if(!id)return `<div class="conOpt" style="opacity:.35;cursor:default"><b>판매 완료</b></div>`;
+   const pr=price(PRICE[STARS[id].rank]),ok=R.dust>=pr;
+   return `<div style="display:flex;flex-direction:column;align-items:center;gap:5px">`+
+    cardHTML({id},{cls:ok?' pick':'',attr:`${ok?`onclick="buyCard(${i})"`:'style="opacity:.45"'}`})+
+    `<div style="font-size:12px;color:#ffe9b0">✧ ${pr}</div></div>`;
+  }).join('')}</div>
+  <div class="optRow">
+   ${shopRelic?`<div class="conOpt" ${R.dust>=price(85)?`onclick="buyRelic()"`:'style="opacity:.4;cursor:default"'}><b>${RELICS[shopRelic].n}</b><div class="own">${RELICS[shopRelic].d}</div><div class="idn">✧ ${price(85)}</div></div>`:''}
+   ${shopPotions.map((k,i)=>`<div class="conOpt" ${R.dust>=price(25)&&R.items.length<3?`onclick="buyPotion(${i})"`:'style="opacity:.4;cursor:default"'}><b>${ITEMS[k].n}</b><div class="own">${ITEMS[k].d}</div><div class="idn">✧ ${price(25)} · 소모품</div></div>`).join('')}
+  </div>
+  <button class="btn ghost" ${R.dust>=price(50)?'':'disabled'} onclick="openRemove()">지우기 서비스 — 기본 카드 1장 (✧ ${price(50)})</button>
+  <button class="btn" id="shopLeave" onclick="backToMap()">떠나기</button>`;
+}
+window.buyCard=function(i){
+ const id=shopOffer[i];if(!id)return;
+ const pr=price(PRICE[STARS[id].rank]);if(R.dust<pr)return;
+ R.dust-=pr;R.deck.push({id});shopOffer[i]=null;renderShop();
+};
+window.buyRelic=function(){
+ if(!shopRelic||R.dust<price(85))return;
+ R.dust-=price(85);R.relics.push(shopRelic);shopRelic=null;renderShop();
+};
+window.buyPotion=function(i){
+ const k=shopPotions[i];
+ if(!k||R.dust<price(25)||R.items.length>=3)return;
+ R.dust-=price(25);R.items.push(k);shopPotions.splice(i,1);renderShop();
+};
+window.openRemove=function(){
+ if(R.dust<price(50))return;
+ $('rewardPanel').innerHTML=`<h2>지우기 — 기본 카드를 고르세요 (✧ ${price(50)})</h2>
+  <p>시작 덱의 기본 카드만 지울 수 있습니다. 흐린 카드는 여정에서 새로 담은 별입니다.</p>
+  <div class="optRow">${R.deck.map((en,i)=>
+   cardHTML(en,{cls:en.basic?' pick':'',attr:en.basic?`onclick="removeCard(${i})"`:'style="opacity:.3"'})).join('')}</div>
+  <button class="btn ghost" onclick="renderShop()">돌아가기</button>`;
+};
+window.removeCard=function(i){
+ const en=R.deck[i];
+ if(R.dust<price(50)||!en||!en.basic)return;
+ R.dust-=price(50);R.deck.splice(i,1);renderShop();
+};
+
+/* ═══════════ 휴식 ═══════════ */
+function showRest(){
+ const heal=18+(hasRelic('pendulum')?10:0);
+ $('rewardPanel').innerHTML=`<h2>♨ 휴식 — 별빛 아래에서</h2>
+  <p>하나를 고르세요.</p>
+  <button class="btn" onclick="doRest()">휴식 — HP ${heal} 회복${hasRelic('pendulum')?' (진자 시계)':''}</button>
+  <button class="btn" onclick="openUpgrade('backToMap')">강화 — 카드 1장</button>
+  <button class="btn ghost" onclick="backToMap()">떠나기</button>`;
+ $('rewardOvl').classList.add('show');
+}
+window.doRest=function(){
+ R.hp=Math.min(R.maxHp,R.hp+18+(hasRelic('pendulum')?10:0));
+ backToMap();
+};
+window.openUpgrade=function(ret,count){
+ upgRemain=count||1;upgReturn=ret;
+ renderUpgrade();
+};
+let upgRemain=1,upgReturn='backToMap';
+function renderUpgrade(){
+ const can=R.deck.map((en,i)=>({en,i})).filter(x=>!x.en.id2&&!x.en.up);
+ $('rewardPanel').innerHTML=`<h2>강화 — 별을 벼립니다 (남은 ${upgRemain}장)</h2>
+  <p>강화는 카드당 1회. 쌍성은 강화할 수 없습니다.</p>
+  <div class="optRow">${R.deck.map((en,i)=>{
+   const ok=!en.id2&&!en.up;
+   return cardHTML(en,{cls:ok?' pick':'',attr:ok?`onclick="doUpgrade(${i})"`:'style="opacity:.3"'});
+  }).join('')}</div>
+  <button class="btn ghost" onclick="window[upgReturn]()">${can.length?'그만두기':'돌아가기'}</button>`;
+ $('rewardOvl').classList.add('show');
+}
+window.doUpgrade=function(i){
+ const en=R.deck[i];
+ if(!en||en.id2||en.up)return;
+ en.up=1;upgRemain--;
+ if(upgRemain>0)renderUpgrade();else window[upgReturn]();
+};
+
+/* ═══════════ 대장간 (쌍성 합성) ═══════════ */
+let forgeFirst=null;
+function showForge(){forgeFirst=null;renderForge();$('rewardOvl').classList.add('show');}
+function renderForge(){
+ $('rewardPanel').innerHTML=`<h2>⚒ 대장간 — 두 별을 하나로</h2>
+  <p>같은 별자리 별 2장을 골라 <b>쌍성</b>으로 벼립니다. 비용은 높은 쪽, 효과는 둘 다, 성좌 <b>2성</b>으로 계산합니다. (방문당 1회)</p>
+  <div class="optRow">${R.deck.map((en,i)=>{
+   const isFirst=forgeFirst===i;
+   const ok=!en.id2&&(forgeFirst===null?true:(i!==forgeFirst&&canMergeWith(R.deck[forgeFirst],en)));
+   return cardHTML(en,{cls:(ok?' pick':'')+(isFirst?' picked':''),attr:ok?`onclick="forgePick(${i})"`:'style="opacity:.3"'});
+  }).join('')}</div>
+  <button class="btn ghost" onclick="backToMap()">떠나기</button>`;
+}
+window.forgePick=function(i){
+ if(forgeFirst===null){forgeFirst=i;renderForge();return;}
+ if(i===forgeFirst){forgeFirst=null;renderForge();return;}
+ const a=R.deck[forgeFirst],b=R.deck[i];
+ if(!canMergeWith(a,b))return;
+ const merged={id:a.id,up:a.up,id2:b.id,up2:b.up};
+ $('rewardPanel').innerHTML=`<h2>⚒ 쌍성 미리보기</h2>
+  <div class="optRow">${cardHTML(merged)}</div>
+  <button class="btn" onclick="forgeConfirm(${forgeFirst},${i})">벼린다</button>
+  <button class="btn ghost" onclick="forgeFirst=null;renderForge()">다시 고르기</button>`;
+};
+window.forgeConfirm=function(ai,bi){
+ const a=R.deck[ai],b=R.deck[bi];
+ const merged={id:a.id,up:a.up,id2:b.id,up2:b.up};
+ R.deck=R.deck.filter((_,x)=>x!==ai&&x!==bi);
+ R.deck.push(merged);
+ backToMap();
+};
+
+/* ═══════════ 이벤트 (하이리스크 하이리턴) ═══════════ */
+const EVENTS=[
+ {id:'supernova',n:'초신성 관측',d:'죽어 가는 별이 마지막으로 타오른다. 가까이서 기록하면 으뜸별의 정수를 얻겠지만, 폭풍이 몸을 태울 것이다.',
+  risk:{t:'HP 12를 잃고 α급 별 1장을 담는다',run(){R.hp-=12;const a=Object.keys(STARS).filter(id=>STARS[id].rank===1);R.deck.push({id:a[rand(0,a.length-1)]});}},
+  safe:{t:'멀리서 바라만 본다',run(){}}},
+ {id:'blackhole',n:'블랙홀의 가장자리',d:'사건의 지평선 근처에 오래된 관측 기구가 떠 있다. 손을 뻗으면 덱의 별 두 개가 빨려 들어갈 것이다.',
+  can:()=>R.deck.length>=7,
+  risk:{t:'무작위 2장을 잃고 유물을 얻는다',run(){for(let i=0;i<2;i++)R.deck.splice(rand(0,R.deck.length-1),1);giveRandomRelic();}},
+  safe:{t:'지나간다',run(){}}},
+ {id:'meteorshow',n:'유성우 속으로',d:'별똥별이 쏟아진다. 한가운데로 뛰어들면 더 많이 주울 수 있다.',
+  risk:{t:'HP 8을 잃고 소모품 2개',run(){R.hp-=8;addItem();addItem();}},
+  safe:{t:'가장자리에서 1개만 줍는다',run(){addItem();}}},
+ {id:'wish',n:'별똥별의 소원',d:'소원을 빌면 가루가 두 배가 된다고 한다. 물론 절반의 밤에는 아무것도 남지 않았다고도 한다.',
+  can:()=>R.dust>0,
+  risk:{t:'별빛 가루 전부를 건다 (50% 두 배 / 50% 소멸)',run(){if(Math.random()<0.5){R.dust*=2;}else R.dust=0;}},
+  safe:{t:'빌지 않는다',run(){}}},
+ {id:'observatory',n:'낡은 관측소',d:'버려진 관측소. 무너진 천장 아래 무언가 반짝인다. 잔해를 파헤치면 다칠 것이다.',
+  risk:{t:'HP 10을 잃고 유물을 얻는다',run(){R.hp-=10;giveRandomRelic();}},
+  safe:{t:'지나간다',run(){}}},
+ {id:'darknebula',n:'어두운 성운',d:'빛을 삼키는 성운. 별 하나를 제물로 바치면 남은 별들이 더 밝게 벼려진다.',
+  can:()=>R.deck.length>=6&&R.deck.some(en=>!en.id2&&!en.up),
+  risk:{t:'무작위 1장을 잃고 카드 2장을 강화한다',run(){R.deck.splice(rand(0,R.deck.length-1),1);openUpgrade('backToMap',2);return true;}},
+  safe:{t:'지나간다',run(){}}},
+ {id:'timedilation',n:'시간 지연',d:'강한 중력 우물 곁을 지나면 지름길이 열린다 — 대신 몸의 시간이 뒤틀린다.',
+  risk:{t:'최대 HP −5, 별빛 가루 80',run(){R.maxHp-=5;R.hp=Math.min(R.hp,R.maxHp);R.dust+=80;}},
+  safe:{t:'돌아서 간다',run(){}}},
+ {id:'binarydance',n:'쌍성의 춤',d:'두 별이 서로를 도는 춤. 끼어들면 내 덱의 같은 별자리 한 쌍이 하나로 묶인다 — 어느 쌍일지는 하늘이 정한다.',
+  can:()=>{const g={};for(const en of R.deck)if(!en.id2){const c=STARS[en.id].con;(g[c]=g[c]||[]).push(en);}return Object.values(g).some(a=>a.length>=2);},
+  risk:{t:'무작위 한 쌍이 즉시 쌍성으로 합성된다',run(){
+   const g={};R.deck.forEach((en,i)=>{if(!en.id2){const c=STARS[en.id].con;(g[c]=g[c]||[]).push(i);}});
+   const pairs=Object.values(g).filter(a=>a.length>=2);
+   const pair=pairs[rand(0,pairs.length-1)];
+   const ai=pair[0],bi=pair[1],a=R.deck[ai],b=R.deck[bi];
+   const merged={id:a.id,up:a.up,id2:b.id,up2:b.up};
+   R.deck=R.deck.filter((_,x)=>x!==ai&&x!==bi);R.deck.push(merged);
+  }},
+  safe:{t:'춤을 방해하지 않는다',run(){}}},
+];
+function giveRandomRelic(){
+ const un=Object.keys(RELICS).filter(k=>!hasRelic(k));
+ if(un.length)R.relics.push(un[rand(0,un.length-1)]);else R.dust+=40;
+}
+function addItem(){
+ if(R.items.length>=3)return;
+ const ks=Object.keys(ITEMS);R.items.push(ks[rand(0,ks.length-1)]);
+}
+function showEvent(){
+ const cand=EVENTS.filter(e=>!R.usedEvents.includes(e.id)&&(!e.can||e.can()));
+ if(!cand.length){R.dust+=20;showMap();return;}
+ const ev=cand[rand(0,cand.length-1)];
+ R.usedEvents.push(ev.id);
+ $('rewardPanel').innerHTML=`<h2>? ${ev.n}</h2>
+  <p style="max-width:520px;margin:0 auto 16px">${ev.d}</p>
+  <button class="btn" onclick="evChoose('${ev.id}',true)">${ev.risk.t}</button><br>
+  <button class="btn ghost" onclick="evChoose('${ev.id}',false)">${ev.safe.t}</button>`;
+ $('rewardOvl').classList.add('show');
+}
+window.evChoose=function(id,risky){
+ const ev=EVENTS.find(e=>e.id===id);
+ const stay=(risky?ev.risk:ev.safe).run();
+ if(R.hp<=0){lose('가혹한 우주');return;}
+ if(!stay)backToMap();
+};
+
+/* ═══════════ 종료 ═══════════ */
+function clearRun(){
+ $('endPanel').innerHTML=`<h2>🌌 여정 완주!</h2>
+  <p>오리온 대성운을 잠재웠습니다. 덱 ${R.deck.length}장 · HP ${R.hp}/${R.maxHp} · 가루 ${R.dust} · 승리 ${R.wins}회<br>
+  조력자 ${R.allies.map(k=>ALLIES[k].n).join('·')||'없음'} · 유물 ${R.relics.map(k=>RELICS[k].n).join('·')||'없음'}</p>
+  <p style="font-size:12px">${R.deck.map(en=>stripTags(cardName(en.id))+(en.up?'+':'')+(en.id2?'(쌍성)':'')).join(' · ')}</p>
+  <button class="btn" onclick="location.reload()">새 여정</button>`;
+ $('endOvl').classList.add('show');
+}
+function lose(cause){
+ over=true;
+ $('endPanel').innerHTML=`<h2>별이 지다…</h2>
+  <p>${cause||(E?E.name:'우주')}에게 쓰러졌습니다. (승리 ${R.wins}회)</p>
+  <button class="btn" onclick="location.reload()">다시 도전</button>`;
+ $('endOvl').classList.add('show');
+}
+
+/* ═══════════ 런 시작 ═══════════ */
+function startRun(){
+ R.hp=70;R.maxHp=70;R.dust=0;R.allies=[];R.relics=[];R.items=[];R.usedEvents=[];R.pos=-1;R.wins=0;
+ R.deck=['caph','caph','tsih','phecda','phecda','megrez','castor','castor','saiph','saiph']
+   .map(id=>({id,basic:true}));
+ R.map=genMap();
+ showAllyPick(true,()=>{$('rewardOvl').classList.remove('show');showMap();});
+}
+
+document.addEventListener('keydown',e=>{
+ if($('rewardOvl').classList.contains('show')||$('endOvl').classList.contains('show'))return;
+ if(!S||$('app').style.display==='none')return;
+ if(e.code==='Space'||e.key==='e'||e.key==='E'){e.preventDefault();endTurn();}
+ const n=parseInt(e.key);
+ if(n>=1&&n<=9)playCard(n-1);
+});
+
+startRun();
+</script>
+</body>
+</html>
