@@ -33,7 +33,8 @@ def b64(im, fmt='PNG', **kw):
 
 # ── 조력자 초상 ──
 def portraits(art):
-    for key, fname in (('galileo', 'galilei'), ('copernicus', 'copernicus'), ('brahe', 'brahe')):
+    for key, fname in (('galileo', 'galilei'), ('copernicus', 'copernicus'), ('brahe', 'brahe'),
+                       ('kepler', 'kepler'), ('herschel', 'herschel')):
         sheet = Image.open(os.path.join(ROOT, '조력자', f'{fname}-talk-sheet.png')).convert('RGBA')
         frames = []
         for f in range(4):

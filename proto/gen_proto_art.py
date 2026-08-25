@@ -212,6 +212,20 @@ def en_blackhole():  # 은하핵의 블랙홀 — 강착 원반 + 사건의 지�
     g.px(11, 12, 0); g.px(17, 15, 0)
     ART['en_blackhole'] = g.data()
 
+def al_merchant():  # 떠돌이 별장수 — 두건 망토 + 등불 (28×28)
+    g = G(28, 28, ['#1c2547', '#2c3a6e', '#8a7a3e', '#ffd76a', '#e8c8a0', '#0e1428', '#9a8a5e'])
+    for y in range(6, 26):     # 망토 (아래로 퍼짐)
+        w = 4 + (y - 6) * 0.55
+        for x in range(int(14 - w), int(14 + w) + 1):
+            g.px(x, y, 0 if (x + y) % 5 else 1)
+    for x in range(9, 20): g.px(x, 8, 1)          # 두건 테
+    g.disk(14, 7, 3.4, 5)                          # 두건 그늘
+    g.px(12, 7, 4); g.px(16, 7, 4)                 # 반짝이는 눈
+    g.line(20, 12, 23, 10, 6)                      # 등불 지팡이
+    g.disk(24, 9, 1.8, 2); g.px(24, 9, 3); g.spark(24, 9, 3, 1)   # 등불
+    g.px(8, 14, 3); g.px(19, 20, 3); g.px(6, 22, 2)               # 망토의 별 장식
+    ART['al_merchant'] = g.data()
+
 # ══════════════════ 조력자 초상 (24×24 — 실루엣 + 상징물) ══════════════════
 # ※ 외부 그림 교체: 24×24 투명 PNG를 준비해 PIXEL_ART['al_*'] 대신 <img>로 갈면 된다
 
@@ -347,7 +361,7 @@ CONST_SHAPES = build_const_shapes()
 def build():
     en_shard(); en_comet(); en_moonlet(); en_mars(); en_titan(); en_rogue()
     en_pleiades(); en_hyades(); en_m1(); en_m42(); en_m13(); en_blackhole()
-    al_galileo(); al_brahe(); al_copernicus()
+    al_galileo(); al_brahe(); al_copernicus(); al_merchant()
     it_potion(); it_meteorite(); it_flask()
     gen_relics(); gen_nodes()
 
