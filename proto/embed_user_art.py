@@ -98,6 +98,28 @@ def strip_label(cell):
         is_speck = area <= 12
         if is_label or is_speck:
             kill |= (lab == i + 1)
+    # v0.12 추가 — ① 셀 위 가장자리에 걸린 이웃 행 잔재(납작한 조각) 제거
+    for i, sl in enumerate(objs):
+        if sl is None: continue
+        ys, xs = sl
+        oh, ow = ys.stop - ys.start, xs.stop - xs.start
+        if ys.stop < h * 0.10 and oh <= h * 0.08 and sizes[i] < biggest * 0.5:
+            kill |= (lab == i + 1)
+    # ② 본체와 픽셀로 이어진 하단 낱글자("쌍" 사건) — 침식으로 연결을 끊어 분리 제거
+    mask = a > 60
+    er = ndimage.binary_erosion(mask, iterations=1)
+    lab2, n2 = ndimage.label(er)
+    if n2:
+        sizes2 = ndimage.sum(er, lab2, range(1, n2 + 1))
+        big2 = sizes2.max()
+        for i, sl in enumerate(ndimage.find_objects(lab2)):
+            if sl is None: continue
+            ys, xs = sl
+            oh, ow = ys.stop - ys.start, xs.stop - xs.start
+            if (ys.start > h * 0.80 and oh <= h * 0.13 and ow <= w * 0.18
+                    and sizes2[i] < big2 * 0.5):
+                glyph = ndimage.binary_dilation(lab2 == i + 1, iterations=2) & mask
+                kill |= glyph
     if kill.any():
         a[kill] = 0
         out = cell.copy()

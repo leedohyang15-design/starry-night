@@ -177,6 +177,41 @@ def en_m42():  # 오리온 대성운 — 두 날개 + 트라페지움 (보스 28
     g.px(14, 14, 1)
     ART['en_m42'] = g.data()
 
+def en_m13():  # 헤르쿨레스 구상성단 M13 — 빽빽한 별 공 (정예 28)
+    g = G(28, 28, ['#ffffff', '#ffe9c8', '#d8b88f', '#8f7a5a', '#4a3f2c', '#241f14'])
+    import random as _r
+    _r.seed(13)
+    for i in range(240):  # 중심으로 밀집하는 별들
+        a = _r.random() * 6.283
+        d = (_r.random() ** 1.8) * 11.5
+        x, y = 14 + math.cos(a) * d, 14 + math.sin(a) * d * 0.95
+        c = 0 if d < 3 else (1 if d < 6 else (2 if d < 8.5 else 3))
+        g.px(x, y, c)
+    for a in range(0, 360, 45):  # 외곽 흩어진 별
+        r = math.radians(a)
+        g.px(14 + math.cos(r) * 12.5, 14 + math.sin(r) * 12, 4)
+    g.spark(14, 14, 0, 1)
+    ART['en_m13'] = g.data()
+
+def en_blackhole():  # 은하핵의 블랙홀 — 강착 원반 + 사건의 지평선 (보스 28)
+    g = G(28, 28, ['#ffffff', '#ffd76a', '#ff9a3a', '#b76bff', '#5a2a9f', '#1c0e3a'])
+    for y in range(28):  # 기울어진 강착 원반
+        for x in range(28):
+            dx, dy = x - 14, y - 14
+            e = (dx / 12.5) ** 2 + (dy / 4.2) ** 2
+            if 0.45 < e < 1.0:
+                ph = (math.atan2(dy, dx) * 3 + e * 6) % 3
+                g.px(x, y, 1 if ph < 1 else (2 if ph < 2 else 3))
+            elif 1.0 <= e < 1.35 and (x + y) % 2 == 0:
+                g.px(x, y, 4)
+    for i in range(-11, 12):  # 중력 렌즈 광륜 (세로 고리)
+        yy = 14 - math.sqrt(max(0, 1 - (i / 11.5) ** 2)) * 7
+        g.px(14 + i * 0.55, yy, 3 if i % 2 else 4)
+    g.disk(14, 14, 4.6, 5)           # 사건의 지평선
+    g.ring(14, 14, 4.6, 1, 1.0)      # 광자 고리
+    g.px(11, 12, 0); g.px(17, 15, 0)
+    ART['en_blackhole'] = g.data()
+
 # ══════════════════ 조력자 초상 (24×24 — 실루엣 + 상징물) ══════════════════
 # ※ 외부 그림 교체: 24×24 투명 PNG를 준비해 PIXEL_ART['al_*'] 대신 <img>로 갈면 된다
 
@@ -287,7 +322,9 @@ def gen_nodes():
 
 CONST_KEY_MAP = {'ori': 'orion', 'uma': 'uma', 'umi': 'umi', 'cas': 'cassiopeia',
                  'cyg': 'cygnus', 'gem': 'gemini', 'sco': 'scorpius', 'leo': 'leo',
-                 'lib': 'libra', 'sgr': 'sagittarius'}
+                 'lib': 'libra', 'sgr': 'sagittarius',
+                 'per': 'perseus', 'peg': 'pegasus', 'tau': 'taurus',
+                 'cap': 'capricornus', 'cep': 'cepheus'}
 
 def build_const_shapes():
     import os
@@ -309,7 +346,7 @@ CONST_SHAPES = build_const_shapes()
 
 def build():
     en_shard(); en_comet(); en_moonlet(); en_mars(); en_titan(); en_rogue()
-    en_pleiades(); en_hyades(); en_m1(); en_m42()
+    en_pleiades(); en_hyades(); en_m1(); en_m42(); en_m13(); en_blackhole()
     al_galileo(); al_brahe(); al_copernicus()
     it_potion(); it_meteorite(); it_flask()
     gen_relics(); gen_nodes()
