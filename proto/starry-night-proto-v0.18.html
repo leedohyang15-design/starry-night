@@ -1327,7 +1327,9 @@ function genMap(){
  /* v0.18: 정예 = 회피 가능한 선택 노드 (구 4·8행 전체 정예 폐지 — 민무늬 스타터로는 강제 정예가 벽) */
  setOne(4,'elite');setOne(8,'elite');
  setOne(3,'shop');setOne(9,'shop');
- setOne(6,'rest');setOne(10,'rest');
+ setOne(6,'rest');
+ /* v0.18: 보스 직전 행 = 전원 휴식 (StS 모닥불 문법 — 경로 운으로 휴식 0회가 나오지 않게) */
+ for(const n of rowNodes(10))if(n.type==='battle')n.type='rest';
  setOne(rand(2,3)===2?2:5,'forge')||setOne(2,'forge')||setOne(5,'forge');
  setOne(rand(6,7),'elite'); /* 선택 정예 → 2회 확정 + 최대 3회 */
  let ev=0;
