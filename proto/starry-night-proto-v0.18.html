@@ -1122,7 +1122,7 @@ function upFx(fx){
  f._costDown=1;return f;   /* 수치가 없는 기믹 카드 → 비용 −1 */
 }
 /* v0.18 기본 카드 = 민무늬 스타터 (ε 100% — 피해 6/성막 5 환율 그대로, 부가효과 없음 → 지울 메리트) */
-const BASIC_FX={kochab:{dmg:6},tsih:{dmg:6},merak:{block:10},phecda:{block:5},caph:{block:5},ruchbah:{block:5},yildun:{block:5}};
+const BASIC_FX={kochab:{dmg:7},tsih:{dmg:7},merak:{block:10},phecda:{block:5},caph:{block:5},ruchbah:{block:5},yildun:{block:5}};
 function partFx(id,up,basic){const base=(basic&&BASIC_FX[id])||STARS[id].fx;return up?upFx(base):base;}
 function cardFx(en){const l=[partFx(en.id,en.up,en.basic)];if(en.id2)l.push(partFx(en.id2,en.up2));return l;}
 function partCost(id,up){const base=STARS[id].cost;return up&&partFx(id,up)._costDown?Math.max(0,base-1):base;}
