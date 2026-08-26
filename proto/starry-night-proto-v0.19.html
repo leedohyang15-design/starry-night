@@ -1227,7 +1227,7 @@ function upFx(fx){
 }
 /* v0.18 기본 카드 = 민무늬 스타터 (ε 100% — 피해 6/성막 5 환율 그대로, 부가효과 없음 → 지울 메리트) */
 /* 카시오페이아 기본 별은 변광(무작위) — 평균은 다른 기본 카드와 동일, 성좌 randMax의 페이오프가 시작 덱부터 살아 있다 */
-const BASIC_FX={kochab:{dmg:7},tsih:{randDmg:[4,10]},merak:{block:10},phecda:{block:5},caph:{randBlock:[3,7]},ruchbah:{randBlock:[3,7]},yildun:{block:5}};
+const BASIC_FX={kochab:{dmg:7},tsih:{randDmg:[4,10]},segin:{randDmg:[4,10]},merak:{block:10},phecda:{block:5},caph:{randBlock:[3,7]},ruchbah:{randBlock:[3,7]},yildun:{block:5}};
 function partFx(id,up,basic){const base=(basic&&BASIC_FX[id])||STARS[id].fx;return up?upFx(base):base;}
 function cardFx(en){const l=[partFx(en.id,en.up,en.basic)];if(en.id2)l.push(partFx(en.id2,en.up2));return l;}
 function partCost(id,up){const base=STARS[id].cost;return up&&partFx(id,up)._costDown?Math.max(0,base-1):base;}
@@ -2707,7 +2707,8 @@ function startRun(){
  R.hp=70;R.maxHp=70;R.dust=0;R.allies=[];R.relics=[];R.items=[];R.usedEvents=[];R.pos=-1;R.wins=0;R.act=1;
  /* 기본덱 11장 = 큰곰·작은곰·카시오페이아 (중복 허용 — 2026-08-25 사용자 지시) */
  /* 저코스트 남발 방지(2026-08-25): 0코 제거·물질 캔트립 2장만·2코 수비 2장 (평균 1.2코) */
- R.deck=['merak','merak','phecda','phecda','caph','tsih','tsih','tsih','ruchbah','kochab','yildun']
+ /* v0.19.1 공/수 재배분(2026-08-26 사용자 지시): 공격 6(코카브2·치흐3·세긴) / 수비 5 — StS 공격 다수 문법 */
+ R.deck=['kochab','kochab','tsih','tsih','tsih','segin','merak','phecda','phecda','caph','yildun']
    .map(id=>({id,basic:true}));
  R.map=genMap();
  showAllyPick(true,()=>{$('rewardOvl').classList.remove('show');showMap();});
