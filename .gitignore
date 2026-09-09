@@ -28,3 +28,13 @@ rank_table.json
 *-BOOK-*
 starry-night/
 claude-skills/
+이벤트그림/
+
+# ── 서드파티 설치 스킬 (ui-ux-pro-max-cli가 생성 — 기계마다 로컬 설치) ──
+.claude/skills/ui-ux-pro-max/
+.claude/skills/banner-design/
+.claude/skills/brand/
+.claude/skills/design/
+.claude/skills/design-system/
+.claude/skills/slides/
+.claude/skills/ui-styling/
